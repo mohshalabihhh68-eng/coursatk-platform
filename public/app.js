@@ -311,7 +311,7 @@ function joinRel(base, rel) {
 }
 
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
-  if (/^(blob:|data:)/i.test(uri)) return uri;
+  if (/^(blob:|data:|memory:)/i.test(uri)) return uri;
   if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) return absUrl(uri);
   if (uri.indexOf(location.origin + "/api/") === 0) return uri;
   if (/^https?:\/\//i.test(uri)) return location.origin + "/api/cdn?u=" + toB64url(uri);
@@ -346,25 +346,56 @@ function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variant
     .join("\n");
 }
 
-function BlobLoader(DefaultLoader) {
+var memoryStore = {};
+var memorySeq = 0;
+
+function memoryPut(data) {
+  memorySeq += 1;
+  var url = "memory://asset/" + memorySeq;
+  memoryStore[url] = data;
+  return url;
+}
+
+function loaderStats(byteLength) {
+  var now = typeof performance !== "undefined" ? performance.now() : Date.now();
+  return {
+    aborted: false,
+    loaded: byteLength,
+    retry: 0,
+    total: byteLength,
+    chunkCount: 1,
+    bwEstimate: 0,
+    loading: { start: now, first: now, end: now },
+    parsing: { start: 0, end: 0 },
+    buffering: { start: 0, first: 0, end: 0 },
+  };
+}
+
+function MemoryLoader(DefaultLoader) {
   return class extends DefaultLoader {
     load(context, config, callbacks) {
       var url = (context && context.url) || "";
-      if (url.indexOf("blob:") === 0 || url.indexOf("data:") === 0) {
-        fetch(url)
-          .then(function (r) {
-            return r.arrayBuffer();
-          })
-          .then(function (data) {
-            callbacks.onSuccess({ url: url, data: data }, { code: 200, text: "OK" }, context, null);
-          })
-          .catch(function (err) {
-            callbacks.onError(
-              { code: 0, text: String((err && err.message) || err) },
-              context,
-              null
-            );
-          });
+      var stored = memoryStore[url];
+      if (stored == null && url.indexOf("memory://") === 0) {
+        var id = url.split("memory://asset/")[1];
+        if (id) stored = memoryStore["memory://asset/" + id.split(/[?#]/)[0]];
+      }
+      if (stored != null) {
+        var data = stored;
+        if (context && context.responseType !== "arraybuffer" && typeof data !== "string") {
+          data = new TextDecoder().decode(data);
+        }
+        var size = typeof data === "string" ? data.length : data.byteLength;
+        try {
+          callbacks.onSuccess({ url: url, data: data }, loaderStats(size), context, null);
+        } catch (err) {
+          callbacks.onError(
+            { code: 0, text: String((err && err.message) || err) },
+            context,
+            null,
+            loaderStats(0)
+          );
+        }
         return;
       }
       return super.load(context, config, callbacks);
@@ -488,31 +519,33 @@ async function playVideo(videoId, title) {
       throw new Error("invalid AES key");
     }
 
-    var keyBlob = new Blob([aesKey], { type: "application/octet-stream" });
-    var keyBlobUrl = URL.createObjectURL(keyBlob);
+    var keyBytes = aesKey instanceof ArrayBuffer
+      ? aesKey
+      : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset + aesKey.byteLength);
+    var keyMemoryUrl = memoryPut(keyBytes);
 
     var fixedVariant = rewritePlaylist(
       variantText,
       streamToken,
-      keyBlobUrl,
+      keyMemoryUrl,
       variantBasePath,
       variantFileUrl
     );
+    if (fixedVariant.indexOf("#EXTM3U") !== 0) {
+      fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
+    }
     if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
       var ivPart = ivHex ? ",IV=0x" + ivHex : "";
       fixedVariant =
         "#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI=\"" +
-        keyBlobUrl +
+        keyMemoryUrl +
         "\"" +
         ivPart +
         "\n" +
         fixedVariant.replace(/^#EXTM3U\s*/m, "");
     }
 
-    var variantBlob = new Blob([fixedVariant], {
-      type: "application/vnd.apple.mpegurl",
-    });
-    var variantBlobUrl = URL.createObjectURL(variantBlob);
+    var playlistUrl = memoryPut(fixedVariant);
 
     status.textContent = "جاري التشغيل...";
 
@@ -527,9 +560,9 @@ async function playVideo(videoId, title) {
     if (window.Hls && Hls.isSupported()) {
       hls = new Hls({
         enableWorker: false,
-        loader: BlobLoader(Hls.DefaultConfig.loader),
+        loader: MemoryLoader(Hls.DefaultConfig.loader),
       });
-      hls.loadSource(variantBlobUrl);
+      hls.loadSource(playlistUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         status.textContent = "";
@@ -547,15 +580,7 @@ async function playVideo(videoId, title) {
           (fragUrl ? " " + fragUrl : "");
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = variantBlobUrl;
-      video.addEventListener(
-        "loadedmetadata",
-        function () {
-          status.textContent = "";
-          video.play().catch(function () {});
-        },
-        { once: true }
-      );
+      status.textContent = "المتصفح لا يدعم HLS";
     } else {
       status.textContent = "المتصفح لا يدعم HLS";
     }
