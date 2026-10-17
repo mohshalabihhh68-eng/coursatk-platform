@@ -1,6 +1,3 @@
-/**
- * Backend proxy - pulls from coursatk API
- */
 const express = require("express");
 const fetch = require("node-fetch");
 const path = require("path");
@@ -20,117 +17,137 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-function coursatkHeaders() {
+function headers() {
   return {
-    Authorization: `Bearer ${STUDENT_TOKEN}`,
+    Authorization: "Bearer " + STUDENT_TOKEN,
     Accept: "application/json",
     Origin: "https://coursatk.online",
     Referer: "https://coursatk.online/",
-    "User-Agent":
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36",
   };
 }
 
-async function proxyJson(url, opts = {}) {
+async function proxyJson(url, opts) {
+  opts = opts || {};
   const res = await fetch(url, {
-    ...opts,
-    headers: { ...coursatkHeaders(), ...(opts.headers || {}) },
+    method: opts.method || "GET",
+    headers: Object.assign({}, headers(), opts.headers || {}),
+    body: opts.body,
   });
   const text = await res.text();
   try {
     return { status: res.status, body: JSON.parse(text) };
-  } catch {
+  } catch (e) {
     return { status: res.status, body: text };
   }
 }
 
-app.get("/api/years", async (_req, res) => {
-  const { status, body } = await proxyJson(`${API}/api/v1/user/years`);
-  res.status(status).json(body);
+app.get("/api/years", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/years");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:yearId", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/user/subjects/ \){req.params.yearId}`
-  );
-  res.status(status).json(body);
+app.get("/api/subjects/:id", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:subjectId/teachers", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/user/subjects/ \){req.params.subjectId}/teachers`
-  );
-  res.status(status).json(body);
+app.get("/api/subjects/:id/teachers", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/teachers/:teacherId/chapters", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/user/teachers/ \){req.params.teacherId}/chapters`
-  );
-  res.status(status).json(body);
+app.get("/api/teachers/:id/chapters", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/chapters/:chapterId/lectures", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/user/chapters/ \){req.params.chapterId}/lectures`
-  );
-  res.status(status).json(body);
+app.get("/api/chapters/:id/lectures", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/lectures/:lectureId/content", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/user/lectures/ \){req.params.lectureId}/content`
-  );
-  res.status(status).json(body);
+app.get("/api/lectures/:id/content", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/profile", async (_req, res) => {
-  const { status, body } = await proxyJson(`${API}/api/v1/user/profile`);
-  res.status(status).json(body);
+app.get("/api/profile", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/profile");
+  res.status(r.status).json(r.body);
 });
 
-app.post("/api/video/:videoId/play", async (req, res) => {
-  const { status, body } = await proxyJson(
-    `\( {API}/api/v1/video/ \){req.params.videoId}/stream-weave/play`,
-    { method: "POST", headers: { "Content-Length": "0" } }
-  );
-  res.status(status).json(body);
+app.post("/api/video/:id/play", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST",
+    headers: { "Content-Length": "0" },
+    body: "",
+  });
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/stream/*", async (req, res) => {
-  const swPath = req.params[0];
-  const token = req.query.t;
+app.get("/api/stream/*", async function (req, res) {
+  var swPath = req.params[0];
+  var token = req.query.t;
   if (!token) return res.status(400).json({ error: "missing token" });
 
-  const url = `\( {SW}/api/v1/ \){swPath}`;
-  const upstream = await fetch(url, {
+  var url = SW + "/api/v1/" + swPath;
+  var upstream = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: "Bearer " + token,
       Origin: "https://coursatk.online",
       Referer: "https://coursatk.online/",
       Accept: "*/*",
     },
   });
 
-  const ct = upstream.headers.get("content-type") || "application/octet-stream";
+  var ct = upstream.headers.get("content-type") || "application/octet-stream";
   res.set("Content-Type", ct);
   res.set("Access-Control-Allow-Origin", "*");
 
-  if (ct.includes("mpegurl") || ct.includes("m3u8") || swPath.endsWith(".m3u8")) {
-    let text = await upstream.text();
-    text = text.replace(/^(?!#)(?!https?:\/\/)(.+)$/gm, (line) => {
-      const trimmed = line.trim();
+  if (ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1 || swPath.indexOf(".m3u8") !== -1) {
+    var text = await upstream.text();
+    text = text.replace(/^(?!#)(?!https?:\/\/)(.+)$/gm, function (line) {
+      var trimmed = line.trim();
       if (!trimmed) return line;
-      if (trimmed.startsWith("http")) return trimmed;
-      const base = swPath.includes("/")
-        ? swPath.substring(0, swPath.lastIndexOf("/") + 1)
-        : "";
-      return `/api/stream/\( {base} \){trimmed}?t=${encodeURIComponent(token)}`;
+      if (trimmed.indexOf("http") === 0) return trimmed;
+      var base = swPath.indexOf("/") !== -1 ? swPath.substring(0, swPath.lastIndexOf("/") + 1) : "";
+      return "/api/stream/" + base + trimmed + "?t=" + encodeURIComponent(token);
     });
-    text = text.replace(/URI="([^"]+)"/g, (_m, uri) => {
-      if (uri.startsWith("http")) return `URI="${uri}"`;
-      const clean = uri.startsWith("/") ? uri.slice(1) : uri;
-      const keyPath = clean.replace(/^api\/v1\//, "");
-      return `URI="/api/stream/\( {keyPath}?t= \){encodeURIComponent(token)}"`;
+    text = text.replace(/URI="([^"]+)"/g, function (_m, uri) {
+      if (uri.indexOf("http") === 0) return 'URI="' + uri + '"';
+      var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
+      var keyPath = clean.replace(/^api\/v1\//, "");
+      return 'URI="/api/stream/' + keyPath + "?t=" + encodeURIComponent(token) + '"';
     });
-    return
+    return res.send(text);
+  }
+
+  var buf = await upstream.buffer();
+  res.send(buf);
+});
+
+app.post("/api/heartbeat", async function (req, res) {
+  var url = req.body && req.body.url;
+  var token = req.body && req.body.token;
+  if (!url || !token) return res.status(400).json({ error: "url+token required" });
+  var upstream = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+      Origin: "https://coursatk.online",
+      "Content-Type": "application/json",
+    },
+    body: "{}",
+  });
+  var text = await upstream.text();
+  res.status(upstream.status).type("json").send(text);
+});
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.listen(PORT, function () {
+  console.log("Running on port " + PORT);
+});
