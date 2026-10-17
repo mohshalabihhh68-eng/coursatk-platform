@@ -6,9 +6,10 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// التوكن الجديد
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNmY4NmViNzVlMGNiYzkyYTQ2MzRmZDM5NzMyZmU1NjUifQ.vtogp7QoIQ8MFhR5MZTSKW-NNWCfYVpJ6ORS6dzPQ_k";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
 
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
@@ -43,7 +44,11 @@ function browserHeaders(extra) {
 
 function b64urlEncode(value) {
   var buf = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
-  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return buf
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 function b64urlDecode(value) {
@@ -119,6 +124,8 @@ async function proxyJson(url, opts) {
     return { status: res.status, body: text };
   }
 }
+
+// ==================== API Routes ====================
 
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
