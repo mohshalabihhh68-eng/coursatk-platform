@@ -53,30 +53,22 @@ app.get("/api/subjects/:id", async function (req, res) {
 });
 
 app.get("/api/subjects/:id/teachers", async function (req, res) {
-  const r = await proxyJson(
-    API + "/api/v1/user/subjects/" + req.params.id + "/teachers"
-  );
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
   res.status(r.status).json(r.body);
 });
 
 app.get("/api/teachers/:id/chapters", async function (req, res) {
-  const r = await proxyJson(
-    API + "/api/v1/user/teachers/" + req.params.id + "/chapters"
-  );
+  const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
   res.status(r.status).json(r.body);
 });
 
 app.get("/api/chapters/:id/lectures", async function (req, res) {
-  const r = await proxyJson(
-    API + "/api/v1/user/chapters/" + req.params.id + "/lectures"
-  );
+  const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
   res.status(r.status).json(r.body);
 });
 
 app.get("/api/lectures/:id/content", async function (req, res) {
-  const r = await proxyJson(
-    API + "/api/v1/user/lectures/" + req.params.id + "/content"
-  );
+  const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
   res.status(r.status).json(r.body);
 });
 
@@ -86,18 +78,14 @@ app.get("/api/profile", async function (req, res) {
 });
 
 app.post("/api/video/:id/play", async function (req, res) {
-  const r = await proxyJson(
-    API + "/api/v1/video/" + req.params.id + "/stream-weave/play",
-    {
-      method: "POST",
-      headers: { "Content-Length": "0" },
-      body: "",
-    }
-  );
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST",
+    headers: { "Content-Length": "0" },
+    body: "",
+  });
   res.status(r.status).json(r.body);
 });
 
-// Proxy external CDN segment URLs (fixes CORS networkError)
 app.get("/api/cdn", async function (req, res) {
   try {
     var target = req.query.url;
@@ -106,28 +94,25 @@ app.get("/api/cdn", async function (req, res) {
       headers: {
         Origin: "https://coursatk.online",
         Referer: "https://coursatk.online/",
+        Accept: "*/*",
         "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36",
       },
     });
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
     res.set("Content-Type", ct);
     res.set("Access-Control-Allow-Origin", "*");
-    res.set("Cache-Control", "public, max-age=60");
-    var buf = await upstream.buffer();
+    var buf = Buffer.from(await upstream.arrayBuffer());
     res.status(upstream.status).send(buf);
   } catch (e) {
-    res.status(502).send("cdn proxy error: " + e.message);
+    res.status(502).send("cdn error: " + e.message);
   }
 });
 
-// Proxy stream-weave playlists + encryption key
 app.get("/api/stream", async function (req, res) {
   try {
     var swPath = (req.query.path || "").replace(/^\/+/, "");
     var token = req.query.t;
-    if (!token || !swPath) {
-      return res.status(400).json({ error: "missing path or token" });
-    }
+    if (!token || !swPath) return res.status(400).json({ error: "missing path or token" });
 
     var url = SW + "/api/v1/" + swPath;
     var upstream = await fetch(url, {
@@ -142,10 +127,10 @@ app.get("/api/stream", async function (req, res) {
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
     res.set("Content-Type", ct);
     res.set("Access-Control-Allow-Origin", "*");
+    res.set("Cache-Control", "no-store");
 
     var isM3u8 =
-      ct.indexOf("mpegurl") !== -1 ||
-      ct.indexOf("m3u8") !== -1 ||
+      (ct && (ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1)) ||
       swPath.indexOf(".m3u8") !== -1;
 
     if (isM3u8) {
@@ -164,9 +149,7 @@ app.get("/api/stream", async function (req, res) {
           if (s.charAt(0) === "#") {
             return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
               if (uri.indexOf("http") === 0) {
-                return (
-                  'URI="/api/cdn?url=' + encodeURIComponent(uri) + '"'
-                );
+                return 'URI="/api/cdn?url=' + encodeURIComponent(uri) + '"';
               }
               var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
               clean = clean.replace(/^api\/v1\//, "");
@@ -196,7 +179,7 @@ app.get("/api/stream", async function (req, res) {
       return res.send(text);
     }
 
-    var buf = await upstream.buffer();
+    var buf = Buffer.from(await upstream.arrayBuffer());
     res.status(upstream.status).send(buf);
   } catch (e) {
     res.status(502).json({ error: e.message });
@@ -207,9 +190,7 @@ app.post("/api/heartbeat", async function (req, res) {
   try {
     var url = req.body && req.body.url;
     var token = req.body && req.body.token;
-    if (!url || !token) {
-      return res.status(400).json({ error: "url+token required" });
-    }
+    if (!url || !token) return res.status(400).json({ error: "url+token required" });
     var upstream = await fetch(url, {
       method: "POST",
       headers: {
