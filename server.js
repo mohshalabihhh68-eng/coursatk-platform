@@ -125,7 +125,7 @@ async function proxyJson(url, opts) {
   }
 }
 
-// ==================== API Routes ====================
+// ==================== Routes ====================
 
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
