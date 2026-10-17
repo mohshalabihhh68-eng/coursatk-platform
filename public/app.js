@@ -16,7 +16,7 @@ async function api(path, opts) {
   const res = await fetch(path, opts);
   const data = await res.json();
   if (!res.ok || data.success === false) {
-    throw new Error(data.error || data.message || "HTTP " + res.status);
+    throw new Error(data.error || data.message || ("HTTP " + res.status));
   }
   return data.data !== undefined ? data.data : data;
 }
@@ -263,6 +263,7 @@ async function renderContent() {
   }
   appEl.innerHTML = html;
 }
+
 function rewritePlaylist(text, streamToken, keyBlobUrl) {
   var lines = text.split("\n");
   var out = [];
@@ -322,8 +323,12 @@ async function playVideo(videoId, title) {
 
     var variantRel = masterText
       .split("\n")
-      .map(function (l) { return l.trim(); })
-      .find(function (l) { return l && l.charAt(0) !== "#"; });
+      .map(function (l) {
+        return l.trim();
+      })
+      .find(function (l) {
+        return l && l.charAt(0) !== "#";
+      });
     if (!variantRel) throw new Error("no variant");
 
     var variantUrl;
@@ -395,9 +400,9 @@ async function playVideo(videoId, title) {
     if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
       var ivPart = ivHex ? ",IV=0x" + ivHex : "";
       fixedVariant =
-        "#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI=\"" +
+        '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="' +
         keyBlobUrl +
-        "\"" +
+        '"' +
         ivPart +
         "\n" +
         fixedVariant.replace(/^#EXTM3U\s*/m, "");
@@ -456,4 +461,22 @@ function stopPlayback() {
     hls.destroy();
     hls = null;
   }
-  var video = document.getElementById("
+  var video = document.getElementById("video");
+  if (video) {
+    video.removeAttribute("src");
+    video.load();
+  }
+}
+
+function closePlayer() {
+  stopPlayback();
+  document.getElementById("player-modal").classList.add("hidden");
+}
+
+loadPlayerScript()
+  .then(function (c) {
+    cryptoUtils = c;
+  })
+  .catch(function () {});
+
+render();
