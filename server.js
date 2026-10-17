@@ -88,19 +88,25 @@ app.post("/api/video/:id/play", async function (req, res) {
 
 app.get("/api/cdn", async function (req, res) {
   try {
-    var target = req.query.url;
+    var target = req.query.url || "";
+    if (req.query.u) {
+      target = Buffer.from(String(req.query.u), "base64").toString("utf8");
+    }
     if (!target) return res.status(400).send("missing url");
     var upstream = await fetch(target, {
       headers: {
         Origin: "https://coursatk.online",
         Referer: "https://coursatk.online/",
         Accept: "*/*",
-        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36",
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
+      redirect: "follow",
     });
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
     res.set("Content-Type", ct);
     res.set("Access-Control-Allow-Origin", "*");
+    res.set("Cache-Control", "public, max-age=30");
     var buf = Buffer.from(await upstream.arrayBuffer());
     res.status(upstream.status).send(buf);
   } catch (e) {
@@ -130,7 +136,8 @@ app.get("/api/stream", async function (req, res) {
     res.set("Cache-Control", "no-store");
 
     var isM3u8 =
-      (ct && (ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1)) ||
+      ct.indexOf("mpegurl") !== -1 ||
+      ct.indexOf("m3u8") !== -1 ||
       swPath.indexOf(".m3u8") !== -1;
 
     if (isM3u8) {
@@ -145,11 +152,10 @@ app.get("/api/stream", async function (req, res) {
         .map(function (line) {
           var s = line.trim();
           if (!s) return line;
-
           if (s.charAt(0) === "#") {
             return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
               if (uri.indexOf("http") === 0) {
-                return 'URI="/api/cdn?url=' + encodeURIComponent(uri) + '"';
+                return 'URI="/api/cdn?u=' + Buffer.from(uri).toString("base64") + '"';
               }
               var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
               clean = clean.replace(/^api\/v1\//, "");
@@ -162,11 +168,9 @@ app.get("/api/stream", async function (req, res) {
               );
             });
           }
-
           if (s.indexOf("http") === 0) {
-            return "/api/cdn?url=" + encodeURIComponent(s);
+            return "/api/cdn?u=" + Buffer.from(s).toString("base64");
           }
-
           return (
             "/api/stream?path=" +
             encodeURIComponent(base + s) +
@@ -175,7 +179,6 @@ app.get("/api/stream", async function (req, res) {
           );
         })
         .join("\n");
-
       return res.send(text);
     }
 
