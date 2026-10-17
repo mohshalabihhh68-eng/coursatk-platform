@@ -9,6 +9,7 @@ const state = {
 
 let hls = null;
 let hbTimer = null;
+let cryptoUtils = null;
 
 async function api(path, opts) {
   opts = opts || {};
@@ -18,6 +19,71 @@ async function api(path, opts) {
     throw new Error(data.error || data.message || "HTTP " + res.status);
   }
   return data.data !== undefined ? data.data : data;
+}
+
+function findCrypto() {
+  if (
+    window.DecryptionUtils &&
+    typeof window.DecryptionUtils.decryptPlaybackKey === "function" &&
+    typeof window.DecryptionUtils.decryptAES128WithIV === "function"
+  ) {
+    return window.DecryptionUtils;
+  }
+  var names = Object.getOwnPropertyNames(window);
+  for (var i = 0; i < names.length; i++) {
+    try {
+      var obj = window[names[i]];
+      if (
+        obj &&
+        typeof obj === "object" &&
+        typeof obj.decryptPlaybackKey === "function" &&
+        typeof obj.decryptAES128WithIV === "function"
+      ) {
+        return obj;
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+function loadPlayerScript() {
+  return new Promise(function (resolve, reject) {
+    if (findCrypto()) return resolve(findCrypto());
+    var existing = document.querySelector('script[src*="player.stream-weave.com"]');
+    if (existing) {
+      var tries = 0;
+      var t = setInterval(function () {
+        var c = findCrypto();
+        if (c) {
+          clearInterval(t);
+          resolve(c);
+        } else if (++tries > 40) {
+          clearInterval(t);
+          reject(new Error("timeout crypto"));
+        }
+      }, 150);
+      return;
+    }
+    var s = document.createElement("script");
+    s.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
+    s.onload = function () {
+      var tries = 0;
+      var t = setInterval(function () {
+        var c = findCrypto();
+        if (c) {
+          clearInterval(t);
+          resolve(c);
+        } else if (++tries > 40) {
+          clearInterval(t);
+          reject(new Error("crypto not found"));
+        }
+      }, 150);
+    };
+    s.onerror = function () {
+      reject(new Error("failed to load player.js"));
+    };
+    document.head.appendChild(s);
+  });
 }
 
 function goHome() {
@@ -198,6 +264,33 @@ async function renderContent() {
   appEl.innerHTML = html;
 }
 
+function rewritePlaylist(text, streamToken, keyBlobUrl) {
+  var lines = text.split("\n");
+  var out = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var s = line.trim();
+    if (!s) {
+      out.push(line);
+      continue;
+    }
+    if (s.charAt(0) === "#") {
+      if (s.indexOf("#EXT-X-KEY:") === 0 && keyBlobUrl) {
+        out.push(s.replace(/URI="[^"]+"/, 'URI="' + keyBlobUrl + '"'));
+      } else {
+        out.push(s);
+      }
+      continue;
+    }
+    if (s.indexOf("http") === 0) {
+      out.push("/api/cdn?url=" + encodeURIComponent(s));
+    } else {
+      out.push(s);
+    }
+  }
+  return out.join("\n");
+}
+
 async function playVideo(videoId, title) {
   var modal = document.getElementById("player-modal");
   var video = document.getElementById("video");
@@ -206,19 +299,89 @@ async function playVideo(videoId, title) {
   status.textContent = "جاري فتح الجلسة...";
   modal.classList.remove("hidden");
   stopPlayback();
+
   try {
     var session = await api("/api/video/" + videoId + "/play", { method: "POST" });
     var streamToken = session.token;
     var swVideoId = session.video_id;
     var hbUrl = session.heartbeat_url;
 
+    status.textContent = "تحميل أدوات فك التشفير...";
+    if (!cryptoUtils) cryptoUtils = await loadPlayerScript();
+
+    status.textContent = "جلب قائمة التشغيل...";
     var masterUrl =
       "/api/stream?path=" +
       encodeURIComponent("videos/" + swVideoId + "/stream/master.m3u8") +
       "&t=" +
       encodeURIComponent(streamToken);
 
-    status.textContent = "جاري التحميل...";
+    var masterText = await fetch(masterUrl).then(function (r) {
+      if (!r.ok) throw new Error("master " + r.status);
+      return r.text();
+    });
+
+    var variantRel = masterText
+      .split("\n")
+      .map(function (l) {
+        return l.trim();
+      })
+      .find(function (l) {
+        return l && l.charAt(0) !== "#";
+      });
+    if (!variantRel) throw new Error("no variant");
+
+    var variantPath = "videos/" + swVideoId + "/stream/" + variantRel;
+    var variantUrl =
+      "/api/stream?path=" +
+      encodeURIComponent(variantPath) +
+      "&t=" +
+      encodeURIComponent(streamToken);
+
+    var variantText = await fetch(variantUrl).then(function (r) {
+      if (!r.ok) throw new Error("variant " + r.status);
+      return r.text();
+    });
+
+    status.textContent = "فك المفتاح...";
+    var keyLine = variantText.split("\n").find(function (l) {
+      return l.indexOf("#EXT-X-KEY:") === 0;
+    });
+    if (!keyLine) throw new Error("no key line");
+
+    var keyUriMatch = keyLine.match(/URI="([^"]+)"/);
+    if (!keyUriMatch) throw new Error("no key uri");
+
+    var keyPath = keyUriMatch[1].replace(/^\//, "").replace(/^api\/v1\//, "");
+    var keyUrl =
+      "/api/stream?path=" +
+      encodeURIComponent(keyPath) +
+      "&t=" +
+      encodeURIComponent(streamToken);
+
+    var wrappedKey = new Uint8Array(
+      await fetch(keyUrl).then(function (r) {
+        if (!r.ok) throw new Error("key " + r.status);
+        return r.arrayBuffer();
+      })
+    );
+
+    var keyResult = await cryptoUtils.decryptPlaybackKey(wrappedKey, swVideoId);
+    var aesKey = keyResult && keyResult.key;
+    if (!aesKey || aesKey.byteLength !== 16) {
+      throw new Error("invalid AES key");
+    }
+
+    var keyBlob = new Blob([aesKey], { type: "application/octet-stream" });
+    var keyBlobUrl = URL.createObjectURL(keyBlob);
+
+    var fixedVariant = rewritePlaylist(variantText, streamToken, keyBlobUrl);
+    var variantBlob = new Blob([fixedVariant], {
+      type: "application/vnd.apple.mpegurl"
+    });
+    var variantBlobUrl = URL.createObjectURL(variantBlob);
+
+    status.textContent = "جاري التشغيل...";
 
     hbTimer = setInterval(function () {
       fetch("/api/heartbeat", {
@@ -229,18 +392,21 @@ async function playVideo(videoId, title) {
     }, 25000);
 
     if (window.Hls && Hls.isSupported()) {
-      hls = new Hls();
-      hls.loadSource(masterUrl);
+      hls = new Hls({ enableWorker: true });
+      hls.loadSource(variantBlobUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         status.textContent = "";
         video.play().catch(function () {});
       });
       hls.on(Hls.Events.ERROR, function (_, data) {
-        if (data.fatal) status.textContent = "خطأ: " + data.type;
+        if (data.fatal) {
+          status.textContent =
+            "خطأ: " + data.type + (data.details ? " / " + data.details : "");
+        }
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = masterUrl;
+      video.src = variantBlobUrl;
       video.addEventListener("loadedmetadata", function () {
         status.textContent = "";
         video.play().catch(function () {});
@@ -249,6 +415,7 @@ async function playVideo(videoId, title) {
       status.textContent = "المتصفح لا يدعم HLS";
     }
   } catch (e) {
+    console.error(e);
     status.textContent = "فشل: " + e.message;
   }
 }
@@ -273,5 +440,14 @@ function closePlayer() {
   stopPlayback();
   document.getElementById("player-modal").classList.add("hidden");
 }
+
+loadPlayerScript()
+  .then(function (c) {
+    cryptoUtils = c;
+    console.log("[SW] crypto ready");
+  })
+  .catch(function (e) {
+    console.warn("[SW] crypto preload failed", e);
+  });
 
 render();
