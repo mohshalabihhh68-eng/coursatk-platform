@@ -1,4 +1,3 @@
-
 const state = {
   view: "years",
   year: null,
@@ -11,6 +10,8 @@ const state = {
 let hls = null;
 let hbTimer = null;
 let cryptoUtils = null;
+let currentKeyBlobUrl = null;
+let currentPlaylistBlobUrl = null;
 
 async function api(path, opts) {
   opts = opts || {};
@@ -25,8 +26,7 @@ async function api(path, opts) {
 function findCrypto() {
   if (
     window.DecryptionUtils &&
-    typeof window.DecryptionUtils.decryptPlaybackKey === "function" &&
-    typeof window.DecryptionUtils.decryptAES128WithIV === "function"
+    typeof window.DecryptionUtils.decryptPlaybackKey === "function"
   ) {
     return window.DecryptionUtils;
   }
@@ -37,8 +37,7 @@ function findCrypto() {
       if (
         obj &&
         typeof obj === "object" &&
-        typeof obj.decryptPlaybackKey === "function" &&
-        typeof obj.decryptAES128WithIV === "function"
+        typeof obj.decryptPlaybackKey === "function"
       ) {
         return obj;
       }
@@ -265,7 +264,7 @@ async function renderContent() {
   appEl.innerHTML = html;
 }
 
-// ==================== Player Logic ====================
+// ==================== Player Helpers ====================
 
 function toB64url(str) {
   return btoa(unescape(encodeURIComponent(str)))
@@ -278,14 +277,6 @@ function fromB64url(value) {
   var s = String(value).replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
   return decodeURIComponent(escape(atob(s)));
-}
-
-function absUrl(u) {
-  if (!u) return u;
-  if (/^(https?:|blob:|data:)/i.test(u)) return u;
-  if (u.indexOf("//") === 0) return location.protocol + u;
-  if (u.charAt(0) === "/") return location.origin + u;
-  return location.origin + "/" + u;
 }
 
 function joinRel(base, rel) {
@@ -314,12 +305,17 @@ function joinRel(base, rel) {
 }
 
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
-  if (/^(blob:|data:|memory:)/i.test(uri)) return uri;
-  if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) return absUrl(uri);
-  if (uri.indexOf(location.origin + "/api/") === 0) return uri;
-  if (/^https?:\/\//i.test(uri)) return location.origin + "/api/cdn?u=" + toB64url(uri);
+  if (/^(blob:|data:)/i.test(uri)) return uri;
+  if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) {
+    return location.origin + uri;
+  }
+  if (/^https?:\/\//i.test(uri)) {
+    return location.origin + "/api/cdn?u=" + toB64url(uri);
+  }
   if (variantFileUrl) {
-    return location.origin + "/api/cdn?u=" + toB64url(new URL(uri, variantFileUrl).href);
+    try {
+      return location.origin + "/api/cdn?u=" + toB64url(new URL(uri, variantFileUrl).href);
+    } catch (e) {}
   }
   return (
     location.origin +
@@ -349,62 +345,7 @@ function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variant
     .join("\n");
 }
 
-var memoryStore = {};
-var memorySeq = 0;
-
-function memoryPut(data) {
-  memorySeq += 1;
-  var url = "memory://asset/" + memorySeq;
-  memoryStore[url] = data;
-  return url;
-}
-
-function loaderStats(byteLength) {
-  var now = typeof performance !== "undefined" ? performance.now() : Date.now();
-  return {
-    aborted: false,
-    loaded: byteLength,
-    retry: 0,
-    total: byteLength,
-    chunkCount: 1,
-    bwEstimate: 0,
-    loading: { start: now, first: now, end: now },
-    parsing: { start: 0, end: 0 },
-    buffering: { start: 0, first: 0, end: 0 },
-  };
-}
-
-function MemoryLoader(DefaultLoader) {
-  return class extends DefaultLoader {
-    load(context, config, callbacks) {
-      var url = (context && context.url) || "";
-      var stored = memoryStore[url];
-      if (stored == null && url.indexOf("memory://") === 0) {
-        var id = url.split("memory://asset/")[1];
-        if (id) stored = memoryStore["memory://asset/" + id.split(/[?#]/)[0]];
-      }
-      if (stored != null) {
-        var data = stored;
-        if (context && context.responseType !== "arraybuffer" && typeof data !== "string") {
-          data = new TextDecoder().decode(data);
-        }
-        var size = typeof data === "string" ? data.length : data.byteLength;
-        try {
-          callbacks.onSuccess({ url: url, data: data }, loaderStats(size), context, null);
-        } catch (err) {
-          callbacks.onError(
-            { code: 0, text: String((err && err.message) || err) },
-            context,
-            null,
-            loaderStats(0)
-          );
-        }
-        return;
-      }
-      return super.load(context, config, callbacks);
-    }
-  };
-}
+// ==================== Main Play Function ====================
 
 async function playVideo(videoId, title) {
   var modal = document.getElementById("player-modal");
@@ -421,6 +362,10 @@ async function playVideo(videoId, title) {
     var swVideoId = session.video_id;
     var hbUrl = session.heartbeat_url;
 
+    if (!streamToken || !swVideoId) {
+      throw new Error("الجلسة ناقصة (مفيش token أو video_id)");
+    }
+
     status.textContent = "تحميل أدوات فك التشفير...";
     if (!cryptoUtils) cryptoUtils = await loadPlayerScript();
 
@@ -431,10 +376,9 @@ async function playVideo(videoId, title) {
       "&t=" +
       encodeURIComponent(streamToken);
 
-    var masterText = await fetch(masterUrl).then(function (r) {
-      if (!r.ok) throw new Error("master " + r.status);
-      return r.text();
-    });
+    var masterRes = await fetch(masterUrl);
+    if (!masterRes.ok) throw new Error("master.m3u8 → HTTP " + masterRes.status);
+    var masterText = await masterRes.text();
 
     var variantRel = masterText
       .split("\n")
@@ -444,7 +388,8 @@ async function playVideo(videoId, title) {
       .find(function (l) {
         return l && l.charAt(0) !== "#";
       });
-    if (!variantRel) throw new Error("no variant");
+
+    if (!variantRel) throw new Error("مفيش variant في الـ master");
 
     var variantUrl;
     var variantBasePath = "videos/" + swVideoId + "/stream/";
@@ -473,10 +418,9 @@ async function playVideo(videoId, title) {
         encodeURIComponent(streamToken);
     }
 
-    var variantText = await fetch(variantUrl).then(function (r) {
-      if (!r.ok) throw new Error("variant " + r.status);
-      return r.text();
-    });
+    var variantRes = await fetch(variantUrl);
+    if (!variantRes.ok) throw new Error("variant → HTTP " + variantRes.status);
+    var variantText = await variantRes.text();
 
     status.textContent = "فك المفتاح...";
     var keyLine = variantText.split("\n").find(function (l) {
@@ -509,50 +453,55 @@ async function playVideo(videoId, title) {
       "&t=" +
       encodeURIComponent(streamToken);
 
-    var wrappedKey = new Uint8Array(
-      await fetch(keyUrl).then(function (r) {
-        if (!r.ok) throw new Error("key " + r.status);
-        return r.arrayBuffer();
-      })
-    );
+    var keyRes = await fetch(keyUrl);
+    if (!keyRes.ok) throw new Error("key → HTTP " + keyRes.status);
+    var wrappedKey = new Uint8Array(await keyRes.arrayBuffer());
 
     var keyResult = await cryptoUtils.decryptPlaybackKey(wrappedKey, swVideoId);
     var aesKey = keyResult && keyResult.key;
     if (!aesKey || aesKey.byteLength !== 16) {
-      throw new Error("invalid AES key");
+      throw new Error("المفتاح غير صالح (مش 16 بايت)");
     }
 
+    // Blob URLs (أفضل من memory://)
     var keyBytes =
       aesKey instanceof ArrayBuffer
         ? aesKey
         : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset + aesKey.byteLength);
-    var keyMemoryUrl = memoryPut(keyBytes);
+
+    var keyBlob = new Blob([keyBytes], { type: "application/octet-stream" });
+    currentKeyBlobUrl = URL.createObjectURL(keyBlob);
 
     var fixedVariant = rewritePlaylist(
       variantText,
       streamToken,
-      keyMemoryUrl,
+      currentKeyBlobUrl,
       variantBasePath,
       variantFileUrl
     );
+
     if (fixedVariant.indexOf("#EXTM3U") !== 0) {
       fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
     }
     if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
       var ivPart = ivHex ? ",IV=0x" + ivHex : "";
       fixedVariant =
-        "#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI=\"" +
-        keyMemoryUrl +
-        "\"" +
+        '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="' +
+        currentKeyBlobUrl +
+        '"' +
         ivPart +
         "\n" +
         fixedVariant.replace(/^#EXTM3U\s*/m, "");
     }
 
-    var playlistUrl = memoryPut(fixedVariant);
+    var playlistBlob = new Blob([fixedVariant], {
+      type: "application/vnd.apple.mpegurl",
+    });
+    currentPlaylistBlobUrl = URL.createObjectURL(playlistBlob);
 
     status.textContent = "جاري التشغيل...";
 
+    // Heartbeat كل 25 ثانية
     hbTimer = setInterval(function () {
       fetch("/api/heartbeat", {
         method: "POST",
@@ -564,33 +513,33 @@ async function playVideo(videoId, title) {
     if (window.Hls && Hls.isSupported()) {
       hls = new Hls({
         enableWorker: false,
-        loader: MemoryLoader(Hls.DefaultConfig.loader),
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
       });
-      hls.loadSource(playlistUrl);
+
+      hls.loadSource(currentPlaylistBlobUrl);
       hls.attachMedia(video);
+
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         status.textContent = "";
-        video.play().catch(function () {});
+        video.play().catch(function () {
+          status.textContent = "اضغط Play يدويًا";
+        });
       });
+
       hls.on(Hls.Events.ERROR, function (_, data) {
+        console.error("HLS error:", data);
         if (!data.fatal) return;
-        var fragUrl = (data.frag && data.frag.url) || data.url || "";
-        var code = data.response && data.response.code;
-        status.textContent =
-          "خطأ: " +
-          data.type +
-          (data.details ? " / " + data.details : "") +
-          (code ? " HTTP " + code : "") +
-          (fragUrl ? " " + fragUrl : "");
+        var msg = data.type + (data.details ? " / " + data.details : "");
+        if (data.response && data.response.code) msg += " HTTP " + data.response.code;
+        status.textContent = "خطأ HLS: " + msg;
       });
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      status.textContent = "المتصفح لا يدعم HLS";
     } else {
-      status.textContent = "المتصفح لا يدعم HLS";
+      status.textContent = "المتصفح لا يدعم HLS.js";
     }
   } catch (e) {
     console.error(e);
-    status.textContent = "فشل: " + e.message;
+    status.textContent = "فشل: " + (e.message || e);
   }
 }
 
@@ -602,6 +551,14 @@ function stopPlayback() {
   if (hls) {
     hls.destroy();
     hls = null;
+  }
+  if (currentKeyBlobUrl) {
+    URL.revokeObjectURL(currentKeyBlobUrl);
+    currentKeyBlobUrl = null;
+  }
+  if (currentPlaylistBlobUrl) {
+    URL.revokeObjectURL(currentPlaylistBlobUrl);
+    currentPlaylistBlobUrl = null;
   }
   var video = document.getElementById("video");
   if (video) {
@@ -615,6 +572,7 @@ function closePlayer() {
   document.getElementById("player-modal").classList.add("hidden");
 }
 
+// تحميل الـ crypto من الأول
 loadPlayerScript()
   .then(function (c) {
     cryptoUtils = c;
