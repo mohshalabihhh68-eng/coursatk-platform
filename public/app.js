@@ -263,7 +263,6 @@ async function renderContent() {
   }
   appEl.innerHTML = html;
 }
-
 function rewritePlaylist(text, streamToken, keyBlobUrl) {
   var lines = text.split("\n");
   var out = [];
@@ -323,20 +322,22 @@ async function playVideo(videoId, title) {
 
     var variantRel = masterText
       .split("\n")
-      .map(function (l) {
-        return l.trim();
-      })
-      .find(function (l) {
-        return l && l.charAt(0) !== "#";
-      });
+      .map(function (l) { return l.trim(); })
+      .find(function (l) { return l && l.charAt(0) !== "#"; });
     if (!variantRel) throw new Error("no variant");
 
-    var variantPath = "videos/" + swVideoId + "/stream/" + variantRel;
-    var variantUrl =
-      "/api/stream?path=" +
-      encodeURIComponent(variantPath) +
-      "&t=" +
-      encodeURIComponent(streamToken);
+    var variantUrl;
+    if (variantRel.indexOf("/api/stream") === 0) {
+      variantUrl = variantRel;
+    } else if (variantRel.indexOf("http") === 0) {
+      variantUrl = "/api/cdn?url=" + encodeURIComponent(variantRel);
+    } else {
+      variantUrl =
+        "/api/stream?path=" +
+        encodeURIComponent("videos/" + swVideoId + "/stream/" + variantRel) +
+        "&t=" +
+        encodeURIComponent(streamToken);
+    }
 
     var variantText = await fetch(variantUrl).then(function (r) {
       if (!r.ok) throw new Error("variant " + r.status);
@@ -345,14 +346,29 @@ async function playVideo(videoId, title) {
 
     status.textContent = "فك المفتاح...";
     var keyLine = variantText.split("\n").find(function (l) {
-      return l.indexOf("#EXT-X-KEY:") === 0;
+      return l.indexOf("EXT-X-KEY") !== -1;
     });
-    if (!keyLine) throw new Error("no key line");
 
-    var keyUriMatch = keyLine.match(/URI="([^"]+)"/);
-    if (!keyUriMatch) throw new Error("no key uri");
+    var keyPath = "videos/" + swVideoId + "/key";
+    var ivHex = null;
+    if (keyLine) {
+      var keyUriMatch = keyLine.match(/URI="([^"]+)"/);
+      var ivMatch = keyLine.match(/IV=0x([0-9a-fA-F]+)/i);
+      if (ivMatch) ivHex = ivMatch[1];
+      if (keyUriMatch) {
+        var uri = keyUriMatch[1];
+        if (uri.indexOf("/api/stream") === 0) {
+          try {
+            var u = new URL(uri, location.origin);
+            var pth = u.searchParams.get("path");
+            if (pth) keyPath = pth;
+          } catch (e) {}
+        } else if (uri.indexOf("http") !== 0) {
+          keyPath = uri.replace(/^\//, "").replace(/^api\/v1\//, "");
+        }
+      }
+    }
 
-    var keyPath = keyUriMatch[1].replace(/^\//, "").replace(/^api\/v1\//, "");
     var keyUrl =
       "/api/stream?path=" +
       encodeURIComponent(keyPath) +
@@ -376,6 +392,17 @@ async function playVideo(videoId, title) {
     var keyBlobUrl = URL.createObjectURL(keyBlob);
 
     var fixedVariant = rewritePlaylist(variantText, streamToken, keyBlobUrl);
+    if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
+      var ivPart = ivHex ? ",IV=0x" + ivHex : "";
+      fixedVariant =
+        "#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI=\"" +
+        keyBlobUrl +
+        "\"" +
+        ivPart +
+        "\n" +
+        fixedVariant.replace(/^#EXTM3U\s*/m, "");
+    }
+
     var variantBlob = new Blob([fixedVariant], {
       type: "application/vnd.apple.mpegurl"
     });
@@ -429,25 +456,4 @@ function stopPlayback() {
     hls.destroy();
     hls = null;
   }
-  var video = document.getElementById("video");
-  if (video) {
-    video.removeAttribute("src");
-    video.load();
-  }
-}
-
-function closePlayer() {
-  stopPlayback();
-  document.getElementById("player-modal").classList.add("hidden");
-}
-
-loadPlayerScript()
-  .then(function (c) {
-    cryptoUtils = c;
-    console.log("[SW] crypto ready");
-  })
-  .catch(function (e) {
-    console.warn("[SW] crypto preload failed", e);
-  });
-
-render();
+  var video = document.getElementById("
