@@ -264,6 +264,10 @@ async function renderContent() {
   appEl.innerHTML = html;
 }
 
+function toB64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
 function rewritePlaylist(text, streamToken, keyBlobUrl) {
   var lines = text.split("\n");
   var out = [];
@@ -283,7 +287,7 @@ function rewritePlaylist(text, streamToken, keyBlobUrl) {
       continue;
     }
     if (s.indexOf("http") === 0) {
-      out.push("/api/cdn?url=" + encodeURIComponent(s));
+      out.push("/api/cdn?u=" + toB64(s));
     } else {
       out.push(s);
     }
@@ -335,7 +339,7 @@ async function playVideo(videoId, title) {
     if (variantRel.indexOf("/api/stream") === 0) {
       variantUrl = variantRel;
     } else if (variantRel.indexOf("http") === 0) {
-      variantUrl = "/api/cdn?url=" + encodeURIComponent(variantRel);
+      variantUrl = "/api/cdn?u=" + toB64(variantRel);
     } else {
       variantUrl =
         "/api/stream?path=" +
