@@ -48,11 +48,11 @@
         </div>
       </div>
 
-      <!-- المشغل المخصص -->
+      <!-- المشغل المخصص الفخم -->
       <div class="custom-player-container" id="custom-player">
         <video id="video" playsinline></video>
         
-        <!-- طبقة استقبال النقرات (للتسريع والتقديم) -->
+        <!-- طبقة استقبال النقرات -->
         <div class="click-layer" id="click-layer"></div>
 
         <!-- شاشة التحميل / الحالة -->
@@ -61,21 +61,20 @@
           <span>جاري التشغيل...</span>
         </div>
 
-        <!-- أيقونة التشغيل الكبيرة (Play Overlay) -->
+        <!-- أيقونة التشغيل الكبيرة -->
         <div id="big-play-btn" class="big-play-btn hidden" onclick="togglePlay()">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </div>
 
-        <!-- مؤشر التسريع (يظهر عند الضغط المطول) -->
+        <!-- مؤشر التسريع (أيقونة صغيرة وأنيقة) -->
         <div id="speed-indicator" class="speed-indicator hidden">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span>2x سرعة</span>
+          <span style="font-size: 16px; font-weight: bold;">2x ⏩</span>
         </div>
 
         <!-- مؤشر التقديم / التأخير -->
         <div id="seek-indicator" class="seek-indicator hidden">+10s</div>
 
-        <!-- أدوات التحكم السفلية -->
+        <!-- أدوات التحكم السفلية (تصميم زجاجي) -->
         <div class="controls-bar" id="controls-bar">
           <div class="progress-container" onclick="seekVideo(event)">
             <div class="progress-bar" id="progress-bar">
