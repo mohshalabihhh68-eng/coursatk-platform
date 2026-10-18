@@ -1,56 +1,302 @@
-/* ============================================================
-   الحالة الأصلية — متطابقة مع ملفك الأصلي
-   ============================================================ */
-const state = {
-  view: "years",
-  year: null,
-  subject: null,
-  teacher: null,
-  chapter: null,
-  lecture: null,
-};
-
+// ==================== State ====================
+const state = { view: "years", year: null, subject: null, teacher: null, chapter: null, lecture: null };
 let hls = null;
 let hbTimer = null;
 let cryptoUtils = null;
 let currentKeyBlobUrl = null;
 let currentPlaylistBlobUrl = null;
-let currentPlaylistData = null; // للبحث بدون إعادة تحميل
 
-/* ============================================================
-   API Helper — كما هو
-   ============================================================ */
-async function api(path, opts) {
-  opts = opts || {};
+const appEl = document.getElementById("app");
+
+// ==================== API & Utils ====================
+async function api(path, opts = {}) {
   const res = await fetch(path, opts);
   const data = await res.json();
-  if (!res.ok || data.success === false) {
-    throw new Error(data.error || data.message || "HTTP " + res.status);
-  }
+  if (!res.ok || data.success === false) throw new Error(data.error || data.message || "HTTP " + res.status);
   return data.data !== undefined ? data.data : data;
 }
 
-/* ============================================================
-   Crypto Loader — كما هو
-   ============================================================ */
-function findCrypto() {
-  if (
-    window.DecryptionUtils &&
-    typeof window.DecryptionUtils.decryptPlaybackKey === "function"
-  ) {
-    return window.DecryptionUtils;
+function goHome() {
+  state.view = "years"; state.year = null; state.subject = null; state.teacher = null; state.chapter = null; state.lecture = null;
+  render();
+}
+function setView(view, extra) {
+  if (extra) Object.assign(state, extra);
+  state.view = view;
+  render();
+  window.scrollTo(0, 0); // رجوع لأعلى الصفحة
+}
+
+// ==================== Render Logic ====================
+async function render() {
+  appEl.innerHTML = '<div class="loading">جاري التحميل...</div>';
+  try {
+    if (state.view === "years") await renderYears();
+    else if (state.view === "subjects") await renderSubjects();
+    else if (state.view === "teachers") await renderTeachers();
+    else if (state.view === "chapters") await renderChapters();
+    else if (state.view === "lectures") await renderLectures();
+    else if (state.view === "content") await renderContent();
+  } catch (e) {
+    appEl.innerHTML = '<div class="error" style="color:red;text-align:center;padding:50px;">خطأ: ' + e.message + "</div>";
   }
+}
+
+// 1. شاشة السنوات
+async function renderYears() {
+  const years = await api("/api/years");
+  let html = `
+    <div class="page-title-area">
+      <div class="page-badge">📚 مسار علمي علوم</div>
+      <h1>المواد الدراسية <span>2027</span></h1>
+      <p>اختار المادة اللي عايز تكمل فيها وتابع المحاضرات والواجبات مع أفضل المدرسين.</p>
+    </div>
+    <div class="grid">`;
+  
+  years.forEach(y => {
+    html += `
+      <div class="card" onclick='setView("subjects", ${JSON.stringify({ year: y })})'>
+        <div class="card-img-wrapper">
+          <img src="${y.image_url || ''}" onerror="this.style.display='none'" />
+          <div class="status-badge">🟢 متاح الان</div>
+        </div>
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="card-year">2027</div>
+            <div class="card-title">${y.name}</div>
+          </div>
+          <div class="meta-row">
+            <span>آخر تحديث: 2027/8/20</span>
+            <span>⏱</span>
+          </div>
+          <button class="btn-gradient">عرض المدرسين ←</button>
+        </div>
+      </div>`;
+  });
+  appEl.innerHTML = html + "</div>";
+}
+
+// 2. شاشة المواد
+async function renderSubjects() {
+  const subjects = await api("/api/subjects/" + state.year.id);
+  let html = `
+    <div class="page-title-area">
+      <button class="back-btn-top" onclick="goHome()">← رجوع للسنين</button>
+      <div class="page-badge">🗂️ السنة</div>
+      <h1>مواد <span>${state.year.name}</span></h1>
+      <p>اختار المادة اللي عايز تكمل فيها وتابع المحاضرات.</p>
+    </div>
+    <div class="grid">`;
+
+  subjects.forEach(s => {
+    html += `
+      <div class="card" onclick='setView("teachers", ${JSON.stringify({ subject: s })})'>
+        <div class="card-img-wrapper">
+          <img src="${s.image_url || ''}" onerror="this.style.display='none'" />
+          <div class="status-badge">🟢 متاح الان</div>
+        </div>
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="card-year">2027</div>
+            <div class="card-title">${s.name}</div>
+          </div>
+          <div class="meta-row">
+            <span>آخر تحديث: 2027/8/20</span>
+            <span>⏱</span>
+          </div>
+          <button class="btn-gradient">عرض المدرسين ←</button>
+        </div>
+      </div>`;
+  });
+  appEl.innerHTML = html + "</div>";
+}
+
+// 3. شاشة المدرسين
+async function renderTeachers() {
+  const data = await api("/api/subjects/" + state.subject.id + "/teachers");
+  const teachers = data.teachers || [];
+  let html = `
+    <div class="page-title-area">
+      <button class="back-btn-top" onclick='setView("subjects", ${JSON.stringify({ year: state.year })})'>← رجوع للمواد</button>
+      <div class="page-badge">السنة</div>
+      <h1>مدرسين <span>المادة</span></h1>
+      <p>اختار المدرس اللي تحب تتابع معاه وشوف الفصول المتاحة.</p>
+    </div>
+    <div class="grid">`;
+
+  teachers.forEach(t => {
+    html += `
+      <div class="teacher-card">
+        <div class="teacher-top">
+          <div class="teacher-info">
+            <div class="teacher-role">مدرس المادة</div>
+            <div class="teacher-name">${t.name}</div>
+          </div>
+          <img class="teacher-avatar" src="${t.image_url || ''}" onerror="this.style.display='none'" />
+        </div>
+        <div class="teacher-stats">
+          <span class="count-badge">${t.chapter_count || 0}</span>
+          <span>الفصول المتاحة 📚</span>
+        </div>
+        <button class="btn-gradient" onclick='setView("chapters", ${JSON.stringify({ teacher: t })})'>اكتشف الفصول ←</button>
+      </div>`;
+  });
+  appEl.innerHTML = html + "</div>";
+}
+
+// 4. شاشة الفصول
+async function renderChapters() {
+  const chapters = await api("/api/teachers/" + state.teacher.id + "/chapters");
+  let html = `
+    <div class="page-title-area">
+      <button class="back-btn-top" onclick='setView("teachers", ${JSON.stringify({ subject: state.subject })})'>← رجوع للمدرسين</button>
+      <div class="page-badge">English</div>
+      <h1>فصول <span>${state.teacher.name}</span></h1>
+      <p>استكشف الفصول المتاحة، اعرف عدد المحاضرات، وابدأ مذاكرة المنهج.</p>
+    </div>
+    <div class="grid">`;
+
+  chapters.forEach(c => {
+    html += `
+      <div class="teacher-card">
+        <div class="teacher-top">
+          <div class="teacher-info">
+            <div class="teacher-role">الفصل ${c.order || ''}</div>
+            <div class="teacher-name">${c.name}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">م. ${state.teacher.name}</div>
+          </div>
+          <img class="teacher-avatar" src="${c.image_url || ''}" onerror="this.style.opacity=0.3" />
+        </div>
+        <div class="teacher-stats">
+          <span class="count-badge">${c.lecture_count || 0}</span>
+          <span>عدد المحاضرات ⏱</span>
+        </div>
+        <button class="btn-gradient" onclick='setView("lectures", ${JSON.stringify({ chapter: c })})'>مشاهدة المحاضرات ←</button>
+      </div>`;
+  });
+  appEl.innerHTML = html + "</div>";
+}
+
+// 5. شاشة المحاضرات
+async function renderLectures() {
+  const lectures = await api("/api/chapters/" + state.chapter.id + "/lectures");
+  let html = `
+    <div class="page-title-area">
+      <button class="back-btn-top" onclick='setView("chapters", ${JSON.stringify({ teacher: state.teacher })})'>← رجوع للفصول</button>
+      <div class="page-badge">${state.teacher.name}</div>
+      <h1>${state.chapter.name}</h1>
+      <p>دي قائمة المحاضرات اللي في الفصل ده. هتلاقي فيها الفيديوهات والملفات.</p>
+    </div>
+    <div class="grid">`;
+
+  lectures.forEach((l, idx) => {
+    html += `
+      <div class="card">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="card-year">المحاضرة ${idx + 1}</div>
+            <div class="card-title">${l.name}</div>
+          </div>
+          <div class="content-icon-box">
+             <div class="content-icon-item">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+               <span>${l.video_count || 0}</span><small>فيديو</small>
+             </div>
+             <div class="content-icon-item">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+               <span>${l.pdf_count || 0}</span><small>ملف</small>
+             </div>
+             <div class="content-icon-item">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+               <span>${l.exam_count || 0}</span><small>امتحان</small>
+             </div>
+          </div>
+          <button class="btn-gradient" onclick='setView("content", ${JSON.stringify({ lecture: l })})'>محتوي المحاضرة ←</button>
+        </div>
+      </div>`;
+  });
+  appEl.innerHTML = html + "</div>";
+}
+
+// 6. شاشة محتوى المحاضرة (الفيديوهات والملفات)
+async function renderContent() {
+  const content = await api("/api/lectures/" + state.lecture.id + "/content");
+  const videos = content.videos || [];
+  const pdfs = content.pdfs || [];
+
+  let html = `
+    <div class="page-title-area" style="text-align:right; margin-bottom:20px;">
+      <button class="back-btn-top" style="right:auto;left:0;" onclick='setView("lectures", ${JSON.stringify({ chapter: state.chapter })})'>← رجوع</button>
+      <div class="page-badge">المحاضرة #${state.lecture.id}</div>
+      <h1>محتوي <span>${state.lecture.name}</span></h1>
+      <p>ذاكر المحاضرة كاملة من فيديوهات وملفات.</p>
+    </div>
+    
+    <div class="card" style="padding:24px; margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+        <h2 style="font-size:1.2rem;">الفيديوهات</h2>
+        <span class="page-badge">${videos.length} فيديو متاح</span>
+      </div>
+      <div style="background:rgba(255,107,0,0.1); border:1px solid rgba(255,107,0,0.2); color:#ff9e00; padding:12px; border-radius:12px; margin-bottom:20px; font-size:0.9rem;">
+        ⚠️ تنبيه هام: عشان الفيديوهات تشتغل معاك لازم تكون محمل مشغل كورساتك الخاص بيك.
+      </div>
+      <div class="grid">`;
+
+  videos.forEach((v, i) => {
+    const title = String(v.title).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    html += `
+      <div class="video-card">
+        <div class="video-thumbnail">
+          <img src="${v.thumbnail_url || ''}" />
+          <div class="video-num-badge">فيديو #${i + 1}</div>
+          <div class="video-duration-badge">⏱ ${v.duration || '00:00'}</div>
+          <div class="play-overlay">
+            <div class="play-btn-circle">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="padding:16px; text-align:center;">
+          <h3 style="font-size:1rem; margin-bottom:16px;">${v.title}</h3>
+          <button class="btn-gradient" onclick="playVideo(${v.id}, '${title}')">تشغيل الفيديو ▶</button>
+        </div>
+      </div>`;
+  });
+  
+  html += `</div></div>`;
+
+  if (pdfs.length > 0) {
+    html += `
+      <div class="card" style="padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+          <h2 style="font-size:1.2rem;">ملفات الشرح</h2>
+          <span class="page-badge">${pdfs.length} ملف متاح</span>
+        </div>
+        <div class="grid">`;
+    pdfs.forEach((p, i) => {
+      html += `
+        <div class="card" style="padding:20px; text-align:center; background:var(--bg-card-light);">
+          <h3 style="font-size:1rem; margin-bottom:16px;">${p.title}</h3>
+          <div style="display:flex; gap:10px;">
+            <a href="${p.url}" target="_blank" class="btn-gradient" style="text-decoration:none; flex:1; padding:10px; font-size:0.85rem;">عرض الملف 👁</a>
+            <a href="${p.url}" download class="btn-gradient" style="text-decoration:none; flex:1; padding:10px; font-size:0.85rem; background:#3b2a15;">تحميل الملف ⬇</a>
+          </div>
+        </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  appEl.innerHTML = html;
+}
+
+// ==================== Player Logic (كما هو من ملفك) ====================
+function findCrypto() {
+  if (window.DecryptionUtils && typeof window.DecryptionUtils.decryptPlaybackKey === "function") return window.DecryptionUtils;
   var names = Object.getOwnPropertyNames(window);
   for (var i = 0; i < names.length; i++) {
     try {
       var obj = window[names[i]];
-      if (
-        obj &&
-        typeof obj === "object" &&
-        typeof obj.decryptPlaybackKey === "function"
-      ) {
-        return obj;
-      }
+      if (obj && typeof obj === "object" && typeof obj.decryptPlaybackKey === "function") return obj;
     } catch (e) {}
   }
   return null;
@@ -61,22 +307,18 @@ function loadPlayerScript() {
     if (findCrypto()) return resolve(findCrypto());
     var existing = document.querySelector('script[src*="player.stream-weave.com"]');
     if (existing) {
-      var tries = 0;
-      var t = setInterval(function () {
+      var tries = 0; var t = setInterval(function () {
         var c = findCrypto();
-        if (c) { clearInterval(t); resolve(c); }
-        else if (++tries > 40) { clearInterval(t); reject(new Error("timeout crypto")); }
+        if (c) { clearInterval(t); resolve(c); } else if (++tries > 40) { clearInterval(t); reject(new Error("timeout crypto")); }
       }, 150);
       return;
     }
     var s = document.createElement("script");
     s.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
     s.onload = function () {
-      var tries = 0;
-      var t = setInterval(function () {
+      var tries = 0; var t = setInterval(function () {
         var c = findCrypto();
-        if (c) { clearInterval(t); resolve(c); }
-        else if (++tries > 40) { clearInterval(t); reject(new Error("crypto not found")); }
+        if (c) { clearInterval(t); resolve(c); } else if (++tries > 40) { clearInterval(t); reject(new Error("crypto not found")); }
       }, 150);
     };
     s.onerror = function () { reject(new Error("failed to load player.js")); };
@@ -84,342 +326,41 @@ function loadPlayerScript() {
   });
 }
 
-/* ============================================================
-   Navigation — كما هو + إضافات
-   ============================================================ */
-function goHome() {
-  state.view = "years";
-  state.year = null;
-  state.subject = null;
-  state.teacher = null;
-  state.chapter = null;
-  state.lecture = null;
-  render();
-}
-
-function setView(view, extra) {
-  if (extra) {
-    for (var k in extra) state[k] = extra[k];
-  }
-  state.view = view;
-  render();
-}
-
-/* ============================================================
-   Theme Toggle (جديد)
-   ============================================================ */
-(function initTheme() {
-  const saved = localStorage.getItem("theme");
-  if (saved) document.documentElement.setAttribute("data-theme", saved);
-})();
-
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
-  document.documentElement.setAttribute("data-theme", cur);
-  localStorage.setItem("theme", cur);
-  const icon = document.getElementById("theme-icon");
-  if (icon) icon.textContent = cur === "light" ? "☀️" : "🌙";
-}
-
-/* ============================================================
-   Escape HTML (جديد للأمان)
-   ============================================================ */
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) => (
-    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
-  ));
-}
-
-/* ============================================================
-   Render الرئيسي — كما هو
-   ============================================================ */
-var appEl = document.getElementById("app");
-
-async function render() {
-  appEl.innerHTML = '<div class="loading">جاري التحميل...</div>';
-  try {
-    if (state.view === "years") await renderYears();
-    else if (state.view === "subjects") await renderSubjects();
-    else if (state.view === "teachers") await renderTeachers();
-    else if (state.view === "chapters") await renderChapters();
-    else if (state.view === "lectures") await renderLectures();
-    else if (state.view === "content") await renderContent();
-    else if (state.view === "search") await renderSearch();
-  } catch (e) {
-    appEl.innerHTML = '<div class="error">خطأ: ' + esc(e.message) + "</div>";
-  }
-}
-
-/* ============================================================
-   Render Years — كما هو
-   ============================================================ */
-async function renderYears() {
-  var years = await api("/api/years");
-  currentPlaylistData = { years };
-  var html = "<h1>السنوات الدراسية</h1><div class='grid'>";
-  for (var i = 0; i < years.length; i++) {
-    var y = years[i];
-    html +=
-      "<div class='card' onclick='setView(\"subjects\"," +
-      JSON.stringify({ year: y }) +
-      ")'><img src='" +
-      esc(y.image_url || "") +
-      "' onerror=\"this.style.display='none'\"/><div class='body'><div class='title'>" +
-      esc(y.name) +
-      "</div></div></div>";
-  }
-  html += "</div>";
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Render Subjects — كما هو
-   ============================================================ */
-async function renderSubjects() {
-  var subjects = await api("/api/subjects/" + state.year.id);
-  var html =
-    "<div class='crumbs'><span class='link' onclick='goHome()'>الرئيسية</span> / " +
-    esc(state.year.name) +
-    "</div><h1>المواد</h1><div class='grid'>";
-  for (var i = 0; i < subjects.length; i++) {
-    var s = subjects[i];
-    html +=
-      "<div class='card' onclick='setView(\"teachers\"," +
-      JSON.stringify({ subject: s }) +
-      ")'><img src='" +
-      esc(s.image_url || "") +
-      "' onerror=\"this.style.display='none'\"/><div class='body'><div class='title'>" +
-      esc(s.name) +
-      "</div></div></div>";
-  }
-  html += "</div>";
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Render Teachers — كما هو
-   ============================================================ */
-async function renderTeachers() {
-  var data = await api("/api/subjects/" + state.subject.id + "/teachers");
-  var teachers = data.teachers || [];
-  var html =
-    "<div class='crumbs'><span class='link' onclick='goHome()'>الرئيسية</span> / " +
-    esc(state.year.name) + " / " + esc(state.subject.name) +
-    "</div><h1>المدرسين</h1><div class='grid'>";
-  for (var i = 0; i < teachers.length; i++) {
-    var t = teachers[i];
-    html +=
-      "<div class='card' onclick='setView(\"chapters\"," +
-      JSON.stringify({ teacher: t }) +
-      ")'><img src='" +
-      esc(t.image_url || "") +
-      "' onerror=\"this.style.display='none'\"/><div class='body'><div class='title'>" +
-      esc(t.name) +
-      "</div><div class='meta'>" +
-      (t.chapter_count || 0) +
-      " فصل</div></div></div>";
-  }
-  html += "</div>";
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Render Chapters — كما هو
-   ============================================================ */
-async function renderChapters() {
-  var chapters = await api("/api/teachers/" + state.teacher.id + "/chapters");
-  var html =
-    "<div class='crumbs'><span class='link' onclick='goHome()'>الرئيسية</span> / " +
-    esc(state.subject.name) + " / " + esc(state.teacher.name) +
-    "</div><h1>الفصول</h1><div class='list'>";
-  for (var i = 0; i < chapters.length; i++) {
-    var c = chapters[i];
-    html +=
-      "<div class='list-item' onclick='setView(\"lectures\"," +
-      JSON.stringify({ chapter: c }) +
-      ")'><img src='" +
-      esc(c.image_url || "") +
-      "' onerror=\"this.style.opacity=0.3\"/><div><div class='title'>" +
-      esc(c.name) +
-      "</div><div class='meta'>" +
-      (c.lecture_count || 0) +
-      " محاضرة</div></div></div>";
-  }
-  html += "</div>";
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Render Lectures — كما هو
-   ============================================================ */
-async function renderLectures() {
-  var lectures = await api("/api/chapters/" + state.chapter.id + "/lectures");
-  var html =
-    "<div class='crumbs'><span class='link' onclick='goHome()'>الرئيسية</span> / " +
-    esc(state.teacher.name) + " / " + esc(state.chapter.name) +
-    "</div><h1>المحاضرات</h1><div class='list'>";
-  for (var i = 0; i < lectures.length; i++) {
-    var l = lectures[i];
-    html +=
-      "<div class='list-item' onclick='setView(\"content\"," +
-      JSON.stringify({ lecture: l }) +
-      ")'><img src='" +
-      esc(l.image_url || "") +
-      "' onerror=\"this.style.opacity=0.3\"/><div><div class='title'>" +
-      esc(l.name) +
-      "</div><div class='meta'>" +
-      (l.video_count || 0) +
-      " فيديو</div></div></div>";
-  }
-  html += "</div>";
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Render Content — كما هو
-   ============================================================ */
-async function renderContent() {
-  var content = await api("/api/lectures/" + state.lecture.id + "/content");
-  var videos = content.videos || [];
-  var pdfs = content.pdfs || [];
-  var html =
-    "<div class='crumbs'><span class='link' onclick='goHome()'>الرئيسية</span> / " +
-    esc(state.lecture.name) +
-    "</div><h1>" +
-    esc(state.lecture.name) +
-    "</h1><h3>الفيديوهات</h3>";
-  for (var i = 0; i < videos.length; i++) {
-    var v = videos[i];
-    var title = String(v.title).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-    html +=
-      "<button class='btn' onclick=\"playVideo(" +
-      v.id +
-      ",'" +
-      title +
-      "')\"><span>▶</span><span>" +
-      esc(v.title) +
-      "</span></button>";
-  }
-  html += "<h3>الملفات</h3>";
-  for (var j = 0; j < pdfs.length; j++) {
-    var p = pdfs[j];
-    html +=
-      "<a class='btn' href='" +
-      esc(p.url) +
-      "' target='_blank' rel='noopener'><span>📄</span><span>" +
-      esc(p.title) +
-      "</span></a>";
-  }
-  appEl.innerHTML = html;
-}
-
-/* ============================================================
-   Search (جديد) — يبحث في المحتوى المحمّل
-   ============================================================ */
-async function renderSearch() {
-  const q = (document.getElementById("search-input")?.value || "").trim().toLowerCase();
-  if (!q) { goHome(); return; }
-  if (!currentPlaylistData) {
-    appEl.innerHTML = '<div class="empty">لا يوجد محتوى محمّل للبحث</div>';
-    return;
-  }
-  const results = [];
-  const years = currentPlaylistData.years || [];
-  for (const y of years) {
-    if (y.name.toLowerCase().includes(q)) results.push({ type: "سنة", name: y.name, action: `setView("subjects",${JSON.stringify({ year: y })})` });
-  }
-  if (!results.length) {
-    appEl.innerHTML = `<h1>نتائج البحث: "${esc(q)}"</h1><div class="empty">لا توجد نتائج في الصفحة الحالية. تنقل للفصول أولاً.</div>`;
-    return;
-  }
-  appEl.innerHTML = `
-    <h1>نتائج البحث: "${esc(q)}"</h1>
-    <div class="list">
-      ${results.map(r => `
-        <div class="list-item" onclick='${r.action}'>
-          <div><div class="title">${esc(r.name)}</div><div class="meta">${r.type}</div></div>
-        </div>
-      `).join("")}
-    </div>`;
-}
-
-/* ============================================================
-   Player Helpers — كما هي بالحرف
-   ============================================================ */
-function toB64url(str) {
-  return btoa(unescape(encodeURIComponent(str)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
-function fromB64url(value) {
-  var s = String(value).replace(/-/g, "+").replace(/_/g, "/");
-  while (s.length % 4) s += "=";
-  return decodeURIComponent(escape(atob(s)));
-}
+function toB64url(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, ""); }
+function fromB64url(value) { var s = String(value).replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return decodeURIComponent(escape(atob(s))); }
 
 function joinRel(base, rel) {
-  var q = "";
-  var relPath = String(rel);
-  var qi = relPath.indexOf("?");
-  if (qi !== -1) {
-    q = relPath.slice(qi);
-    relPath = relPath.slice(0, qi);
-  }
+  var q = ""; var relPath = String(rel); var qi = relPath.indexOf("?");
+  if (qi !== -1) { q = relPath.slice(qi); relPath = relPath.slice(0, qi); }
   var stack = String(base || "").split("/");
-  if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) {
-    stack.pop();
-  }
+  if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) stack.pop();
   if (stack.length && stack[stack.length - 1] === "") stack.pop();
   relPath.split("/").forEach(function (part) {
     if (!part || part === ".") return;
-    if (part === "..") stack.pop();
-    else stack.push(part);
+    if (part === "..") stack.pop(); else stack.push(part);
   });
   return stack.join("/") + q;
 }
 
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
   if (/^(blob:|data:)/i.test(uri)) return uri;
-  if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) {
-    return location.origin + uri;
-  }
-  if (/^https?:\/\//i.test(uri)) {
-    return location.origin + "/api/cdn?u=" + toB64url(uri);
-  }
-  if (variantFileUrl) {
-    try {
-      return location.origin + "/api/cdn?u=" + toB64url(new URL(uri, variantFileUrl).href);
-    } catch (e) {}
-  }
-  return location.origin + "/api/stream?path=" +
-    encodeURIComponent(joinRel(variantBasePath || "", uri)) +
-    "&t=" + encodeURIComponent(streamToken);
+  if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) return location.origin + uri;
+  if (/^https?:\/\//i.test(uri)) return location.origin + "/api/cdn?u=" + toB64url(uri);
+  if (variantFileUrl) { try { return location.origin + "/api/cdn?u=" + toB64url(new URL(uri, variantFileUrl).href); } catch (e) {} }
+  return location.origin + "/api/stream?path=" + encodeURIComponent(joinRel(variantBasePath || "", uri)) + "&t=" + encodeURIComponent(streamToken);
 }
 
 function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variantFileUrl) {
-  return text
-    .split("\n")
-    .map(function (line) {
-      var s = line.trim();
-      if (!s) return line;
-      if (s.charAt(0) === "#") {
-        if (s.indexOf("#EXT-X-KEY:") === 0 && keyBlobUrl) {
-          return s.replace(/URI="[^"]+"/, 'URI="' + keyBlobUrl + '"');
-        }
-        return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
-          return 'URI="' + resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) + '"';
-        });
-      }
-      return resolveMedia(s, variantBasePath, streamToken, variantFileUrl);
-    })
-    .join("\n");
+  return text.split("\n").map(function (line) {
+    var s = line.trim(); if (!s) return line;
+    if (s.charAt(0) === "#") {
+      if (s.indexOf("#EXT-X-KEY:") === 0 && keyBlobUrl) return s.replace(/URI="[^"]+"/, 'URI="' + keyBlobUrl + '"');
+      return s.replace(/URI="([^"]+)"/g, function (_m, uri) { return 'URI="' + resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) + '"'; });
+    }
+    return resolveMedia(s, variantBasePath, streamToken, variantFileUrl);
+  }).join("\n");
 }
 
-/* ============================================================
-   Main Play Function — كما هي بالحرف
-   ============================================================ */
 async function playVideo(videoId, title) {
   var modal = document.getElementById("player-modal");
   var video = document.getElementById("video");
@@ -432,58 +373,34 @@ async function playVideo(videoId, title) {
 
   try {
     var session = await api("/api/video/" + videoId + "/play", { method: "POST" });
-    var streamToken = session.token;
-    var swVideoId = session.video_id;
-    var hbUrl = session.heartbeat_url;
+    var streamToken = session.token, swVideoId = session.video_id, hbUrl = session.heartbeat_url;
 
-    if (!streamToken || !swVideoId) {
-      throw new Error("الجلسة ناقصة (مفيش token أو video_id)");
-    }
-
+    if (!streamToken || !swVideoId) throw new Error("الجلسة ناقصة (مفيش token أو video_id)");
     status.textContent = "تحميل أدوات فك التشفير...";
     if (!cryptoUtils) cryptoUtils = await loadPlayerScript();
-
+    
     status.textContent = "جلب قائمة التشغيل...";
-    var masterUrl =
-      "/api/stream?path=" +
-      encodeURIComponent("videos/" + swVideoId + "/stream/master.m3u8") +
-      "&t=" + encodeURIComponent(streamToken);
-
+    var masterUrl = "/api/stream?path=" + encodeURIComponent("videos/" + swVideoId + "/stream/master.m3u8") + "&t=" + encodeURIComponent(streamToken);
     var masterRes = await fetch(masterUrl);
     if (!masterRes.ok) throw new Error("master.m3u8 → HTTP " + masterRes.status);
     var masterText = await masterRes.text();
-
-    var variantRel = masterText
-      .split("\n")
-      .map(function (l) { return l.trim(); })
-      .find(function (l) { return l && l.charAt(0) !== "#"; });
-
+    
+    var variantRel = masterText.split("\n").map(function (l) { return l.trim(); }).find(function (l) { return l && l.charAt(0) !== "#"; });
     if (!variantRel) throw new Error("مفيش variant في الـ master");
 
-    var variantUrl;
-    var variantBasePath = "videos/" + swVideoId + "/stream/";
-    var variantFileUrl = null;
-
+    var variantUrl, variantBasePath = "videos/" + swVideoId + "/stream/", variantFileUrl = null;
     if (variantRel.indexOf("/api/stream") === 0 || variantRel.indexOf("/api/cdn") === 0) {
       variantUrl = variantRel;
       try {
         var vu = new URL(variantRel, location.origin);
-        if (vu.pathname.indexOf("/api/stream") === 0 && vu.searchParams.get("path")) {
-          variantBasePath = vu.searchParams.get("path");
-        }
-        if (vu.pathname.indexOf("/api/cdn") === 0 && vu.searchParams.get("u")) {
-          variantFileUrl = fromB64url(vu.searchParams.get("u"));
-        }
+        if (vu.pathname.indexOf("/api/stream") === 0 && vu.searchParams.get("path")) variantBasePath = vu.searchParams.get("path");
+        if (vu.pathname.indexOf("/api/cdn") === 0 && vu.searchParams.get("u")) variantFileUrl = fromB64url(vu.searchParams.get("u"));
       } catch (e) {}
     } else if (variantRel.indexOf("http") === 0) {
-      variantFileUrl = variantRel;
-      variantUrl = "/api/cdn?u=" + toB64url(variantRel);
+      variantFileUrl = variantRel; variantUrl = "/api/cdn?u=" + toB64url(variantRel);
     } else {
       variantBasePath = "videos/" + swVideoId + "/stream/" + variantRel;
-      variantUrl =
-        "/api/stream?path=" +
-        encodeURIComponent(variantBasePath) +
-        "&t=" + encodeURIComponent(streamToken);
+      variantUrl = "/api/stream?path=" + encodeURIComponent(variantBasePath) + "&t=" + encodeURIComponent(streamToken);
     }
 
     var variantRes = await fetch(variantUrl);
@@ -491,27 +408,16 @@ async function playVideo(videoId, title) {
     var variantText = await variantRes.text();
 
     status.textContent = "فك المفتاح...";
-    var keyLine = variantText.split("\n").find(function (l) {
-      return l.indexOf("EXT-X-KEY") !== -1;
-    });
-
-    var keyPath = "videos/" + swVideoId + "/key";
-    var ivHex = null;
+    var keyLine = variantText.split("\n").find(function (l) { return l.indexOf("EXT-X-KEY") !== -1; });
+    var keyPath = "videos/" + swVideoId + "/key", ivHex = null;
     if (keyLine) {
-      var keyUriMatch = keyLine.match(/URI="([^"]+)"/);
-      var ivMatch = keyLine.match(/IV=0x([0-9a-fA-F]+)/i);
+      var keyUriMatch = keyLine.match(/URI="([^"]+)"/), ivMatch = keyLine.match(/IV=0x([0-9a-fA-F]+)/i);
       if (ivMatch) ivHex = ivMatch[1];
       if (keyUriMatch) {
         var uri = keyUriMatch[1];
         if (uri.indexOf("/api/stream") === 0 || uri.indexOf(location.origin + "/api/stream") === 0) {
-          try {
-            var u = new URL(uri, location.origin);
-            var pth = u.searchParams.get("path");
-            if (pth) keyPath = pth;
-          } catch (e) {}
-        } else if (uri.indexOf("http") !== 0 && uri.indexOf("/api/cdn") !== 0) {
-          keyPath = uri.replace(/^\//, "").replace(/^api\/v1\//, "");
-        }
+          try { var u = new URL(uri, location.origin); var pth = u.searchParams.get("path"); if (pth) keyPath = pth; } catch (e) {}
+        } else if (uri.indexOf("http") !== 0 && uri.indexOf("/api/cdn") !== 0) keyPath = uri.replace(/^\//, "").replace(/^api\/v1\//, "");
       }
     }
 
@@ -519,102 +425,56 @@ async function playVideo(videoId, title) {
     var keyRes = await fetch(keyUrl);
     if (!keyRes.ok) throw new Error("key → HTTP " + keyRes.status);
     var wrappedKey = new Uint8Array(await keyRes.arrayBuffer());
-
     var keyResult = await cryptoUtils.decryptPlaybackKey(wrappedKey, swVideoId);
     var aesKey = keyResult && keyResult.key;
-    if (!aesKey || aesKey.byteLength !== 16) {
-      throw new Error("المفتاح غير صالح (مش 16 بايت)");
-    }
+    if (!aesKey || aesKey.byteLength !== 16) throw new Error("المفتاح غير صالح (مش 16 بايت)");
 
-    var keyBytes = aesKey instanceof ArrayBuffer
-      ? aesKey
-      : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset + aesKey.byteLength);
+    var keyBytes = aesKey instanceof ArrayBuffer ? aesKey : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset + aesKey.byteLength);
+    currentKeyBlobUrl = URL.createObjectURL(new Blob([keyBytes], { type: "application/octet-stream" }));
 
-    var keyBlob = new Blob([keyBytes], { type: "application/octet-stream" });
-    currentKeyBlobUrl = URL.createObjectURL(keyBlob);
-
-    var fixedVariant = rewritePlaylist(
-      variantText,
-      streamToken,
-      currentKeyBlobUrl,
-      variantBasePath,
-      variantFileUrl
-    );
-
-    if (fixedVariant.indexOf("#EXTM3U") !== 0) {
-      fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
-    }
+    var fixedVariant = rewritePlaylist(variantText, streamToken, currentKeyBlobUrl, variantBasePath, variantFileUrl);
+    if (fixedVariant.indexOf("#EXTM3U") !== 0) fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
     if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
       var ivPart = ivHex ? ",IV=0x" + ivHex : "";
-      fixedVariant =
-        '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="' +
-        currentKeyBlobUrl +
-        '"' + ivPart + "\n" +
-        fixedVariant.replace(/^#EXTM3U\s*/m, "");
+      fixedVariant = '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="' + currentKeyBlobUrl + '"' + ivPart + "\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
     }
 
-    var playlistBlob = new Blob([fixedVariant], { type: "application/vnd.apple.mpegurl" });
-    currentPlaylistBlobUrl = URL.createObjectURL(playlistBlob);
-
+    currentPlaylistBlobUrl = URL.createObjectURL(new Blob([fixedVariant], { type: "application/vnd.apple.mpegurl" }));
     status.textContent = "جاري التشغيل...";
 
-    // Heartbeat كل 25 ثانية
     hbTimer = setInterval(function () {
-      fetch("/api/heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: hbUrl, token: streamToken }),
-      }).catch(function () {});
+      fetch("/api/heartbeat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: hbUrl, token: streamToken }) }).catch(function () {});
     }, 25000);
 
     if (window.Hls && Hls.isSupported()) {
-      hls = new Hls({
-        enableWorker: false,
-        maxBufferLength: 30,
-        maxMaxBufferLength: 60,
-      });
+      hls = new Hls({ enableWorker: false, maxBufferLength: 30, maxMaxBufferLength: 60 });
       hls.loadSource(currentPlaylistBlobUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        status.textContent = "";
         status.classList.add("hidden");
-        video.play().catch(function () {
-          status.textContent = "اضغط Play يدويًا";
-          status.classList.remove("hidden");
-        });
+        video.play().catch(function () { status.textContent = "اضغط Play يدويًا"; status.classList.remove("hidden"); });
       });
       hls.on(Hls.Events.ERROR, function (_, data) {
-        console.error("HLS error:", data);
         if (!data.fatal) return;
         var msg = data.type + (data.details ? " / " + data.details : "");
         if (data.response && data.response.code) msg += " HTTP " + data.response.code;
-        status.textContent = "خطأ HLS: " + msg;
-        status.classList.remove("hidden");
+        status.textContent = "خطأ HLS: " + msg; status.classList.remove("hidden");
       });
     } else {
-      status.textContent = "المتصفح لا يدعم HLS.js";
-      status.classList.remove("hidden");
+      status.textContent = "المتصفح لا يدعم HLS.js"; status.classList.remove("hidden");
     }
   } catch (e) {
-    console.error(e);
-    status.textContent = "فشل: " + (e.message || e);
-    status.classList.remove("hidden");
+    console.error(e); status.textContent = "فشل: " + (e.message || e); status.classList.remove("hidden");
   }
 }
 
-/* ============================================================
-   Stop Playback — كما هو
-   ============================================================ */
 function stopPlayback() {
   if (hbTimer) { clearInterval(hbTimer); hbTimer = null; }
   if (hls) { hls.destroy(); hls = null; }
   if (currentKeyBlobUrl) { URL.revokeObjectURL(currentKeyBlobUrl); currentKeyBlobUrl = null; }
   if (currentPlaylistBlobUrl) { URL.revokeObjectURL(currentPlaylistBlobUrl); currentPlaylistBlobUrl = null; }
   var video = document.getElementById("video");
-  if (video) {
-    video.removeAttribute("src");
-    video.load();
-  }
+  if (video) { video.removeAttribute("src"); video.load(); }
 }
 
 function closePlayer() {
@@ -622,57 +482,12 @@ function closePlayer() {
   document.getElementById("player-modal").classList.add("hidden");
 }
 
-/* ============================================================
-   Speed & Quality Controls (جديد)
-   ============================================================ */
-document.addEventListener("click", function (e) {
-  if (e.target.matches("#speed-btns button")) {
-    const sp = parseFloat(e.target.dataset.speed);
-    const video = document.getElementById("video");
-    if (video) video.playbackRate = sp;
-    document.querySelectorAll("#speed-btns button").forEach(function (b) {
-      b.classList.toggle("active", b === e.target);
-    });
-  }
+// Theme Toggle
+document.getElementById("theme-toggle").addEventListener("click", () => {
+  const cur = document.body.getAttribute("data-theme") === "light" ? "dark" : "light";
+  document.body.setAttribute("data-theme", cur);
 });
 
-document.addEventListener("change", function (e) {
-  if (e.target.id === "quality-select" && hls) {
-    const v = parseInt(e.target.value, 10);
-    hls.currentLevel = v === -1 ? -1 : v;
-  }
-});
-
-/* ============================================================
-   Modal close on ESC (جديد)
-   ============================================================ */
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") closePlayer();
-});
-
-/* ============================================================
-   Search Input Binding (جديد)
-   ============================================================ */
-document.addEventListener("DOMContentLoaded", function () {
-  const si = document.getElementById("search-input");
-  if (si) {
-    si.addEventListener("input", function (e) {
-      const q = e.target.value.trim().toLowerCase();
-      if (q) {
-        state.view = "search";
-        renderSearch();
-      } else {
-        goHome();
-      }
-    });
-  }
-});
-
-/* ============================================================
-   Init
-   ============================================================ */
-loadPlayerScript()
-  .then(function (c) { cryptoUtils = c; })
-  .catch(function () {});
-
+// تشغيل التطبيق
+loadPlayerScript().then(c => cryptoUtils = c).catch(() => {});
 render();
