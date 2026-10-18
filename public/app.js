@@ -13,10 +13,29 @@ const clickLayer  = document.getElementById("click-layer");
 
 // ==================== API & Utils ====================
 async function api(path, opts = {}) {
+  // 🔥 إضافة credentials: 'include' عشان يبعت الكوكيز والصلاحيات للسيرفر
+  opts.credentials = opts.credentials || 'include';
+  opts.headers = opts.headers || {};
+  
   const res  = await fetch(path, opts);
-  const data = await res.json();
-  if (!res.ok || data.success === false)
+  
+  // لو السيرفر رد بـ 403 (ممنوع)، بنطلع إيرور واضح
+  if (res.status === 403) {
+    throw new Error("غير مصرح لك بالوصول (403). يرجى تسجيل الدخول أو التأكد من الصلاحيات.");
+  }
+  
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    if (!res.ok) throw new Error(`HTTP ${res.status} - فشل في قراءة البيانات`);
+    data = text;
+  }
+
+  if (!res.ok || data.success === false) {
     throw new Error(data.error || data.message || "HTTP " + res.status);
+  }
   return data.data !== undefined ? data.data : data;
 }
 
@@ -42,7 +61,7 @@ async function render() {
     else if (state.view === "lectures") await renderLectures();
     else if (state.view === "content")  await renderContent();
   } catch (e) {
-    appEl.innerHTML = '<div style="color:red;text-align:center;padding:50px;">خطأ: ' + e.message + "</div>";
+    appEl.innerHTML = `<div style="color:#ff3d00;text-align:center;padding:50px;font-weight:bold;font-size:1.2rem;">خطأ: ${e.message}</div>`;
   }
 }
 
@@ -360,6 +379,7 @@ async function playVideo(videoId, title) {
   stopPlayback();
 
   try {
+    // تم تعديل دالة api عشان تبعت الكوكيز، فهنا هتشتغل عادي
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"});
     var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess;
     if(!tok||!swId) throw new Error("الجلسة ناقصة");
@@ -369,7 +389,7 @@ async function playVideo(videoId, title) {
 
     // master
     var mUrl = "/api/stream?path="+encodeURIComponent("videos/"+swId+"/stream/master.m3u8")+"&t="+encodeURIComponent(tok);
-    var mRes = await fetch(mUrl);
+    var mRes = await fetch(mUrl, { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
     if(!mRes.ok) throw new Error("master.m3u8 → HTTP "+mRes.status);
     var mText = await mRes.text();
 
@@ -391,7 +411,7 @@ async function playVideo(videoId, title) {
       varUrl="/api/stream?path="+encodeURIComponent(vBase)+"&t="+encodeURIComponent(tok);
     }
 
-    var vRes = await fetch(varUrl);
+    var vRes = await fetch(varUrl, { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
     if(!vRes.ok) throw new Error("variant → HTTP "+vRes.status);
     var vText = await vRes.text();
 
@@ -411,7 +431,7 @@ async function playVideo(videoId, title) {
       }
     }
 
-    var kRes = await fetch("/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(tok));
+    var kRes = await fetch("/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(tok), { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
     if(!kRes.ok) throw new Error("key → HTTP "+kRes.status);
     var wrapped = new Uint8Array(await kRes.arrayBuffer());
     var kr = await cryptoUtils.decryptPlaybackKey(wrapped, swId);
@@ -432,7 +452,7 @@ async function playVideo(videoId, title) {
     status.querySelector('span').textContent = "جاري التشغيل...";
 
     hbTimer = setInterval(()=>{
-      fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},
+      fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",
         body:JSON.stringify({url:hbUrl,token:tok})}).catch(()=>{});
     }, 25000);
 
@@ -588,20 +608,18 @@ let pressTimer = null;
 let isLongPress = false;
 let speedBeforeHold = 1;
 
-// 1. النقر المطول (لتسريع الفيديو)
 clickLayer.addEventListener('mousedown', startPress);
 clickLayer.addEventListener('touchstart', startPress, {passive: true});
 
 function startPress(e) {
   isLongPress = false;
   
-  // لو الفيديو واقف، مفيش تسريع
   if (videoEl.paused) return;
 
   pressTimer = setTimeout(() => {
     isLongPress = true;
     speedBeforeHold = videoEl.playbackRate;
-    videoEl.playbackRate = 2; // تسريع صامت
+    videoEl.playbackRate = 2;
   }, 400);
 }
 
@@ -613,36 +631,29 @@ clickLayer.addEventListener('touchcancel', endPress);
 function endPress() {
   clearTimeout(pressTimer);
   if (isLongPress) {
-    videoEl.playbackRate = speedBeforeHold; // إرجاع السرعة الطبيعية
+    videoEl.playbackRate = speedBeforeHold;
     isLongPress = false;
   }
 }
 
-// 2. النقر العادي (Click) والنقر المزدوج (Double Click)
-// نستخدم حدث 'click' المباشر عشان نمنع أي تداخل
 clickLayer.addEventListener('click', (e) => {
-  // لو كان ضغط مطول، متعملش حاجة
   if (isLongPress) return;
-
-  // إظهار / إخفاء شريط التحكم
   playerContainer.classList.toggle('hide-cursor');
 });
 
 clickLayer.addEventListener('dblclick', (e) => {
-  // لو كان ضغط مطول، متعملش حاجة
   if (isLongPress) return;
 
   const rect = playerContainer.getBoundingClientRect();
   const relativeX = e.clientX - rect.left;
   const width = rect.width;
 
-  // النقر المزدوج يمين (تقديم) أو شمال (تأخير)
   if (relativeX > width * 0.65) {
     skipTime(10);
   } else if (relativeX < width * 0.35) {
     skipTime(-10);
   } else {
-    togglePlay(); // النقر المزدوج في النص بيشغل/يوقف
+    togglePlay();
   }
 });
 
@@ -660,7 +671,6 @@ function showSeekIndicator(text, icon) {
   el._ht = setTimeout(()=> el.classList.add('hidden'), 700);
 }
 
-// إخفاء الماوس أوتوماتيك
 let cursorTimer;
 playerContainer.addEventListener('mousemove', ()=>{
   playerContainer.classList.remove('hide-cursor');
