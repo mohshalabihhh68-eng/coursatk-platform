@@ -12,7 +12,7 @@
 body { font-size: 1.1rem; line-height: 1.6; background-color: var(--bg); color: var(--text-main); direction: rtl; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
-/* Topbar & Pages (نفس القديم) */
+/* Topbar & Pages */
 .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 24px; background:var(--bg); position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
 .topbar-left, .topbar-right { display:flex; align-items:center; gap:12px; }
 .brand-text p { font-size:0.85rem; color:var(--text-muted); margin-top:1px; }
@@ -218,4 +218,4 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
   .stat-val { font-size: 1.2rem; }
   .video-nav-btns { justify-content: space-between; }
   .btn-nav { flex: 1; justify-content: center; }
-               }
+  }
