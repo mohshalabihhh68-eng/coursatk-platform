@@ -12,14 +12,13 @@
   --radius:       16px;
   --font:         'Cairo', sans-serif;
 
-  /* ---- Typography scale ---- */
-  --fs-xs:   0.78rem;   /* 12.5px  — badges, meta */
-  --fs-sm:   0.875rem;  /* 14px    — sub-labels   */
-  --fs-base: 1rem;      /* 16px    — body          */
-  --fs-md:   1.1rem;    /* 17.6px  — card titles   */
-  --fs-lg:   1.3rem;    /* 20.8px  — section heads */
-  --fs-xl:   1.6rem;    /* 25.6px  — page titles   */
-  --fs-2xl:  2rem;      /* 32px    — hero titles   */
+  --fs-xs:   0.8rem;   
+  --fs-sm:   0.9rem;  
+  --fs-base: 1.05rem;  
+  --fs-md:   1.15rem;  
+  --fs-lg:   1.35rem;  
+  --fs-xl:   1.6rem;   
+  --fs-2xl:  2.1rem;   
 }
 
 [data-theme="light"] {
@@ -34,8 +33,13 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
-body {
+/* جعل الخط عريض في كل الموقع */
+body, h1, h2, h3, h4, h5, h6, p, span, div, button, input, a, small, label {
   font-family: var(--font);
+  font-weight: 700; /* جعلنا كل النصوص Bold افتراضياً */
+}
+
+body {
   font-size: var(--fs-base);
   line-height: 1.6;
   background-color: var(--bg);
@@ -43,6 +47,11 @@ body {
   direction: rtl;
   -webkit-font-smoothing: antialiased;
 }
+
+/* جعل العناوين الكبيرة بوزن أثقل */
+h1, .page-title-area h1 { font-weight: 800; }
+h2, .section-header h2 { font-weight: 800; }
+h3, .card-title, .teacher-name { font-weight: 800; }
 
 /* ==================== Topbar ==================== */
 .topbar {
@@ -54,7 +63,7 @@ body {
 }
 .topbar-right,.topbar-left { display:flex; align-items:center; gap:12px; }
 .brand-text h1  { font-size:var(--fs-md); font-weight:800; }
-.brand-text p   { font-size:var(--fs-xs); color:var(--text-muted); margin-top:1px; }
+.brand-text p   { font-size:var(--fs-xs); color:var(--text-muted); margin-top:1px; font-weight: 600; }
 .brand-logo {
   background:#fff; color:var(--brand-orange); font-weight:900;
   width:44px; height:44px; border-radius:50%;
@@ -93,7 +102,7 @@ body {
   font-size:var(--fs-2xl); font-weight:800; margin-bottom:8px; line-height:1.25;
 }
 .page-title-area h1 span { color:var(--brand-orange); }
-.page-title-area p  { color:var(--text-muted); font-size:var(--fs-sm); }
+.page-title-area p  { color:var(--text-muted); font-size:var(--fs-sm); font-weight: 600; }
 
 .back-btn-top {
   position:absolute; right:0; top:20px;
@@ -145,7 +154,7 @@ body {
 .btn-gradient {
   width:100%; background:var(--brand-gradient);
   color:#fff; border:none; padding:13px;
-  border-radius:12px; font-size:var(--fs-sm); font-weight:700;
+  border-radius:12px; font-size:var(--fs-sm); font-weight:800; /* Bold */
   font-family:inherit; cursor:pointer;
   display:flex; align-items:center; justify-content:center; gap:8px;
   transition:opacity .25s, transform .15s;
@@ -163,7 +172,7 @@ body {
 .teacher-info { display:flex; flex-direction:column; align-items:flex-end; text-align:right; gap:4px; }
 .teacher-role { font-size:var(--fs-xs); color:#ff9e00; font-weight:700; }
 .teacher-name { font-size:var(--fs-md); font-weight:800; }
-.teacher-sub  { font-size:var(--fs-xs); color:var(--text-muted); }
+.teacher-sub  { font-size:var(--fs-xs); color:var(--text-muted); font-weight: 600; }
 .teacher-avatar {
   width:78px; height:78px; border-radius:16px;
   object-fit:cover; border:2px solid var(--border); flex-shrink:0;
@@ -176,7 +185,7 @@ body {
 .count-badge {
   background:var(--brand-gradient); color:#fff;
   width:32px; height:32px; display:flex; align-items:center;
-  justify-content:center; border-radius:50%; font-size:var(--fs-sm);
+  justify-content:center; border-radius:50%; font-size:var(--fs-sm); font-weight: 800;
 }
 
 /* ==================== Content Icons ==================== */
@@ -237,7 +246,7 @@ body {
   border:1px solid rgba(255,255,255,.18);
 }
 .video-info  { padding:16px; text-align:center; display:flex; flex-direction:column; gap:14px; flex:1; }
-.video-title { font-size:var(--fs-sm); font-weight:700; line-height:1.45; }
+.video-title { font-size:var(--fs-sm); font-weight:800; line-height:1.45; }
 
 /* ==================== Modal ==================== */
 .modal {
@@ -264,13 +273,13 @@ body {
   border:1px solid rgba(255,255,255,.12);
   color:#fff; padding:10px 18px; border-radius:12px;
   cursor:pointer; font-family:inherit; font-size:var(--fs-sm);
-  font-weight:600; transition:background .2s; flex-shrink:0;
+  font-weight:700; transition:background .2s; flex-shrink:0;
 }
 .back-btn:hover { background:rgba(255,255,255,.13); }
 .back-btn svg   { width:18px; height:18px; }
 
 .modal-titles h3 {
-  font-size:var(--fs-sm); font-weight:800; color:#fff;
+  font-size:var(--fs-base); font-weight:800; color:#fff;
   text-align:center; flex:1; line-height:1.45;
 }
 .modal-action-icon {
@@ -306,7 +315,7 @@ body {
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
   gap:14px; z-index:10; color:#fff;
-  font-weight:700; font-size:var(--fs-sm);
+  font-weight:800; font-size:var(--fs-sm);
   backdrop-filter:blur(6px);
 }
 .player-status.hidden { display:none; }
@@ -459,7 +468,7 @@ body {
 /* ---- time ---- */
 .time-display {
   color:rgba(255,255,255,.9); font-size:11px;
-  font-family:'Courier New',monospace;
+  font-family:'Courier New',monospace; font-weight: 700;
   white-space:nowrap; direction:ltr; letter-spacing:.4px;
   background:rgba(0,0,0,.3); padding:3px 8px; border-radius:6px;
 }
@@ -479,7 +488,7 @@ body {
 .dropdown-content button {
   background:transparent; border:none; color:rgba(255,255,255,.8);
   padding:9px 14px; text-align:center;
-  font-size:var(--fs-xs); font-family:inherit; font-weight:600;
+  font-size:var(--fs-xs); font-family:inherit; font-weight:700;
   cursor:pointer; border-radius:8px; transition:background .15s, color .15s;
 }
 .dropdown-content button:hover  { background:rgba(255,107,0,.18); color:#ff9e00; }
