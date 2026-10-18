@@ -3,29 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>شلبيكوو</title></title>
-  <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
+  <title>ثانوية World - المنصة التعليمية</title>
+  <!-- استدعاء مكتبة الأيقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- استدعاء ملف التصميم -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
+  <!-- الشريط العلوي -->
   <header class="topbar">
-    <div class="logo" onclick="goHome()"> ثانوية World</div>
-    <div id="profile-chip" class="chip hidden"></div>
+    <div class="logo" onclick="goHome()">
+      <span class="logo-text">ثانوية World</span>
+      <div class="logo-icon"></div>
+    </div>
+    <div id="profile-chip" class="chip hidden">
+      <i class="fa-solid fa-user"></i> أ. محمد صلاح
+    </div>
   </header>
 
+  <!-- المحتوى الرئيسي -->
   <main id="app">
-    <div class="loading">جاري التحميل...</div>
+    
+    <!-- هذا الجزء يتم التحكم به عبر الجافاسكريبت، لكننا نضع هيكل تجريبي لتراه -->
+    
+    <!-- مثال 1: الصفحة الرئيسية (السنوات الدراسية) -->
+    <div class="breadcrumb">الرئيسية / <span>السنوات الدراسية</span></div>
+    <h2 class="section-title">السنوات الدراسية</h2>
+    
+    <div class="grid-container years-grid">
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/2a324b/ffffff?text=2024');"></div>
+        <div class="card-footer"><span>2024</span></div>
+      </div>
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/2a324b/ffffff?text=2025');"></div>
+        <div class="card-footer"><span>2025</span></div>
+      </div>
+      <div class="card active">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/FF7A00/ffffff?text=2027');"></div>
+        <div class="card-footer"><span>2027</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- مثال 2: المواد الدراسية -->
+    <h2 class="section-title">المواد</h2>
+    <div class="grid-container subjects-grid">
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/8A2BE2/ffffff?text=الفيزياء');"></div>
+        <div class="card-footer"><span>فيزياء</span></div>
+      </div>
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/FF4500/ffffff?text=اللغة+العربية');"></div>
+        <div class="card-footer"><span>اللغة العربية</span></div>
+      </div>
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/20B2AA/ffffff?text=أحياء');"></div>
+        <div class="card-footer"><span>أحياء</span></div>
+      </div>
+      <div class="card">
+        <div class="card-img" style="background-image: url('https://via.placeholder.com/300x200/FF8C00/ffffff?text=كيمياء');"></div>
+        <div class="card-footer"><span>كيمياء</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- مثال 3: الفصول / المحاضرات -->
+    <h2 class="section-title">الفصول</h2>
+    <div class="list-container">
+      <div class="list-item">
+        <div class="list-content">
+          <h3>حل الكتب الخارجية - شهر 2</h3>
+          <p>3 محاضرات</p>
+        </div>
+        <div class="list-icon">
+          <img src="https://via.placeholder.com/60" alt="أ. محمد">
+        </div>
+      </div>
+      
+      <div class="list-item">
+        <div class="list-content">
+          <h3>الشهر الثاني</h3>
+          <p>4 محاضرات</p>
+        </div>
+        <div class="list-icon">
+          <img src="https://via.placeholder.com/60" alt="أ. محمد">
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- مثال 4: المحاضرة السادسة (الفيديوهات والملفات) -->
+    <div class="breadcrumb">الرئيسية / <span>المحاضرة السادسة</span></div>
+    <h2 class="section-title">المحاضرة السادسة</h2>
+    
+    <h3 class="sub-title"><i class="fa-solid fa-video" style="color: var(--primary);"></i> الفيديوهات</h3>
+    <div class="list-container">
+      <div class="list-item action-item">
+        <div class="list-content">
+          <h3><i class="fa-solid fa-play" style="color: var(--primary);"></i> مقدمة المحاضرة السادسة - محمد صلاح 3 ث</h3>
+        </div>
+      </div>
+      <div class="list-item action-item">
+        <div class="list-content">
+          <h3><i class="fa-solid fa-play" style="color: var(--primary);"></i> النحو - اسم الفاعل وصيغة المبالغة</h3>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title" style="margin-top: 30px;"><i class="fa-solid fa-file-pdf" style="color: #ff4757;"></i> الملفات</h3>
+    <div class="list-container">
+      <div class="list-item action-item">
+        <div class="list-content">
+          <h3><i class="fa-solid fa-file-lines"></i> صفحات واجب المحاضرة السادسة - محمد صلاح</h3>
+        </div>
+      </div>
+      <div class="list-item action-item">
+        <div class="list-content">
+          <h3><i class="fa-solid fa-file-lines"></i> ملف تحليل أسئلة ثانوية عامة في النحو</h3>
+        </div>
+      </div>
+    </div>
+
   </main>
 
+  <!-- مشغل الفيديو (المودال) -->
   <div id="player-modal" class="modal hidden">
     <div class="modal-box">
-      <button class="close-btn" onclick="closePlayer()">✕</button>
-      <h3 id="player-title"></h3>
-      <video id="video" controls playsinline></video>
+      <button class="close-btn" onclick="closePlayer()"><i class="fa-solid fa-xmark"></i></button>
+      <h3 id="player-title">عنوان الفيديو</h3>
+      <div class="video-wrapper">
+        <video id="video" controls playsinline></video>
+      </div>
       <div id="player-status" class="status"></div>
     </div>
   </div>
 
-  <script src="/app.js"></script>
 </body>
 </html>
