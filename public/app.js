@@ -76,9 +76,27 @@ function joinRel(base, rel) { var q="", rp=String(rel), qi=rp.indexOf("?"); if(q
 function resolveMedia(uri, vBase, tok, vFileUrl) { if(/^(blob:|data:)/i.test(uri)) return uri; if(uri.indexOf("/api/stream")===0||uri.indexOf("/api/cdn")===0) return location.origin+uri; if(/^https?:\/\//i.test(uri)) return location.origin+"/api/cdn?u="+toB64url(uri); if(vFileUrl){try{return location.origin+"/api/cdn?u="+toB64url(new URL(uri,vFileUrl).href);}catch(e){}} return location.origin+"/api/stream?path="+encodeURIComponent(joinRel(vBase||"",uri))+"&t="+encodeURIComponent(tok); }
 function rewritePlaylist(text, tok, keyBlob, vBase, vFileUrl) { return text.split("\n").map(line=>{ var s=line.trim(); if(!s) return line; if(s.charAt(0)==="#"){ if(s.indexOf("#EXT-X-KEY:")===0&&keyBlob) return s.replace(/URI="[^"]+"/, 'URI="'+keyBlob+'"'); return s.replace(/URI="([^"]+)"/g,(_m,u)=>'URI="'+resolveMedia(u,vBase,tok,vFileUrl)+'"'); } return resolveMedia(s,vBase,tok,vFileUrl); }).join("\n"); }
 
+// 🔥 دالة الوقت (تظهر ساعات لو أكتر من ساعة)
+function formatTime(sec) {
+  if(isNaN(sec)||sec<0) return '00:00';
+  const t = Math.floor(sec);
+  const h = Math.floor(t/3600);
+  const m = Math.floor((t%3600)/60);
+  const s = t%60;
+  if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// 🔥 مفتاح الحفظ في الـ localStorage
+function getStorageKey(videoId) { return `coursatk_video_${videoId}`; }
+
 async function playVideo(videoId, title) {
   document.getElementById("player-title").textContent = title; document.getElementById("player-modal").classList.remove("hidden"); document.body.style.overflow = "hidden";
   const status = document.getElementById("player-status"); status.querySelector('span').textContent = "جاري فتح الجلسة..."; status.classList.remove("hidden"); stopPlayback();
+  
+  // 🔥 إخفاء إشعار الاستكمال لحد ما الفيديو يحمل
+  document.getElementById("resume-notification").classList.add("hidden");
+  
   try {
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"}); var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess; if(!tok||!swId) throw new Error("الجلسة ناقصة");
     status.querySelector('span').textContent = "فك التشفير..."; if(!cryptoUtils) cryptoUtils = await loadPlayerScript();
@@ -96,7 +114,24 @@ async function playVideo(videoId, title) {
     hbTimer = setInterval(()=>{ fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include", body:JSON.stringify({url:hbUrl,token:tok})}).catch(()=>{}); }, 25000);
     if(window.Hls && Hls.isSupported()){
       hls = new Hls({enableWorker:false, maxBufferLength:30, maxMaxBufferLength:60}); hls.loadSource(currentPlaylistBlobUrl); hls.attachMedia(videoEl);
-      hls.on(Hls.Events.MANIFEST_PARSED, (event, data)=>{ status.classList.add("hidden"); buildQualityMenu(data.levels); videoEl.play().catch(()=>{ centerPlayBtn.classList.remove('hidden'); }); });
+      hls.on(Hls.Events.MANIFEST_PARSED, (event, data)=>{ 
+        status.classList.add("hidden"); 
+        buildQualityMenu(data.levels); 
+        
+        // 🔥 إظهار إشعار الاستكمال لو موجود وقت محفوظ
+        const savedTime = localStorage.getItem(getStorageKey(videoId));
+        if (savedTime && parseFloat(savedTime) > 5) {
+          document.getElementById("resume-time").textContent = formatTime(parseFloat(savedTime));
+          document.getElementById("resume-notification").classList.remove("hidden");
+          document.getElementById("resume-btn").onclick = () => {
+            videoEl.currentTime = parseFloat(savedTime);
+            document.getElementById("resume-notification").classList.add("hidden");
+            videoEl.play();
+          };
+        } else {
+          videoEl.play().catch(()=>{ centerPlayBtn.classList.remove('hidden'); });
+        }
+      });
       hls.on(Hls.Events.ERROR, (_, data)=>{ if(!data.fatal) return; status.querySelector('span').textContent = "خطأ HLS: "+data.type; status.classList.remove('hidden'); });
     } else { videoEl.src = currentPlaylistBlobUrl; videoEl.play(); }
   } catch(e) { status.querySelector('span').textContent = "فشل: "+e.message; status.classList.remove('hidden'); }
@@ -109,16 +144,78 @@ document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')&&!e.ta
 function togglePlay() { if(videoEl.paused) videoEl.play(); else videoEl.pause(); }
 videoEl.addEventListener('play', ()=>{ document.getElementById('play-icon').classList.add('hidden'); document.getElementById('pause-icon').classList.remove('hidden'); playerContainer.classList.remove('paused'); centerPlayBtn.classList.add('hidden'); showControlsTemporary(); });
 videoEl.addEventListener('pause', ()=>{ document.getElementById('play-icon').classList.remove('hidden'); document.getElementById('pause-icon').classList.add('hidden'); playerContainer.classList.add('paused'); playerContainer.classList.remove('hide-cursor'); centerPlayBtn.classList.remove('hidden'); });
-function setSpeed(speed, btn) { videoEl.playbackRate = speed; document.getElementById('speed-btn').textContent = speed===1 ? '1x' : speed+'x'; document.querySelectorAll('#speed-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('speed-menu').classList.add('hidden'); }
 function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('quality-btn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
-function formatTime(sec) { if(isNaN(sec)||sec<0) return '00:00'; const t = Math.floor(sec); const m = Math.floor(t/60); const s = t%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
-videoEl.addEventListener('timeupdate', ()=>{ if(videoEl.duration){ const pct=(videoEl.currentTime/videoEl.duration)*100; document.getElementById('progress-filled').style.width=pct+'%'; document.getElementById('time-display').textContent=`${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`; } });
+
+// 🔥 تحديث شريط التقدم
+videoEl.addEventListener('timeupdate', ()=>{ 
+  if(videoEl.duration){ 
+    const pct=(videoEl.currentTime/videoEl.duration)*100; 
+    document.getElementById('progress-filled').style.width=pct+'%'; 
+    document.getElementById('progress-handle').style.left=pct+'%'; 
+    document.getElementById('time-display').textContent=`${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`; 
+  } 
+});
+
+// 🔥 حفظ الوقت تلقائياً كل 5 ثواني
+let saveTimer = null;
+videoEl.addEventListener('timeupdate', () => {
+  if (!saveTimer) {
+    saveTimer = setTimeout(() => {
+      if (videoEl.currentTime > 0 && state.lecture) {
+        localStorage.setItem(getStorageKey(state.lecture.id), videoEl.currentTime);
+      }
+      saveTimer = null;
+    }, 5000);
+  }
+});
+
 videoEl.addEventListener('loadedmetadata', ()=>{ document.getElementById('time-display').textContent=`00:00 / ${formatTime(videoEl.duration)}`; });
-document.getElementById('progress-container').addEventListener('click', function(e) { const rect = this.getBoundingClientRect(); let pct = (e.clientX - rect.left) / rect.width; if(document.dir === 'rtl') pct = 1 - pct; if(videoEl.duration) videoEl.currentTime = pct * videoEl.duration; });
+
+// 🔥 سحب شريط التقدم (Drag & Seek)
+const progressContainer = document.getElementById('progress-container');
+const progressTooltip = document.getElementById('progress-tooltip');
+let isDragging = false;
+
+function handleSeek(e) {
+  const rect = progressContainer.getBoundingClientRect();
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let pct = (clientX - rect.left) / rect.width;
+  pct = Math.max(0, Math.min(1, pct));
+  
+  if (videoEl.duration) {
+    const newTime = pct * videoEl.duration;
+    if (isDragging) {
+      document.getElementById('progress-filled').style.width = (pct * 100) + '%';
+      document.getElementById('progress-handle').style.left = (pct * 100) + '%';
+      document.getElementById('time-display').textContent = `${formatTime(newTime)} / ${formatTime(videoEl.duration)}`;
+      progressTooltip.textContent = formatTime(newTime);
+      progressTooltip.style.left = (pct * 100) + '%';
+    }
+    if (!isDragging || e.type === 'click') {
+      videoEl.currentTime = newTime;
+    }
+  }
+}
+
+progressContainer.addEventListener('mousedown', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); });
+progressContainer.addEventListener('touchstart', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); }, {passive: true});
+
+document.addEventListener('mousemove', (e) => { if (isDragging) handleSeek(e); });
+document.addEventListener('touchmove', (e) => { if (isDragging) handleSeek(e); }, {passive: true});
+
+document.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
+document.addEventListener('touchend', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
+
+// 🔥 شريط السرعة الجديد
+document.getElementById('speed-slider').addEventListener('input', (e) => {
+  const speed = parseFloat(e.target.value);
+  videoEl.playbackRate = speed;
+  document.getElementById('speed-label').textContent = speed + 'x';
+});
+
 function toggleMute() { videoEl.muted = !videoEl.muted; document.getElementById('vol-icon').style.opacity = videoEl.muted ? '0.4' : '1'; }
 document.getElementById('volume-slider').addEventListener('input', e=>{ videoEl.volume = e.target.value; videoEl.muted = e.target.value==0; });
 function toggleFullscreen() { if(!document.fullscreenElement) playerContainer.requestFullscreen().catch(err=>console.log(err)); else document.exitFullscreen(); }
-
 
 // ==================== 🔥 التحكم الجديد (فصل تام) 🔥 ====================
 let controlsTimeout = null;
@@ -132,29 +229,23 @@ function showControlsTemporary() {
 
 let pressTimer = null; let isLongPress = false; let speedBeforeHold = 1;
 
-// 1. بدء الضغط (مسك الشاشة)
 function startPress(e) {
   isLongPress = false;
-  if (videoEl.paused) return; // مفيش تسريع لو الفيديو واقف
-  
-  // ننتظر 300 مللي ثانية. لو المستخدم ساب قبلها يبقى دي ضغطة عادية
+  if (videoEl.paused) return; 
   pressTimer = setTimeout(() => {
     isLongPress = true;
     speedBeforeHold = videoEl.playbackRate;
-    videoEl.playbackRate = 2; // تسريع
-    if (navigator.vibrate) navigator.vibrate(50); // اهتزاز بسيط للموبايل (اختياري)
+    videoEl.playbackRate = 2;
+    if (navigator.vibrate) navigator.vibrate(50);
   }, 300);
 }
-
-// 2. سيبان الضغط
 function endPress(e) {
   clearTimeout(pressTimer);
   if (isLongPress) {
-    videoEl.playbackRate = speedBeforeHold; // رجع السرعة العادية
+    videoEl.playbackRate = speedBeforeHold;
     isLongPress = false;
   }
 }
-
 clickLayer.addEventListener('mousedown', startPress);
 clickLayer.addEventListener('touchstart', startPress, {passive: true});
 clickLayer.addEventListener('mouseup', endPress);
@@ -162,11 +253,8 @@ clickLayer.addEventListener('mouseleave', endPress);
 clickLayer.addEventListener('touchend', endPress);
 clickLayer.addEventListener('touchcancel', endPress);
 
-// 3. لما تدوس دوسة عادية (Click)
 clickLayer.addEventListener('click', (e) => {
-  if (isLongPress) return; // لو كان ضغط مطول متعملش حاجة
-  
-  // نتحقق لو التحكم ظاهر نخفيه، لو مخفي نظهره
+  if (isLongPress) return; 
   if (playerContainer.classList.contains('show-controls')) {
     clearTimeout(controlsTimeout);
     playerContainer.classList.remove('show-controls');
@@ -175,7 +263,6 @@ clickLayer.addEventListener('click', (e) => {
   }
 });
 
-// 4. الدبل كليك
 clickLayer.addEventListener('dblclick', (e) => {
   if (isLongPress) return;
   const rect = playerContainer.getBoundingClientRect(); 
@@ -189,10 +276,24 @@ clickLayer.addEventListener('dblclick', (e) => {
 function skipTime(sec) { videoEl.currentTime = Math.max(0, Math.min(videoEl.duration||0, videoEl.currentTime+sec)); showSeekIndicator(sec>0?'+10':'-10', sec>0?'⏩':'⏪'); }
 function showSeekIndicator(text, icon) { const el = document.getElementById('seek-indicator'); el.innerHTML = `<span class="seek-icon" style="font-size:24px;">${icon}</span><span>${text}s</span>`; el.classList.remove('hidden'); el.style.animation='none'; el.offsetHeight; el.style.animation=null; if(el._ht) clearTimeout(el._ht); el._ht = setTimeout(()=> el.classList.add('hidden'), 700); }
 
-// شيلنا mousemove عشان الموبايل ميتلخبطش
-
+// ==================== Stop & Close ====================
 function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
-function closePlayer() { stopPlayback(); document.getElementById("player-modal").classList.add("hidden"); document.body.style.overflow = ""; document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); document.getElementById('seek-indicator').classList.add('hidden'); document.getElementById('time-display').textContent = '00:00 / 00:00'; document.getElementById('progress-filled').style.width = '0%'; centerPlayBtn.classList.add('hidden'); playerContainer.classList.remove('show-controls'); }
+function closePlayer() { 
+  // حفظ الوقت قبل الإغلاق
+  if (state.lecture && videoEl.currentTime > 0) {
+    localStorage.setItem(getStorageKey(state.lecture.id), videoEl.currentTime);
+  }
+  stopPlayback(); 
+  document.getElementById("player-modal").classList.add("hidden"); 
+  document.body.style.overflow = ""; 
+  document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); 
+  document.getElementById('seek-indicator').classList.add('hidden'); 
+  document.getElementById('time-display').textContent = '00:00 / 00:00'; 
+  document.getElementById('progress-filled').style.width = '0%'; 
+  centerPlayBtn.classList.add('hidden'); 
+  playerContainer.classList.remove('show-controls'); 
+  document.getElementById('resume-notification').classList.add('hidden');
+}
 
 document.getElementById("theme-toggle").addEventListener("click", ()=>{ const cur = document.body.getAttribute("data-theme")==="light"?"dark":"light"; document.body.setAttribute("data-theme", cur); });
 loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{}); render();
