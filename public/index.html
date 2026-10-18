@@ -10,7 +10,6 @@
 </head>
 <body data-theme="dark">
   
-  <!-- الهيدر العلوي -->
   <header class="topbar">
     <div class="topbar-right">
       <button class="icon-btn" id="theme-toggle" title="تبديل الثيم">
@@ -26,12 +25,10 @@
     </div>
   </header>
 
-  <!-- المحتوى الرئيسي -->
   <main id="app">
     <div class="loading">جاري التحميل...</div>
   </main>
 
-  <!-- مشغل الفيديو (المودال) -->
   <div id="player-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -41,45 +38,33 @@
         </button>
         <div class="modal-titles">
           <h3 id="player-title"></h3>
-          <p>اختر المنصة المناسبة للمشاهدة</p>
         </div>
         <div class="modal-action-icon">
            <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
         </div>
       </div>
 
-      <!-- المشغل المخصص الفخم -->
+      <!-- المشغل المخصص -->
       <div class="custom-player-container" id="custom-player">
         <video id="video" playsinline></video>
         
         <!-- طبقة استقبال النقرات -->
         <div class="click-layer" id="click-layer"></div>
 
-        <!-- شاشة التحميل / الحالة -->
+        <!-- شاشة التحميل -->
         <div id="player-status" class="player-status">
           <div class="spinner"></div>
           <span>جاري التشغيل...</span>
         </div>
 
-        <!-- أيقونة التشغيل الكبيرة -->
-        <div id="big-play-btn" class="big-play-btn hidden" onclick="togglePlay()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-
-        <!-- مؤشر التسريع (أيقونة صغيرة وأنيقة) -->
-        <div id="speed-indicator" class="speed-indicator hidden">
-          <span style="font-size: 16px; font-weight: bold;">2x ⏩</span>
-        </div>
-
-        <!-- مؤشر التقديم / التأخير -->
+        <!-- مؤشر التقديم / التأخير (الدوائر اللي في النص) -->
         <div id="seek-indicator" class="seek-indicator hidden">+10s</div>
 
-        <!-- أدوات التحكم السفلية (تصميم زجاجي) -->
+        <!-- أدوات التحكم السفلية (زجاجية) -->
         <div class="controls-bar" id="controls-bar">
           <div class="progress-container" onclick="seekVideo(event)">
             <div class="progress-bar" id="progress-bar">
               <div class="progress-filled" id="progress-filled"></div>
-              <div class="progress-handle" id="progress-handle"></div>
             </div>
           </div>
           
@@ -88,13 +73,6 @@
               <button class="ctrl-btn" onclick="togglePlay()" id="play-pause-btn">
                 <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-              </button>
-              
-              <button class="ctrl-btn" onclick="skipTime(-10)" title="تأخير 10 ثواني">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
-              </button>
-              <button class="ctrl-btn" onclick="skipTime(10)" title="تقديم 10 ثواني">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
               </button>
               
               <div class="volume-container">
@@ -108,7 +86,7 @@
             </div>
 
             <div class="controls-right">
-              <!-- زرار السرعة -->
+              <!-- قائمة السرعة -->
               <div class="dropdown">
                 <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
                 <div class="dropdown-content hidden" id="speed-menu">
@@ -121,11 +99,11 @@
                 </div>
               </div>
 
-              <!-- زرار الجودة -->
+              <!-- قائمة الجودة -->
               <div class="dropdown">
                 <button class="ctrl-btn text-btn" id="quality-btn" onclick="toggleDropdown('quality-menu')">جودة</button>
                 <div class="dropdown-content hidden" id="quality-menu">
-                  <!-- بيتم ملئها من الجافاسكريبت -->
+                  <button onclick="setQuality(-1, this)" class="active">تلقائي</button>
                 </div>
               </div>
 
