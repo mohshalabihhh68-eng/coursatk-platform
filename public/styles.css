@@ -1,3 +1,4 @@
+/* ==================== Variables ==================== */
 :root {
   --bg: #070a13; --bg-card: #121724; --bg-card-light: #1a2132;
   --text-main: #ffffff; --text-muted: #8b95a5;
@@ -96,7 +97,7 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .seek-indicator.hidden { display:none; }
 @keyframes seekPop { 0% { transform:translate(-50%,-50%) scale(.7); opacity:0; } 100%{ transform:translate(-50%,-50%) scale(1); opacity:1; } }
 
-/* 🔥 شريط التحكم يعتمد على كلاس show-controls */
+/* 🔥 شريط التحكم - بيظهر بالكلاس show-controls */
 .controls-bar { 
   position:absolute; bottom:0; left:0; right:0; 
   background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.6) 50%, transparent 100%); 
@@ -145,4 +146,4 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
   .controls-bar { padding:28px 10px 10px; }
   .center-play-btn { width:60px; height:60px; }
   .center-play-btn svg { width:26px; height:26px; }
-}
+  }
