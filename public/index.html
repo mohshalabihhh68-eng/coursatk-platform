@@ -45,10 +45,9 @@
       <!-- الفيديو (يمين) -->
       <div class="player-main-col">
         
-        <!-- 🔥 المشغل الجديد -->
+        <!-- إطار المشغل -->
         <div class="video-frame">
           <div class="custom-player-container" id="custom-player">
-            
             <video id="video" playsinline></video>
             
             <button class="big-play" id="bigPlay">
@@ -60,7 +59,7 @@
             <div class="error-msg" id="errorMsg">
               <div style="font-size:40px">⚠️</div>
               <div id="errorText">حصل خطأ في تشغيل الفيديو</div>
-              <button id="retryBtn" onclick="retryVideo()">إعادة المحاولة</button>
+              <button id="retryBtn">إعادة المحاولة</button>
             </div>
 
             <div class="controls-bar" id="controls-bar">
@@ -90,8 +89,11 @@
 
                 <div class="controls-right">
                   <button class="ctrl-btn text-btn" id="speedBtn">1×</button>
-                  <button class="ctrl-btn" id="qualityBtn" onclick="toggleDropdown('quality-menu')">جودة</button>
-                  <div class="dropdown-content hidden" id="quality-menu"></div>
+                  
+                  <div class="dropdown">
+                    <button class="ctrl-btn text-btn" id="qualityBtn" onclick="toggleDropdown('quality-menu')">جودة</button>
+                    <div class="dropdown-content hidden" id="quality-menu"></div>
+                  </div>
                   
                   <button class="ctrl-btn" id="fullscreenBtn">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
