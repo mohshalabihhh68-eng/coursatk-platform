@@ -11,7 +11,7 @@
 body { font-size: 1.1rem; line-height: 1.6; background-color: var(--bg); color: var(--text-main); direction: rtl; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
-/* Topbar & Pages (كما هو من قبل) */
+/* Topbar & Pages */
 .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 24px; background:var(--bg); position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
 .topbar-left, .topbar-right { display:flex; align-items:center; gap:12px; }
 .brand-text p { font-size:0.85rem; color:var(--text-muted); margin-top:1px; }
@@ -29,7 +29,7 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 @media (max-width:768px) { .back-btn-top { position:static; margin-bottom:20px; } }
 .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:22px; }
 @media (max-width:600px) { .grid { grid-template-columns:1fr; } }
-.card { background:var(--bg-card); border-radius:20px; border:1px solid var(--border); overflow:hidden; cursor:pointer; transition:transform .3s,box-shadow .3s; }
+.card { background:var(--bg-card); border-radius:20px; border:1px solid var(--border); overflow:hidden; cursor:pointer; transition:transform .3s,box-shadow .3s; position:relative; }
 .card:hover { transform:translateY(-5px); box-shadow:0 14px 34px rgba(0,0,0,.45); }
 .card-img-wrapper { position:relative; height:180px; background:var(--brand-gradient); }
 .card-img-wrapper img { width:100%; height:100%; object-fit:cover; }
@@ -64,7 +64,10 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .video-num-badge { position:absolute; top:10px; right:10px; background:#111; color:#fff; font-size:0.85rem; padding:3px 8px; border-radius:6px; border:1px solid rgba(255,255,255,.18); }
 .video-info { padding:16px; text-align:center; display:flex; flex-direction:column; gap:14px; flex:1; }
 
-/* ==================== 🔥 Player CSS 🔥 ==================== */
+/* شارة تمت المشاهدة */
+.watched-badge { position:absolute; top:10px; left:10px; background:#10b981; color:#fff; font-size:0.8rem; padding:4px 8px; border-radius:6px; display:flex; align-items:center; gap:4px; font-weight:bold; z-index:3; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+
+/* ==================== Player CSS ==================== */
 .modal { position:fixed; inset:0; background:rgba(4,6,12,.97); z-index:999; display:flex; flex-direction:column; overflow-y:auto; backdrop-filter:blur(6px); }
 .modal.hidden { display:none; }
 .modal-box { width:100%; max-width:960px; margin:0 auto; padding:20px 20px 40px; display:flex; flex-direction:column; gap:18px; }
@@ -94,30 +97,11 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .seek-indicator.hidden { display:none; }
 @keyframes seekPop { 0% { transform:translate(-50%,-50%) scale(.7); opacity:0; } 100%{ transform:translate(-50%,-50%) scale(1); opacity:1; } }
 
-/* إشعار استكمال الفيديو */
-.resume-notification {
-  position:absolute; top:20px; left:50%; transform:translateX(-50%);
-  background:rgba(0,0,0,.85); border:1px solid var(--brand-orange);
-  padding:12px 24px; border-radius:12px; z-index:9;
-  display:flex; align-items:center; gap:16px; color:#fff;
-  backdrop-filter:blur(8px); animation:fadeInDown .3s ease-out;
-}
-.resume-notification p { font-size:0.95rem; margin:0; }
-.resume-notification.hidden { display:none; }
-@keyframes fadeInDown { from { opacity:0; transform:translate(-50%,-20px); } to { opacity:1; transform:translate(-50%,0); } }
-
-/* شريط التحكم - تصميم زجاجي (Glass) */
-.controls-bar { 
-  position:absolute; bottom:0; left:0; right:0; 
-  background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.7) 50%, transparent 100%); 
-  padding:40px 24px 20px; display:flex; flex-direction:column; gap:12px; 
-  z-index:5; opacity:0; transition:opacity .3s; pointer-events:none; 
-}
+.controls-bar { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.6) 50%, transparent 100%); padding:40px 18px 14px; display:flex; flex-direction:column; gap:6px; z-index:5; opacity:0; transition:opacity .3s; pointer-events:none; }
 .custom-player-container.show-controls .controls-bar { opacity:1; pointer-events:auto; }
 .custom-player-container.show-controls { cursor:default; }
 .custom-player-container:not(.show-controls) { cursor:none; }
 
-/* --- شريط التقدم --- */
 .progress-container { position:relative; width:100%; height:24px; display:flex; align-items:center; cursor:pointer; direction:ltr; }
 .progress-bar { width:100%; height:4px; background:rgba(255,255,255,.25); border-radius:4px; position:relative; transition:height .15s; }
 .progress-container:hover .progress-bar { height:6px; }
@@ -127,9 +111,8 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .progress-tooltip { position:absolute; bottom:24px; left:0; transform:translateX(-50%); background:rgba(0,0,0,.9); color:#fff; padding:4px 8px; border-radius:6px; font-size:12px; pointer-events:none; direction:ltr; white-space:nowrap; }
 .progress-tooltip.hidden { display:none; }
 
-/* --- أزرار التحكم --- */
-.controls-row { display:flex; justify-content:space-between; align-items:center; direction:ltr; gap:8px; }
-.controls-left, .controls-right { display:flex; align-items:center; gap:8px; }
+.controls-row { display:flex; justify-content:space-between; align-items:center; direction:ltr; gap:6px; }
+.controls-left, .controls-right { display:flex; align-items:center; gap:4px; }
 .ctrl-btn { background:transparent; border:none; color:rgba(255,255,255,.9); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:8px; transition:all .15s; flex-shrink:0; }
 .ctrl-btn:hover { color:#fff; background:rgba(255,255,255,.1); }
 .ctrl-btn svg { width:20px; height:20px; }
@@ -142,27 +125,20 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
 .time-display { color:rgba(255,255,255,.9); font-size:12px; font-family:'Courier New',monospace; white-space:nowrap; direction:ltr; letter-spacing:.4px; background:rgba(0,0,0,.3); padding:3px 8px; border-radius:6px; }
 
-/* --- شريط السرعة الجديد --- */
-.speed-slider-container { display:flex; align-items:center; gap:12px; direction:ltr; padding:4px 8px; background:rgba(255,255,255,.05); border-radius:8px; }
-.speed-label { font-size:12px; font-weight:800; color:var(--brand-orange); min-width:32px; text-align:center; }
-#speed-slider { flex:1; height:4px; -webkit-appearance:none; background:rgba(255,255,255,.2); border-radius:2px; outline:none; cursor:pointer; }
-#speed-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,.5); }
-
-/* --- القوائم المنسدلة --- */
 .dropdown { position:relative; }
 .dropdown-content { position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%); background:rgba(12,16,26,.98); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:6px; display:flex; flex-direction:column; min-width:110px; z-index:20; }
 .dropdown-content.hidden { display:none; }
 .dropdown-content button { background:transparent; border:none; color:rgba(255,255,255,.8); padding:9px 14px; text-align:center; font-size:0.9rem; cursor:pointer; border-radius:8px; transition:background .15s, color .15s; }
 .dropdown-content button:hover { background:rgba(255,107,0,.18); color:#ff9e00; }
 .dropdown-content button.active { color:#ff9e00; background:rgba(255,107,0,.12); }
-#quality-btn { font-size:0.9rem; height:30px; padding:0 10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.85); background:rgba(255,255,255,.06); transition:all .15s; }
-#quality-btn:hover { background:rgba(255,255,255,.12); border-color:var(--brand-orange); color:#fff; }
+#quality-btn, #speed-btn { font-size:0.9rem; height:30px; padding:0 10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.85); background:rgba(255,255,255,.06); transition:all .15s; }
+#quality-btn:hover, #speed-btn:hover { background:rgba(255,255,255,.12); border-color:var(--brand-orange); color:#fff; }
 
 @media (max-width:600px) {
   .modal-box { padding:12px; }
   #volume-slider { width:46px; }
   .time-display { font-size:10px; padding:2px 6px; }
-  .controls-bar { padding:28px 12px 12px; }
+  .controls-bar { padding:28px 10px 10px; }
   .center-play-btn { width:60px; height:60px; }
   .center-play-btn svg { width:26px; height:26px; }
-        }
+               }
