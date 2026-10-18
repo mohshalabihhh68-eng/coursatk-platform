@@ -75,7 +75,18 @@ async function renderContent() {
   
   state.videosList.forEach((v, i) => { 
     const watchedBadge = isWatched(v.id) ? `<div class="watched-badge">✅ تمت المشاهدة</div>` : '';
-    html += `<div class="video-card" onclick="openPlayerPage(${i})" style="cursor:pointer;"><div class="video-thumbnail"><img src="${v.thumbnail_url||''}" onerror="this.style.display='none'" />${watchedBadge}<div class="video-num-badge">فيديو #${i+1}</div><div class="video-duration-badge">⏱ ${formatTime(v.duration ? parseInt(v.duration) : 0)}</div><div class="play-overlay"><div class="play-btn-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="video-info"><h3 class="video-title">${v.title}</h3><button class="btn-gradient">تشغيل الفيديو ▶</button></div></div>`; 
+    
+    // 🟢 تحديث حالة الزرار
+    let actionBtn = `<button class="btn-gradient">تشغيل الفيديو ▶</button>`;
+    const savedTime = localStorage.getItem(getStorageKey(v.id));
+    if (savedTime && parseFloat(savedTime) > 2) {
+       const totalSec = parseInt(v.duration) || 0;
+       const remainSec = totalSec - parseFloat(savedTime);
+       const pct = totalSec > 0 ? Math.round((parseFloat(savedTime) / totalSec) * 100) : 0;
+       actionBtn = `<div class="progress-info-badge"><span>⏱ باقي ${formatTime(remainSec)}</span><span>${pct}% مكتمل</span></div>`;
+    }
+
+    html += `<div class="video-card" onclick="openPlayerPage(${i})" style="cursor:pointer;"><div class="video-thumbnail"><img src="${v.thumbnail_url||''}" onerror="this.style.display='none'" />${watchedBadge}<div class="video-num-badge">فيديو #${i+1}</div><div class="video-duration-badge">⏱ ${formatTime(v.duration ? parseInt(v.duration) : 0)}</div><div class="play-overlay"><div class="play-btn-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="video-info"><h3 class="video-title">${v.title}</h3>${actionBtn}</div></div>`; 
   });
   
   html += `</div></div>`;
@@ -118,6 +129,7 @@ function closePlayer() {
   stopPlayback(); 
   document.getElementById("player-page").classList.add("hidden"); 
   document.body.style.overflow = ""; 
+  renderContent(); // 🟢 تحديث الكروت بعد الخروج
 }
 
 function buildSidebar() {
@@ -169,7 +181,6 @@ async function playVideo(index) {
   buildSidebar(); 
 
   const status = document.getElementById("player-status"); 
-  status.querySelector('span').textContent = "جاري التحميل..."; 
   status.classList.remove("hidden"); 
   stopPlayback();
   
@@ -177,12 +188,10 @@ async function playVideo(index) {
   document.getElementById("center-replay-icon").classList.add("hidden");
   
   try {
-    // 🔥 السرعة هنا: بنجيب التوكن ونفك التشفير في نفس الوقت
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"}); 
     var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess; 
     if(!tok||!swId) throw new Error("الجلسة ناقصة");
     
-    status.querySelector('span').textContent = "فك التشفير..."; 
     if(!cryptoUtils) cryptoUtils = await loadPlayerScript();
     
     var mUrl = "/api/stream?path="+encodeURIComponent("videos/"+swId+"/stream/master.m3u8")+"&t="+encodeURIComponent(tok); 
@@ -194,12 +203,12 @@ async function playVideo(index) {
     var varUrl, vBase="videos/"+swId+"/stream/", vFileUrl=null;
     if(varRel.indexOf("/api/stream")===0||varRel.indexOf("/api/cdn")===0){ varUrl=varRel; try{ var vu=new URL(varRel,location.origin); if(vu.pathname.indexOf("/api/stream")===0&&vu.searchParams.get("path")) vBase=vu.searchParams.get("path"); if(vu.pathname.indexOf("/api/cdn")===0&&vu.searchParams.get("u")) vFileUrl=fromB64url(vu.searchParams.get("u")); }catch(e){} } else if(varRel.indexOf("http")===0){ vFileUrl=varRel; varUrl="/api/cdn?u="+toB64url(varRel); } else { vBase="videos/"+swId+"/stream/"+varRel; varUrl="/api/stream?path="+encodeURIComponent(vBase)+"&t="+encodeURIComponent(tok); }
     var vRes = await fetch(varUrl, { credentials: 'include' }); if(!vRes.ok) throw new Error("variant → HTTP "+vRes.status); var vText = await vRes.text();
-    status.querySelector('span').textContent = "فك المفتاح..."; var keyLine = vText.split("\n").find(l=>l.indexOf("EXT-X-KEY")!==-1); var keyPath = "videos/"+swId+"/key", ivHex=null;
+    var keyLine = vText.split("\n").find(l=>l.indexOf("EXT-X-KEY")!==-1); var keyPath = "videos/"+swId+"/key", ivHex=null;
     if(keyLine){ var km=keyLine.match(/URI="([^"]+)"/), ivm=keyLine.match(/IV=0x([0-9a-fA-F]+)/i); if(ivm) ivHex=ivm[1]; if(km){ var ku=km[1]; if(ku.indexOf("/api/stream")===0||ku.indexOf(location.origin+"/api/stream")===0){ try{var uu=new URL(ku,location.origin);var pp=uu.searchParams.get("path");if(pp)keyPath=pp;}catch(e){} } else if(ku.indexOf("http")!==0&&ku.indexOf("/api/cdn")!==0) keyPath=ku.replace(/^\//,"").replace(/^api\/v1\//,""); } }
     var kRes = await fetch("/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(tok), { credentials: 'include' }); if(!kRes.ok) throw new Error("key → HTTP "+kRes.status); var wrapped = new Uint8Array(await kRes.arrayBuffer()); var kr = await cryptoUtils.decryptPlaybackKey(wrapped, swId); var aesKey = kr&&kr.key; if(!aesKey||aesKey.byteLength!==16) throw new Error("المفتاح غير صالح");
     var kb = aesKey instanceof ArrayBuffer ? aesKey : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset+aesKey.byteLength); currentKeyBlobUrl = URL.createObjectURL(new Blob([kb], {type:"application/octet-stream"}));
     var fixed = rewritePlaylist(vText, tok, currentKeyBlobUrl, vBase, vFileUrl); if(fixed.indexOf("#EXTM3U")!==0) fixed="#EXTM3U\n"+fixed.replace(/^#EXTM3U\s*/m,""); if(fixed.indexOf("EXT-X-KEY")===-1){ var ivp=ivHex?",IV=0x"+ivHex:""; fixed='#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="'+currentKeyBlobUrl+'"'+ivp+"\n"+fixed.replace(/^#EXTM3U\s*/m,""); }
-    currentPlaylistBlobUrl = URL.createObjectURL(new Blob([fixed], {type:"application/vnd.apple.mpegurl"})); status.querySelector('span').textContent = "جاري التشغيل...";
+    currentPlaylistBlobUrl = URL.createObjectURL(new Blob([fixed], {type:"application/vnd.apple.mpegurl"})); 
     hbTimer = setInterval(()=>{ fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include", body:JSON.stringify({url:hbUrl,token:tok})}).catch(()=>{}); }, 25000);
     
     if(window.Hls && Hls.isSupported()){
