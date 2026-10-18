@@ -352,7 +352,6 @@ async function playVideo(videoId, title) {
   const status = document.getElementById("player-status");
   status.querySelector('span').textContent = "جاري فتح الجلسة...";
   status.classList.remove("hidden");
-  document.getElementById('big-play-btn').classList.add('hidden');
   
   stopPlayback();
 
@@ -439,7 +438,7 @@ async function playVideo(videoId, title) {
       hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         status.classList.add("hidden");
         
-        // حل مشكلة الجودات 0p: بنشوف الجودات الحقيقية بس
+        // إظهار الجودات (لو مفيش غير 0p مش هتظهر حاجة غير تلقائي)
         const qMenu = document.getElementById('quality-menu');
         let qHtml = `<button onclick="setQuality(-1, this)" class="active">تلقائي</button>`;
         
@@ -467,7 +466,7 @@ async function playVideo(videoId, title) {
 
   } catch (e) {
     status.querySelector('span').textContent = "فشل: " + e.message;
-    status.classList.remove("hidden");
+    status.classList.remove('hidden');
   }
 }
 
@@ -493,29 +492,15 @@ function togglePlay() {
 videoEl.addEventListener('play', () => {
   document.getElementById('play-icon').classList.add('hidden');
   document.getElementById('pause-icon').classList.remove('hidden');
-  document.getElementById('big-play-btn').classList.add('hidden');
   playerContainer.classList.remove('paused');
 });
 
 videoEl.addEventListener('pause', () => {
   document.getElementById('play-icon').classList.remove('hidden');
   document.getElementById('pause-icon').classList.add('hidden');
-  document.getElementById('big-play-btn').classList.remove('hidden');
   playerContainer.classList.add('paused');
   playerContainer.classList.remove('hide-cursor');
 });
-
-function skipTime(seconds) {
-  videoEl.currentTime += seconds;
-  showSeekIndicator(seconds > 0 ? '+' + seconds + ' ثواني' : seconds + ' ثواني');
-}
-
-function showSeekIndicator(text) {
-  const el = document.getElementById('seek-indicator');
-  el.textContent = text;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 600);
-}
 
 function setSpeed(speed, btnElement) {
   videoEl.playbackRate = speed;
@@ -547,7 +532,6 @@ videoEl.addEventListener('timeupdate', () => {
   if (videoEl.duration) {
     const pct = (videoEl.currentTime / videoEl.duration) * 100;
     document.getElementById('progress-filled').style.width = pct + '%';
-    document.getElementById('progress-handle').style.right = pct + '%';
     document.getElementById('time-display').textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
   }
 });
@@ -598,7 +582,6 @@ clickLayer.addEventListener('mouseleave', handleMouseUp);
 
 function handleMouseDown(e) {
   isLongPress = false;
-  // لو الفيديو واقف مش بنعمل حاجة
   if (videoEl.paused) return;
 
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -607,14 +590,11 @@ function handleMouseDown(e) {
   pressTimer = setTimeout(() => {
     isLongPress = true;
     currentSpeedBeforeHold = videoEl.playbackRate;
-    videoEl.playbackRate = 2; // تسريع مؤقت
-    document.getElementById('speed-indicator').classList.remove('hidden');
-    
-    // إلغاء مؤقت النقر القصير عشان ميتنفذش
-    clearTimeout(clickTimer);
+    videoEl.playbackRate = 2; // تسريع مؤقت بدون إظهار أي مؤشر
+    clearTimeout(clickTimer); // إلغاء مؤقت النقر القصير
   }, 400); // 400ms للضغط المطول
   
-  // التعامل مع النقر العادي (تقدم / تأخير)
+  // التعامل مع النقر العادي
   clickTimer = setTimeout(() => {
     if (!isLongPress) {
       handleTap(clientX, e);
@@ -627,8 +607,7 @@ function handleMouseUp(e) {
   clearTimeout(clickTimer);
   
   if (isLongPress) {
-    videoEl.playbackRate = currentSpeedBeforeHold; // إرجاع السرعة العادية
-    document.getElementById('speed-indicator').classList.add('hidden');
+    videoEl.playbackRate = currentSpeedBeforeHold; // إرجاع السرعة
   }
 }
 
@@ -647,6 +626,24 @@ function handleTap(clientX, e) {
     // المنتصف (تشغيل / إيقاف)
     togglePlay();
   }
+}
+
+function skipTime(seconds) {
+  videoEl.currentTime += seconds;
+  showSeekIndicator(seconds > 0 ? '+10s' : '-10s');
+}
+
+function showSeekIndicator(text) {
+  const el = document.getElementById('seek-indicator');
+  el.textContent = text;
+  el.classList.remove('hidden');
+  
+  // عشان الأنيميشن يشتغل كل مرة
+  el.style.animation = 'none';
+  el.offsetHeight; 
+  el.style.animation = null;
+
+  setTimeout(() => el.classList.add('hidden'), 600);
 }
 
 // ==================== Auto Hide Cursor ====================
@@ -668,12 +665,7 @@ function stopPlayback() {
   if (currentKeyBlobUrl) { URL.revokeObjectURL(currentKeyBlobUrl); currentKeyBlobUrl = null; }
   if (currentPlaylistBlobUrl) { URL.revokeObjectURL(currentPlaylistBlobUrl); currentPlaylistBlobUrl = null; }
   
-  // تصفير السرعة عشان ميبوظش الفيديوهات الجديدة
   videoEl.playbackRate = 1;
-  document.getElementById('speed-btn').textContent = '1x';
-  document.querySelectorAll('#speed-menu button').forEach(b => b.classList.remove('active'));
-  document.querySelector('#speed-menu button:nth-child(3)').classList.add('active');
-
   if (videoEl) { videoEl.removeAttribute("src"); videoEl.load(); }
 }
 
@@ -683,8 +675,6 @@ function closePlayer() {
   document.body.style.overflow = "";
   document.getElementById('quality-menu').classList.add('hidden');
   document.getElementById('speed-menu').classList.add('hidden');
-  document.getElementById('big-play-btn').classList.add('hidden');
-  document.getElementById('speed-indicator').classList.add('hidden');
   document.getElementById('seek-indicator').classList.add('hidden');
 }
 
