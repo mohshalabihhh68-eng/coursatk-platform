@@ -126,15 +126,9 @@ function buildSidebar() {
   
   let watched = 0;
   state.videosList.forEach(v => { if(isWatched(v.id)) watched++; });
-  const remain = state.videosList.length - watched;
-  const pct = state.videosList.length > 0 ? Math.round((watched / state.videosList.length) * 100) : 0;
   
-  document.getElementById('stat-completed').textContent = watched;
-  document.getElementById('stat-remaining').textContent = remain;
-  document.getElementById('stat-progress').textContent = pct + '%';
   document.getElementById('video-count-tag').textContent = `${state.videosList.length} فيديو`;
   document.getElementById('watched-count-tag').textContent = `${watched} تمت مشاهدته`;
-  document.getElementById('remaining-count-tag').textContent = `${remain} متبقي`;
   document.getElementById('side-subtitle').textContent = `${state.videosList.length} فيديو`;
   document.getElementById('video-details-title').textContent = state.videosList[state.currentVideoIndex]?.title || '';
 
@@ -170,10 +164,10 @@ async function playVideo(index) {
   const videoData = state.videosList[index];
   const videoId = videoData.id;
 
-  buildSidebar(); // تحديث القائمة الجانبية
+  buildSidebar(); 
 
   const status = document.getElementById("player-status"); 
-  status.querySelector('span').textContent = "جاري فتح الجلسة..."; 
+  status.querySelector('span').textContent = "جاري التحميل..."; 
   status.classList.remove("hidden"); 
   stopPlayback();
   
@@ -181,6 +175,7 @@ async function playVideo(index) {
   document.getElementById("center-replay-icon").classList.add("hidden");
   
   try {
+    // 🔥 السرعة هنا: بنجيب التوكن ونفك التشفير في نفس الوقت
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"}); 
     var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess; 
     if(!tok||!swId) throw new Error("الجلسة ناقصة");
@@ -241,7 +236,7 @@ videoEl.addEventListener('ended', () => {
   if (state.videosList[state.currentVideoIndex]) {
     markAsWatched(state.videosList[state.currentVideoIndex].id);
     localStorage.removeItem(getStorageKey(state.videosList[state.currentVideoIndex].id));
-    buildSidebar(); // تحديث القائمة عشان تظهر علامة الصح
+    buildSidebar(); 
   }
   document.getElementById("center-play-icon").classList.add("hidden");
   document.getElementById("center-replay-icon").classList.remove("hidden");
@@ -257,7 +252,6 @@ videoEl.addEventListener('ended', () => {
 function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('quality-btn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
 function setSpeed(speed, btn) { videoEl.playbackRate = speed; localStorage.setItem("coursatk_speed", speed); document.getElementById('speed-btn').textContent = speed===1 ? '1x' : speed+'x'; document.querySelectorAll('#speed-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('speed-menu').classList.add('hidden'); }
 
-let saveInterval = null;
 videoEl.addEventListener('timeupdate', () => {
   if (videoEl.duration) {
     const pct = (videoEl.currentTime / videoEl.duration) * 100;
@@ -265,25 +259,18 @@ videoEl.addEventListener('timeupdate', () => {
     document.getElementById('progress-handle').style.left = pct + '%';
     document.getElementById('time-display').textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
   }
-  if (!saveInterval) {
-    saveInterval = setInterval(() => {
-      if (videoEl.currentTime > 0 && state.videosList[state.currentVideoIndex]) {
-        localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
-      }
-    }, 1000);
-  }
 });
 
 videoEl.addEventListener('loadedmetadata', ()=>{ document.getElementById('time-display').textContent=`00:00 / ${formatTime(videoEl.duration)}`; });
 
-window.addEventListener('beforeunload', () => {
-  if (videoEl.currentTime > 0 && state.videosList[state.currentVideoIndex]) {
-    localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
-  }
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden' && videoEl.currentTime > 0 && state.videosList[state.currentVideoIndex]) {
-    localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
+// حفظ التقدم
+let saveTimer = null;
+videoEl.addEventListener('timeupdate', () => {
+  if (!saveTimer && state.videosList[state.currentVideoIndex]) {
+    saveTimer = setTimeout(() => {
+      if (videoEl.currentTime > 0) localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
+      saveTimer = null;
+    }, 2000);
   }
 });
 
@@ -376,16 +363,7 @@ clickLayer.addEventListener('dblclick', (e) => {
 function skipTime(sec) { videoEl.currentTime = Math.max(0, Math.min(videoEl.duration||0, videoEl.currentTime+sec)); showSeekIndicator(sec>0?'+10':'-10', sec>0?'⏩':'⏪'); }
 function showSeekIndicator(text, icon) { const el = document.getElementById('seek-indicator'); el.innerHTML = `<span class="seek-icon" style="font-size:24px;">${icon}</span><span>${text}s</span>`; el.classList.remove('hidden'); el.style.animation='none'; el.offsetHeight; el.style.animation=null; if(el._ht) clearTimeout(el._ht); el._ht = setTimeout(()=> el.classList.add('hidden'), 700); }
 
-function stopPlayback() { 
-  if (saveInterval) { clearInterval(saveInterval); saveInterval = null; }
-  if(hbTimer){clearInterval(hbTimer);hbTimer=null;} 
-  if(hls){hls.destroy();hls=null;} 
-  if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} 
-  if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} 
-  videoEl.playbackRate = 1; 
-  videoEl.removeAttribute("src"); 
-  videoEl.load(); 
-}
+function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
 
 document.getElementById("theme-toggle").addEventListener("click", ()=>{ const cur = document.body.getAttribute("data-theme")==="light"?"dark":"light"; document.body.setAttribute("data-theme", cur); });
 loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{}); render();
