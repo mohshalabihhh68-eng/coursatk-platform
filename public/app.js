@@ -437,21 +437,8 @@ async function playVideo(videoId, title) {
       
       hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         status.classList.add("hidden");
-        
-        // إظهار الجودات (لو مفيش غير 0p مش هتظهر حاجة غير تلقائي)
-        const qMenu = document.getElementById('quality-menu');
-        let qHtml = `<button onclick="setQuality(-1, this)" class="active">تلقائي</button>`;
-        
-        data.levels.forEach((level, i) => {
-          if (level.height > 0) { 
-            qHtml += `<button onclick="setQuality(${i}, this)">${level.height}p</button>`;
-          }
-        });
-        qMenu.innerHTML = qHtml;
-        
-        videoEl.play().catch(() => {
-          document.getElementById('big-play-btn').classList.remove('hidden');
-        });
+        buildQualityMenu(data.levels);
+        videoEl.play().catch(() => {});
       });
 
       hls.on(Hls.Events.ERROR, function (_, data) {
@@ -468,6 +455,32 @@ async function playVideo(videoId, title) {
     status.querySelector('span').textContent = "فشل: " + e.message;
     status.classList.remove('hidden');
   }
+}
+
+// ==================== Quality Menu ====================
+function buildQualityMenu(levels) {
+  const qMenu = document.getElementById('quality-menu');
+  let qHtml = `<button onclick="setQuality(-1, this)" class="active">تلقائي</button>`;
+
+  // ترتيب تنازلي حسب الدقة
+  const sorted = levels
+    .map((l, i) => ({ index: i, height: l.height || 0, bitrate: l.bitrate || 0 }))
+    .filter(l => l.height > 0 || l.bitrate > 0)
+    .sort((a, b) => b.height - a.height);
+
+  sorted.forEach(l => {
+    const label = l.height > 0 ? l.height + 'p' : Math.round(l.bitrate / 1000) + 'k';
+    qHtml += `<button onclick="setQuality(${l.index}, this)">${label}</button>`;
+  });
+
+  // لو مفيش levels بـ height معروف
+  if (sorted.length === 0) {
+    levels.forEach((_, i) => {
+      qHtml += `<button onclick="setQuality(${i}, this)">جودة ${i + 1}</button>`;
+    });
+  }
+
+  qMenu.innerHTML = qHtml;
 }
 
 // ==================== Player UI Logic ====================
@@ -513,7 +526,11 @@ function setSpeed(speed, btnElement) {
 function setQuality(levelIndex, btnElement) {
   if (hls) {
     hls.currentLevel = levelIndex;
-    const text = levelIndex === -1 ? 'تلقائي' : hls.levels[levelIndex].height + 'p';
+    let text = 'تلقائي';
+    if (levelIndex !== -1 && hls.levels[levelIndex]) {
+      const l = hls.levels[levelIndex];
+      text = l.height > 0 ? l.height + 'p' : Math.round(l.bitrate / 1000) + 'k';
+    }
     document.getElementById('quality-btn').textContent = text;
     document.querySelectorAll('#quality-menu button').forEach(b => b.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
@@ -521,23 +538,28 @@ function setQuality(levelIndex, btnElement) {
   }
 }
 
+// ==================== Time Format (HH:MM:SS) ====================
 function formatTime(sec) {
-  if (isNaN(sec)) return '00:00';
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  if (isNaN(sec) || sec < 0) return '00:00:00';
+  const totalSec = Math.floor(sec);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 videoEl.addEventListener('timeupdate', () => {
   if (videoEl.duration) {
     const pct = (videoEl.currentTime / videoEl.duration) * 100;
     document.getElementById('progress-filled').style.width = pct + '%';
-    document.getElementById('time-display').textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
+    document.getElementById('time-display').textContent =
+      `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
   }
 });
 
 videoEl.addEventListener('loadedmetadata', () => {
-  document.getElementById('time-display').textContent = `00:00 / ${formatTime(videoEl.duration)}`;
+  document.getElementById('time-display').textContent =
+    `00:00:00 / ${formatTime(videoEl.duration)}`;
 });
 
 function seekVideo(e) {
@@ -551,7 +573,7 @@ function seekVideo(e) {
 
 function toggleMute() {
   videoEl.muted = !videoEl.muted;
-  document.getElementById('vol-icon').style.opacity = videoEl.muted ? '0.5' : '1';
+  document.getElementById('vol-icon').style.opacity = videoEl.muted ? '0.4' : '1';
 }
 
 document.getElementById('volume-slider').addEventListener('input', (e) => {
@@ -567,83 +589,114 @@ function toggleFullscreen() {
   }
 }
 
-// ==================== Click Layer Logic (Speed & Seek) ====================
-let clickTimer = null;
+// ==================== Click / Double-tap / Long-press Logic ====================
+// المنطق:
+// - ضغطة واحدة في المنتصف = تشغيل/إيقاف
+// - ضغطتين يمين = +10s
+// - ضغطتين شمال = -10s
+// - ضغط مطول = 2x طول ما ضاغط
+// ============================================================
+
+let tapCount = 0;
+let tapTimer = null;
+let tapX = 0;
+
 let pressTimer = null;
 let isLongPress = false;
-let currentSpeedBeforeHold = 1;
+let speedBeforeHold = 1;
 
-clickLayer.addEventListener('mousedown', handleMouseDown);
-clickLayer.addEventListener('touchstart', handleMouseDown, { passive: true });
+const speedIndicator = document.getElementById('speed-indicator');
+const LONG_PRESS_MS = 400;   // زمن اعتبار الضغط المطول
+const DOUBLE_TAP_MS = 280;   // نافذة الضغطتين
 
-clickLayer.addEventListener('mouseup', handleMouseUp);
-clickLayer.addEventListener('touchend', handleMouseUp);
-clickLayer.addEventListener('mouseleave', handleMouseUp);
-
-function handleMouseDown(e) {
-  isLongPress = false;
-  if (videoEl.paused) return;
-
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  
-  // بدء مؤقت التسريع (الضغط المطول)
-  pressTimer = setTimeout(() => {
-    isLongPress = true;
-    currentSpeedBeforeHold = videoEl.playbackRate;
-    videoEl.playbackRate = 2; // تسريع مؤقت بدون إظهار أي مؤشر
-    clearTimeout(clickTimer); // إلغاء مؤقت النقر القصير
-  }, 400); // 400ms للضغط المطول
-  
-  // التعامل مع النقر العادي
-  clickTimer = setTimeout(() => {
-    if (!isLongPress) {
-      handleTap(clientX, e);
-    }
-  }, 250); 
+function getZone(clientX) {
+  const rect = playerContainer.getBoundingClientRect();
+  const rel = (clientX - rect.left) / rect.width;
+  if (rel < 0.35) return 'left';
+  if (rel > 0.65) return 'right';
+  return 'center';
 }
 
-function handleMouseUp(e) {
+clickLayer.addEventListener('touchstart', onPointerDown, { passive: true });
+clickLayer.addEventListener('mousedown', onPointerDown);
+clickLayer.addEventListener('touchend', onPointerUp);
+clickLayer.addEventListener('mouseup', onPointerUp);
+clickLayer.addEventListener('mouseleave', onPointerCancel);
+clickLayer.addEventListener('touchcancel', onPointerCancel);
+
+function onPointerDown(e) {
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  tapX = clientX;
+  isLongPress = false;
+
+  // مؤقت الضغط المطول
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+    if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; tapCount = 0; }
+    if (!videoEl.paused) {
+      speedBeforeHold = videoEl.playbackRate;
+      videoEl.playbackRate = 2;
+      if (speedIndicator) {
+        speedIndicator.classList.add('visible');
+      }
+    }
+  }, LONG_PRESS_MS);
+}
+
+function onPointerUp(e) {
   clearTimeout(pressTimer);
-  clearTimeout(clickTimer);
-  
+
   if (isLongPress) {
-    videoEl.playbackRate = currentSpeedBeforeHold; // إرجاع السرعة
+    // إرجاع السرعة
+    videoEl.playbackRate = speedBeforeHold;
+    if (speedIndicator) speedIndicator.classList.remove('visible');
+    isLongPress = false;
+    return;
+  }
+
+  // نقرة عادية → نحسب الضغطات
+  tapCount++;
+
+  if (tapCount === 1) {
+    tapTimer = setTimeout(() => {
+      // ضغطة واحدة فقط → وسط = play/pause، يمين/يسار = play/pause كذلك
+      if (getZone(tapX) === 'center') togglePlay();
+      else togglePlay();
+      tapCount = 0;
+    }, DOUBLE_TAP_MS);
+  } else if (tapCount === 2) {
+    clearTimeout(tapTimer);
+    tapCount = 0;
+    const zone = getZone(tapX);
+    if (zone === 'right') skipTime(10);
+    else if (zone === 'left') skipTime(-10);
+    else togglePlay(); // ضغطتين في المنتصف = play/pause
   }
 }
 
-function handleTap(clientX, e) {
-  const rect = playerContainer.getBoundingClientRect();
-  const relativeX = clientX - rect.left;
-  const width = rect.width;
-  
-  if (relativeX < width * 0.35) {
-    // الجانب الأيسر (تأخير 10 ثواني)
-    skipTime(-10);
-  } else if (relativeX > width * 0.65) {
-    // الجانب الأيمن (تقديم 10 ثواني)
-    skipTime(10);
-  } else {
-    // المنتصف (تشغيل / إيقاف)
-    togglePlay();
+function onPointerCancel() {
+  clearTimeout(pressTimer);
+  if (isLongPress) {
+    videoEl.playbackRate = speedBeforeHold;
+    if (speedIndicator) speedIndicator.classList.remove('visible');
+    isLongPress = false;
   }
 }
 
 function skipTime(seconds) {
-  videoEl.currentTime += seconds;
-  showSeekIndicator(seconds > 0 ? '+10s' : '-10s');
+  videoEl.currentTime = Math.max(0, Math.min(videoEl.duration || 0, videoEl.currentTime + seconds));
+  showSeekIndicator(seconds > 0 ? '+10' : '-10', seconds > 0 ? '⏩' : '⏪');
 }
 
-function showSeekIndicator(text) {
+function showSeekIndicator(text, icon) {
   const el = document.getElementById('seek-indicator');
-  el.textContent = text;
+  el.innerHTML = `<span class="seek-icon">${icon}</span><span>${text}s</span>`;
   el.classList.remove('hidden');
-  
-  // عشان الأنيميشن يشتغل كل مرة
   el.style.animation = 'none';
-  el.offsetHeight; 
+  el.offsetHeight; // reflow
   el.style.animation = null;
-
-  setTimeout(() => el.classList.add('hidden'), 600);
+  if (el._hideTimer) clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(() => el.classList.add('hidden'), 700);
 }
 
 // ==================== Auto Hide Cursor ====================
@@ -652,9 +705,7 @@ playerContainer.addEventListener('mousemove', () => {
   playerContainer.classList.remove('hide-cursor');
   clearTimeout(cursorTimer);
   if (!videoEl.paused) {
-    cursorTimer = setTimeout(() => {
-      playerContainer.classList.add('hide-cursor');
-    }, 2000);
+    cursorTimer = setTimeout(() => playerContainer.classList.add('hide-cursor'), 2500);
   }
 });
 
@@ -664,8 +715,9 @@ function stopPlayback() {
   if (hls) { hls.destroy(); hls = null; }
   if (currentKeyBlobUrl) { URL.revokeObjectURL(currentKeyBlobUrl); currentKeyBlobUrl = null; }
   if (currentPlaylistBlobUrl) { URL.revokeObjectURL(currentPlaylistBlobUrl); currentPlaylistBlobUrl = null; }
-  
   videoEl.playbackRate = 1;
+  speedBeforeHold = 1;
+  if (speedIndicator) speedIndicator.classList.remove('visible');
   if (videoEl) { videoEl.removeAttribute("src"); videoEl.load(); }
 }
 
@@ -673,9 +725,12 @@ function closePlayer() {
   stopPlayback();
   document.getElementById("player-modal").classList.add("hidden");
   document.body.style.overflow = "";
-  document.getElementById('quality-menu').classList.add('hidden');
-  document.getElementById('speed-menu').classList.add('hidden');
+  document.querySelectorAll('.dropdown-content').forEach(el => el.classList.add('hidden'));
   document.getElementById('seek-indicator').classList.add('hidden');
+  document.getElementById('time-display').textContent = '00:00:00 / 00:00:00';
+  document.getElementById('progress-filled').style.width = '0%';
+  tapCount = 0;
+  if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; }
 }
 
 // ==================== Theme Toggle ====================
