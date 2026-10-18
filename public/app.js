@@ -135,10 +135,12 @@ function buildSidebar() {
   state.videosList.forEach((v, i) => {
     const isCurrent = i === state.currentVideoIndex;
     const watchedFlag = isWatched(v.id);
+    const savedTime = localStorage.getItem(getStorageKey(v.id));
     
     let statusHtml = '';
     if (isCurrent) statusHtml = `<div class="side-status"><span style="color:#ff6b00;">▶ يعمل الآن</span></div>`;
     else if (watchedFlag) statusHtml = `<div class="side-status"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> مكتمل</span></div>`;
+    else if (savedTime && parseFloat(savedTime) > 2) statusHtml = `<div class="side-status">⏱ باقي ${formatTime((parseInt(v.duration)||0) - parseFloat(savedTime))}</div>`;
     else statusHtml = `<div class="side-status">لم يبدأ بعد</div>`;
 
     const div = document.createElement('div');
