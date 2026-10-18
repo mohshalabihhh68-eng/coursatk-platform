@@ -12,10 +12,8 @@
 
   <header class="topbar">
     <div class="topbar-right">
-      <button class="icon-btn" id="theme-toggle" title="تبديل الثيم">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-        </svg>
+      <button class="icon-btn" id="theme-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
     </div>
     <div class="topbar-left" onclick="goHome()" style="cursor:pointer">
@@ -29,6 +27,7 @@
 
   <main id="app"><div class="loading">جاري التحميل...</div></main>
 
+  <!-- المشغل -->
   <div id="player-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -41,22 +40,30 @@
 
       <div class="custom-player-container" id="custom-player">
         <video id="video" playsinline></video>
+        
+        <!-- طبقة النقرات -->
         <div class="click-layer" id="click-layer"></div>
 
+        <!-- شاشة التحميل -->
         <div id="player-status" class="player-status">
-          <div class="spinner"></div><span>جاري التشغيل...</span>
+          <div class="spinner"></div>
+          <span>جاري التشغيل...</span>
         </div>
 
+        <!-- زر التشغيل الكبير في النص -->
         <div id="center-play-btn" class="center-play-btn hidden" onclick="togglePlay()">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </div>
 
+        <!-- مؤشر التقديم/التأخير -->
         <div id="seek-indicator" class="seek-indicator hidden"></div>
 
+        <!-- شريط التحكم -->
         <div class="controls-bar" id="controls-bar">
           <div class="progress-container" id="progress-container">
             <div class="progress-bar"><div class="progress-filled" id="progress-filled"></div></div>
           </div>
+
           <div class="controls-row">
             <div class="controls-left">
               <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">
@@ -71,6 +78,7 @@
               </div>
               <span class="time-display" id="time-display">00:00 / 00:00</span>
             </div>
+
             <div class="controls-right">
               <div class="dropdown">
                 <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
