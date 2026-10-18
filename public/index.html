@@ -27,6 +27,7 @@
 
   <main id="app"><div class="loading">جاري التحميل...</div></main>
 
+  <!-- المشغل -->
   <div id="player-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -41,6 +42,12 @@
         <video id="video" playsinline></video>
         <div class="click-layer" id="click-layer"></div>
 
+        <!-- إشعار استكمال الفيديو -->
+        <div id="resume-notification" class="resume-notification hidden">
+          <p>هل تريد الاستكمال من <span id="resume-time">00:00</span>؟</p>
+          <button id="resume-btn" class="btn-gradient" style="width:auto; padding:8px 20px;">نعم، استكمل</button>
+        </div>
+
         <div id="player-status" class="player-status">
           <div class="spinner"></div><span>جاري التشغيل...</span>
         </div>
@@ -51,31 +58,37 @@
 
         <div id="seek-indicator" class="seek-indicator hidden"></div>
 
+        <!-- شريط التحكم الجديد -->
         <div class="controls-bar" id="controls-bar">
+          
+          <!-- التقدم -->
           <div class="progress-container" id="progress-container">
-            <div class="progress-bar"><div class="progress-filled" id="progress-filled"></div></div>
+            <div class="progress-bar">
+              <div class="progress-filled" id="progress-filled"></div>
+              <div class="progress-handle" id="progress-handle"></div>
+            </div>
+            <!-- Tooltip لوقت السحب -->
+            <div class="progress-tooltip hidden" id="progress-tooltip">00:00</div>
           </div>
+
           <div class="controls-row">
             <div class="controls-left">
               <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">
                 <svg id="play-icon"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
+              
               <div class="volume-container">
                 <button class="ctrl-btn" onclick="toggleMute()">
                   <svg id="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
                 </button>
                 <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
               </div>
+
               <span class="time-display" id="time-display">00:00 / 00:00</span>
             </div>
+
             <div class="controls-right">
-              <div class="dropdown">
-                <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
-                <div class="dropdown-content hidden" id="speed-menu">
-                  <button onclick="setSpeed(0.5, this)">0.5x</button><button onclick="setSpeed(0.75, this)">0.75x</button><button onclick="setSpeed(1, this)" class="active">1x</button><button onclick="setSpeed(1.25, this)">1.25x</button><button onclick="setSpeed(1.5, this)">1.5x</button><button onclick="setSpeed(2, this)">2x</button>
-                </div>
-              </div>
               <div class="dropdown">
                 <button class="ctrl-btn text-btn" id="quality-btn" onclick="toggleDropdown('quality-menu')">جودة</button>
                 <div class="dropdown-content hidden" id="quality-menu"></div>
@@ -85,10 +98,17 @@
               </button>
             </div>
           </div>
+
+          <!-- شريط السرعة الجديد -->
+          <div class="speed-slider-container">
+            <span class="speed-label" id="speed-label">1x</span>
+            <input type="range" id="speed-slider" min="0.5" max="2" step="0.25" value="1">
+          </div>
+
         </div>
       </div>
     </div>
   </div>
   <script src="/app.js"></script>
 </body>
-</html>
+  </html>
