@@ -76,7 +76,6 @@ async function renderContent() {
   state.videosList.forEach((v, i) => { 
     const watchedBadge = isWatched(v.id) ? `<div class="watched-badge">✅ تمت المشاهدة</div>` : '';
     
-    // 🟢 تحديث حالة الزرار
     let actionBtn = `<button class="btn-gradient">تشغيل الفيديو ▶</button>`;
     const savedTime = localStorage.getItem(getStorageKey(v.id));
     if (savedTime && parseFloat(savedTime) > 2) {
@@ -129,7 +128,7 @@ function closePlayer() {
   stopPlayback(); 
   document.getElementById("player-page").classList.add("hidden"); 
   document.body.style.overflow = ""; 
-  renderContent(); // 🟢 تحديث الكروت بعد الخروج
+  renderContent(); 
 }
 
 function buildSidebar() {
