@@ -6,7 +6,7 @@
   <title>كورساتك - منصة تعليمية</title>
   <link rel="stylesheet" href="/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body data-theme="dark">
 
@@ -54,32 +54,26 @@
       <div class="custom-player-container" id="custom-player">
         <video id="video" playsinline></video>
 
-        <!-- طبقة النقرات -->
         <div class="click-layer" id="click-layer"></div>
 
-        <!-- تحميل -->
         <div id="player-status" class="player-status">
           <div class="spinner"></div>
           <span>جاري التشغيل...</span>
         </div>
 
-        <!-- زر التشغيل/الإيقاف في المنتصف -->
         <button id="center-play-btn" class="center-play-btn hidden">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
           </svg>
         </button>
 
-        <!-- مؤشر التقديم/التأخير -->
         <div id="seek-indicator" class="seek-indicator hidden">
           <span class="seek-icon">⏩</span>
           <span>+10s</span>
         </div>
 
-        <!-- مؤشر التسريع المطول -->
         <div id="speed-indicator" class="speed-indicator">⚡ 2x</div>
 
-        <!-- شريط التحكم -->
         <div class="controls-bar" id="controls-bar">
 
           <div class="progress-container" onclick="seekVideo(event)">
