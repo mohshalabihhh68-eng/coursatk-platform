@@ -3,6 +3,13 @@ const state = { view: "years", year: null, subject: null, teacher: null, chapter
 let hls = null; let hbTimer = null; let cryptoUtils = null; let currentKeyBlobUrl = null; let currentPlaylistBlobUrl = null;
 const appEl = document.getElementById("app"); const videoEl = document.getElementById("video"); const playerContainer = document.getElementById("custom-player"); const clickLayer = document.getElementById("click-layer"); const centerPlayBtn = document.getElementById("center-play-btn");
 
+// ==================== Storage Helpers ====================
+const getStorageKey = (id) => `coursatk_video_${id}`;
+const getWatchedKey = (id) => `coursatk_watched_${id}`;
+
+function markAsWatched(id) { localStorage.setItem(getWatchedKey(id), "true"); }
+function isWatched(id) { return localStorage.getItem(getWatchedKey(id)) === "true"; }
+
 // ==================== API & Utils ====================
 async function api(path, opts = {}) {
   opts.credentials = opts.credentials || 'include'; opts.headers = opts.headers || {};
@@ -57,7 +64,14 @@ async function renderLectures() {
 async function renderContent() {
   const content = await api("/api/lectures/" + state.lecture.id + "/content"); const videos = content.videos || []; const pdfs = content.pdfs || [];
   let html = `<div class="page-title-area" style="text-align:right;margin-bottom:20px;"><button class="back-btn-top" style="right:auto;left:0;" onclick='setView("lectures",${JSON.stringify({chapter:state.chapter})})'>← رجوع</button><div class="page-badge">المحاضرة #${state.lecture.id}</div><h1>محتوي <span>${state.lecture.name}</span></h1><p>ذاكر المحاضرة كاملة من فيديوهات وملفات.</p></div><div class="card" style="padding:24px;margin-bottom:24px;cursor:default;"><div class="section-header"><h2>الفيديوهات</h2><span class="page-badge">${videos.length} فيديو متاح</span></div><div class="grid">`;
-  videos.forEach((v, i) => { const title = String(v.title).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); html += `<div class="video-card"><div class="video-thumbnail"><img src="${v.thumbnail_url||''}" onerror="this.style.display='none'" /><div class="video-num-badge">فيديو #${i+1}</div><div class="video-duration-badge">⏱ ${formatTime(v.duration ? parseInt(v.duration) : 0)}</div><div class="play-overlay"><div class="play-btn-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="video-info"><h3 class="video-title">${v.title}</h3><button class="btn-gradient" onclick="playVideo(${v.id},'${title}')">تشغيل الفيديو ▶</button></div></div>`; });
+  
+  // 🔥 إضافة شارة "تمت المشاهدة" في الكروت
+  videos.forEach((v, i) => { 
+    const title = String(v.title).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); 
+    const watchedBadge = isWatched(v.id) ? `<div class="watched-badge">✅ تمت المشاهدة</div>` : '';
+    html += `<div class="video-card"><div class="video-thumbnail"><img src="${v.thumbnail_url||''}" onerror="this.style.display='none'" />${watchedBadge}<div class="video-num-badge">فيديو #${i+1}</div><div class="video-duration-badge">⏱ ${formatTime(v.duration ? parseInt(v.duration) : 0)}</div><div class="play-overlay"><div class="play-btn-circle"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="video-info"><h3 class="video-title">${v.title}</h3><button class="btn-gradient" onclick="playVideo(${v.id},'${title}')">تشغيل الفيديو ▶</button></div></div>`; 
+  });
+  
   html += `</div></div>`;
   if (pdfs.length > 0) {
     html += `<div class="card" style="padding:24px;cursor:default;"><div class="section-header"><h2>ملفات الشرح</h2><span class="page-badge">${pdfs.length} ملف متاح</span></div><div class="grid">`;
@@ -76,26 +90,20 @@ function joinRel(base, rel) { var q="", rp=String(rel), qi=rp.indexOf("?"); if(q
 function resolveMedia(uri, vBase, tok, vFileUrl) { if(/^(blob:|data:)/i.test(uri)) return uri; if(uri.indexOf("/api/stream")===0||uri.indexOf("/api/cdn")===0) return location.origin+uri; if(/^https?:\/\//i.test(uri)) return location.origin+"/api/cdn?u="+toB64url(uri); if(vFileUrl){try{return location.origin+"/api/cdn?u="+toB64url(new URL(uri,vFileUrl).href);}catch(e){}} return location.origin+"/api/stream?path="+encodeURIComponent(joinRel(vBase||"",uri))+"&t="+encodeURIComponent(tok); }
 function rewritePlaylist(text, tok, keyBlob, vBase, vFileUrl) { return text.split("\n").map(line=>{ var s=line.trim(); if(!s) return line; if(s.charAt(0)==="#"){ if(s.indexOf("#EXT-X-KEY:")===0&&keyBlob) return s.replace(/URI="[^"]+"/, 'URI="'+keyBlob+'"'); return s.replace(/URI="([^"]+)"/g,(_m,u)=>'URI="'+resolveMedia(u,vBase,tok,vFileUrl)+'"'); } return resolveMedia(s,vBase,tok,vFileUrl); }).join("\n"); }
 
-// 🔥 دالة الوقت (تظهر ساعات لو أكتر من ساعة)
 function formatTime(sec) {
   if(isNaN(sec)||sec<0) return '00:00';
-  const t = Math.floor(sec);
-  const h = Math.floor(t/3600);
-  const m = Math.floor((t%3600)/60);
-  const s = t%60;
+  const t = Math.floor(sec); const h = Math.floor(t/3600); const m = Math.floor((t%3600)/60); const s = t%60;
   if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
-
-// 🔥 مفتاح الحفظ في الـ localStorage
-function getStorageKey(videoId) { return `coursatk_video_${videoId}`; }
 
 async function playVideo(videoId, title) {
   document.getElementById("player-title").textContent = title; document.getElementById("player-modal").classList.remove("hidden"); document.body.style.overflow = "hidden";
   const status = document.getElementById("player-status"); status.querySelector('span').textContent = "جاري فتح الجلسة..."; status.classList.remove("hidden"); stopPlayback();
   
-  // 🔥 إخفاء إشعار الاستكمال لحد ما الفيديو يحمل
-  document.getElementById("resume-notification").classList.add("hidden");
+  // إظهار زر التشغيل وإخفاء زر الإعادة
+  document.getElementById("center-play-icon").classList.remove("hidden");
+  document.getElementById("center-replay-icon").classList.add("hidden");
   
   try {
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"}); var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess; if(!tok||!swId) throw new Error("الجلسة ناقصة");
@@ -118,19 +126,17 @@ async function playVideo(videoId, title) {
         status.classList.add("hidden"); 
         buildQualityMenu(data.levels); 
         
-        // 🔥 إظهار إشعار الاستكمال لو موجود وقت محفوظ
+        // 🔥 استرجاع السرعة المحفوظة
+        const savedSpeed = localStorage.getItem("coursatk_speed");
+        if (savedSpeed) { setSpeed(parseFloat(savedSpeed)); }
+
+        // 🔥 استرجاع وقت الفيديو المحفوظ
         const savedTime = localStorage.getItem(getStorageKey(videoId));
-        if (savedTime && parseFloat(savedTime) > 5) {
-          document.getElementById("resume-time").textContent = formatTime(parseFloat(savedTime));
-          document.getElementById("resume-notification").classList.remove("hidden");
-          document.getElementById("resume-btn").onclick = () => {
-            videoEl.currentTime = parseFloat(savedTime);
-            document.getElementById("resume-notification").classList.add("hidden");
-            videoEl.play();
-          };
-        } else {
-          videoEl.play().catch(()=>{ centerPlayBtn.classList.remove('hidden'); });
+        if (savedTime && parseFloat(savedTime) > 2) {
+          videoEl.currentTime = parseFloat(savedTime);
         }
+        
+        videoEl.play().catch(()=>{ centerPlayBtn.classList.remove('hidden'); });
       });
       hls.on(Hls.Events.ERROR, (_, data)=>{ if(!data.fatal) return; status.querySelector('span').textContent = "خطأ HLS: "+data.type; status.classList.remove('hidden'); });
     } else { videoEl.src = currentPlaylistBlobUrl; videoEl.play(); }
@@ -142,28 +148,69 @@ function buildQualityMenu(levels) { const qMenu = document.getElementById('quali
 function toggleDropdown(id) { document.querySelectorAll('.dropdown-content').forEach(el=>{ if(el.id!==id) el.classList.add('hidden'); }); document.getElementById(id).classList.toggle('hidden'); }
 document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')&&!e.target.closest('.click-layer')) document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); });
 function togglePlay() { if(videoEl.paused) videoEl.play(); else videoEl.pause(); }
-videoEl.addEventListener('play', ()=>{ document.getElementById('play-icon').classList.add('hidden'); document.getElementById('pause-icon').classList.remove('hidden'); playerContainer.classList.remove('paused'); centerPlayBtn.classList.add('hidden'); showControlsTemporary(); });
-videoEl.addEventListener('pause', ()=>{ document.getElementById('play-icon').classList.remove('hidden'); document.getElementById('pause-icon').classList.add('hidden'); playerContainer.classList.add('paused'); playerContainer.classList.remove('hide-cursor'); centerPlayBtn.classList.remove('hidden'); });
-function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('quality-btn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
 
-// 🔥 تحديث شريط التقدم
-videoEl.addEventListener('timeupdate', ()=>{ 
-  if(videoEl.duration){ 
-    const pct=(videoEl.currentTime/videoEl.duration)*100; 
-    document.getElementById('progress-filled').style.width=pct+'%'; 
-    document.getElementById('progress-handle').style.left=pct+'%'; 
-    document.getElementById('time-display').textContent=`${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`; 
-  } 
+// 🔥 أحداث التشغيل والإيقاف
+videoEl.addEventListener('play', ()=>{ 
+  document.getElementById('play-icon').classList.add('hidden'); 
+  document.getElementById('pause-icon').classList.remove('hidden'); 
+  playerContainer.classList.remove('paused'); 
+  centerPlayBtn.classList.add('hidden'); 
+  showControlsTemporary(); 
+});
+videoEl.addEventListener('pause', ()=>{ 
+  document.getElementById('play-icon').classList.remove('hidden'); 
+  document.getElementById('pause-icon').classList.add('hidden'); 
+  playerContainer.classList.add('paused'); 
+  playerContainer.classList.remove('hide-cursor'); 
+  centerPlayBtn.classList.remove('hidden'); 
 });
 
-// 🔥 حفظ الوقت تلقائياً كل 5 ثواني
+// 🔥 لما الفيديو يخلص
+videoEl.addEventListener('ended', () => {
+  if (state.lecture) {
+    markAsWatched(state.lecture.id); // تسجيل كمشاهد
+    localStorage.removeItem(getStorageKey(state.lecture.id)); // مسح وقت التوقف
+  }
+  // تحويل الزر لزر إعادة
+  document.getElementById("center-play-icon").classList.add("hidden");
+  document.getElementById("center-replay-icon").classList.remove("hidden");
+  centerPlayBtn.classList.remove("hidden");
+  
+  // تحديث زر الإعادة
+  centerPlayBtn.onclick = function() {
+    videoEl.currentTime = 0;
+    videoEl.play();
+    centerPlayBtn.onclick = togglePlay; // رجع السلوك الأصلي
+    document.getElementById("center-play-icon").classList.remove("hidden");
+    document.getElementById("center-replay-icon").classList.add("hidden");
+  };
+});
+
+function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('quality-btn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
+
+// 🔥 حفظ السرعة
+function setSpeed(speed, btn) { 
+  videoEl.playbackRate = speed; 
+  localStorage.setItem("coursatk_speed", speed);
+  document.getElementById('speed-btn').textContent = speed===1 ? '1x' : speed+'x'; 
+  document.querySelectorAll('#speed-menu button').forEach(b=>b.classList.remove('active')); 
+  if(btn) btn.classList.add('active'); 
+  document.getElementById('speed-menu').classList.add('hidden'); 
+}
+
+// 🔥 حفظ التقدم كل 5 ثواني
 let saveTimer = null;
 videoEl.addEventListener('timeupdate', () => {
-  if (!saveTimer) {
+  if (videoEl.duration) {
+    const pct = (videoEl.currentTime / videoEl.duration) * 100;
+    document.getElementById('progress-filled').style.width = pct + '%';
+    document.getElementById('progress-handle').style.left = pct + '%';
+    document.getElementById('time-display').textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
+  }
+  
+  if (!saveTimer && state.lecture) {
     saveTimer = setTimeout(() => {
-      if (videoEl.currentTime > 0 && state.lecture) {
-        localStorage.setItem(getStorageKey(state.lecture.id), videoEl.currentTime);
-      }
+      if (videoEl.currentTime > 0) localStorage.setItem(getStorageKey(state.lecture.id), videoEl.currentTime);
       saveTimer = null;
     }, 5000);
   }
@@ -171,7 +218,7 @@ videoEl.addEventListener('timeupdate', () => {
 
 videoEl.addEventListener('loadedmetadata', ()=>{ document.getElementById('time-display').textContent=`00:00 / ${formatTime(videoEl.duration)}`; });
 
-// 🔥 سحب شريط التقدم (Drag & Seek)
+// 🔥 سحب شريط التقدم
 const progressContainer = document.getElementById('progress-container');
 const progressTooltip = document.getElementById('progress-tooltip');
 let isDragging = false;
@@ -191,27 +238,16 @@ function handleSeek(e) {
       progressTooltip.textContent = formatTime(newTime);
       progressTooltip.style.left = (pct * 100) + '%';
     }
-    if (!isDragging || e.type === 'click') {
-      videoEl.currentTime = newTime;
-    }
+    if (!isDragging || e.type === 'click') videoEl.currentTime = newTime;
   }
 }
 
 progressContainer.addEventListener('mousedown', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); });
 progressContainer.addEventListener('touchstart', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); }, {passive: true});
-
 document.addEventListener('mousemove', (e) => { if (isDragging) handleSeek(e); });
 document.addEventListener('touchmove', (e) => { if (isDragging) handleSeek(e); }, {passive: true});
-
 document.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
 document.addEventListener('touchend', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
-
-// 🔥 شريط السرعة الجديد
-document.getElementById('speed-slider').addEventListener('input', (e) => {
-  const speed = parseFloat(e.target.value);
-  videoEl.playbackRate = speed;
-  document.getElementById('speed-label').textContent = speed + 'x';
-});
 
 function toggleMute() { videoEl.muted = !videoEl.muted; document.getElementById('vol-icon').style.opacity = videoEl.muted ? '0.4' : '1'; }
 document.getElementById('volume-slider').addEventListener('input', e=>{ videoEl.volume = e.target.value; videoEl.muted = e.target.value==0; });
@@ -279,8 +315,7 @@ function showSeekIndicator(text, icon) { const el = document.getElementById('see
 // ==================== Stop & Close ====================
 function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
 function closePlayer() { 
-  // حفظ الوقت قبل الإغلاق
-  if (state.lecture && videoEl.currentTime > 0) {
+  if (state.lecture && videoEl.currentTime > 0 && videoEl.currentTime < videoEl.duration) {
     localStorage.setItem(getStorageKey(state.lecture.id), videoEl.currentTime);
   }
   stopPlayback(); 
@@ -292,7 +327,9 @@ function closePlayer() {
   document.getElementById('progress-filled').style.width = '0%'; 
   centerPlayBtn.classList.add('hidden'); 
   playerContainer.classList.remove('show-controls'); 
-  document.getElementById('resume-notification').classList.add('hidden');
+  centerPlayBtn.onclick = togglePlay;
+  document.getElementById("center-play-icon").classList.remove("hidden");
+  document.getElementById("center-replay-icon").classList.add("hidden");
 }
 
 document.getElementById("theme-toggle").addEventListener("click", ()=>{ const cur = document.body.getAttribute("data-theme")==="light"?"dark":"light"; document.body.setAttribute("data-theme", cur); });
