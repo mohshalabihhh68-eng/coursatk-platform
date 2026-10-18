@@ -30,10 +30,7 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
-/* 
-  🔥 السر هنا: إجبار كل العناصر على استخدام خط Cairo وبوزن 700 (Bold) 
-  عشان نضمن مفيش أي كلمة تطلع رفيعة زي الصورة اللي بعتها.
-*/
+/* 🔥 إجبار الخط العريض */
 *, h1, h2, h3, h4, h5, h6, p, span, div, button, input, a, small, label, strong, b {
   font-family: var(--font) !important;
   font-weight: 700 !important;
@@ -48,7 +45,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* العناوين الكبيرة بتبقى أثقل شوية (Extra Bold) */
 h1, .page-title-area h1, .page-title-area h1 span, h2, .section-header h2, h3, .card-title, .teacher-name, .video-title, .brand-text h1 {
   font-weight: 800 !important; 
 }
@@ -200,23 +196,71 @@ h1, .page-title-area h1, .page-title-area h1 span, h2, .section-header h2, h3, .
 .modal-action-icon { width:42px; height:42px; background:var(--brand-orange); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .modal-action-icon svg { width:22px; height:22px; }
 
-.custom-player-container { position:relative; width:100%; background:#000; border-radius:20px; overflow:hidden; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.06); box-shadow:0 0 0 1px rgba(255,107,0,.07), 0 28px 64px rgba(0,0,0,.75); }
-.custom-player-container video { width:100%; height:100%; object-fit:contain; display:block; }
+/* 🔥 حاوية الفيديو */
+.custom-player-container { 
+  position:relative; 
+  width:100%; 
+  background:#000; 
+  border-radius:20px; 
+  overflow:hidden; 
+  aspect-ratio:16/9; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  border:1px solid rgba(255,255,255,.06); 
+  box-shadow:0 0 0 1px rgba(255,107,0,.07), 0 28px 64px rgba(0,0,0,.75);
+}
 
-.click-layer { position:absolute; inset:0; z-index:4; cursor:pointer; user-select:none; -webkit-user-select:none; }
+/* 🔥 الفيديو نفسه */
+.custom-player-container video { 
+  width:100%; 
+  height:100%; 
+  object-fit:contain; 
+  display:block; 
+  background:#000;
+}
 
+/* 🔥 طبقة النقرات - غير شفافة لالتقاط النقرات، و z-index أقل من التحكم */
+.click-layer { 
+  position:absolute; 
+  inset:0; 
+  z-index:4; 
+  cursor:pointer; 
+  user-select:none; 
+  -webkit-user-select:none; 
+}
+
+/* شاشة التحميل */
 .player-status { position:absolute; inset:0; background:rgba(0,0,0,.65); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:10; color:#fff; font-size:var(--fs-sm); backdrop-filter:blur(6px); }
 .player-status.hidden { display:none; }
 .spinner { width:44px; height:44px; border:3px solid rgba(255,255,255,.15); border-top-color:var(--brand-orange); border-radius:50%; animation:spin .85s linear infinite; }
 @keyframes spin { 100%{ transform:rotate(360deg); } }
 
+/* مؤشر التقديم */
 .seek-indicator { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.52); border:2px solid rgba(255,107,0,.7); color:#fff; width:88px; height:88px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:var(--fs-sm); z-index:8; pointer-events:none; backdrop-filter:blur(8px); animation:seekPop .25s ease-out forwards; }
 .seek-indicator .seek-icon { font-size:1.25rem; line-height:1; }
 .seek-indicator.hidden      { display:none; }
 @keyframes seekPop { 0% { transform:translate(-50%,-50%) scale(.7); opacity:0; } 60% { transform:translate(-50%,-50%) scale(1.05); opacity:1; } 100%{ transform:translate(-50%,-50%) scale(1); opacity:1; } }
 
-.controls-bar { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.45) 65%, transparent 100%); padding:36px 18px 14px; display:flex; flex-direction:column; gap:6px; z-index:7; opacity:0; transition:opacity .28s; pointer-events:none; }
-.custom-player-container:hover .controls-bar, .custom-player-container.paused .controls-bar { opacity:1; pointer-events:auto; }
+/* 🔥 شريط التحكم - z-index 5 عشان فوق طبقة النقر */
+.controls-bar { 
+  position:absolute; 
+  bottom:0; left:0; right:0; 
+  background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.5) 65%, transparent 100%); 
+  padding:36px 18px 14px; 
+  display:flex; 
+  flex-direction:column; 
+  gap:6px; 
+  z-index:5; 
+  opacity:0; 
+  transition:opacity .28s; 
+  pointer-events:none; 
+}
+.custom-player-container:hover .controls-bar, 
+.custom-player-container.paused .controls-bar { 
+  opacity:1; 
+  pointer-events:auto; 
+}
 .custom-player-container.hide-cursor .controls-bar { opacity:0; pointer-events:none; }
 .custom-player-container.hide-cursor { cursor:none; }
 
@@ -261,4 +305,4 @@ h1, .page-title-area h1, .page-title-area h1 span, h2, .section-header h2, h3, .
   .time-display { font-size:10px; padding:2px 6px; }
   .controls-bar { padding:28px 10px 10px; }
   #quality-btn, #speed-btn { padding:0 7px; }
-  }
+        }
