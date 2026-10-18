@@ -13,13 +13,11 @@ const clickLayer  = document.getElementById("click-layer");
 
 // ==================== API & Utils ====================
 async function api(path, opts = {}) {
-  // 🔥 إضافة credentials: 'include' عشان يبعت الكوكيز والصلاحيات للسيرفر
   opts.credentials = opts.credentials || 'include';
   opts.headers = opts.headers || {};
   
   const res  = await fetch(path, opts);
   
-  // لو السيرفر رد بـ 403 (ممنوع)، بنطلع إيرور واضح
   if (res.status === 403) {
     throw new Error("غير مصرح لك بالوصول (403). يرجى تسجيل الدخول أو التأكد من الصلاحيات.");
   }
@@ -68,7 +66,6 @@ async function render() {
 async function renderYears() {
   let years = await api("/api/years");
   
-  // فلترة السنوات (2024 و 2025)
   years = years.filter(y => {
     const name = String(y.name);
     return !name.includes("2024") && !name.includes("2025") && !name.includes("٢٠٢٤") && !name.includes("٢٠٢٥");
@@ -258,7 +255,7 @@ async function renderContent() {
         <div class="video-thumbnail">
           <img src="${v.thumbnail_url||''}" onerror="this.style.display='none'" />
           <div class="video-num-badge">فيديو #${i+1}</div>
-          <div class="video-duration-badge">⏱ ${v.duration||'00:00'}</div>
+          <div class="video-duration-badge">⏱ ${formatTime(v.duration ? parseInt(v.duration) : 0)}</div>
           <div class="play-overlay">
             <div class="play-btn-circle">
               <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7z"/></svg>
@@ -379,7 +376,6 @@ async function playVideo(videoId, title) {
   stopPlayback();
 
   try {
-    // تم تعديل دالة api عشان تبعت الكوكيز، فهنا هتشتغل عادي
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"});
     var { token: tok, video_id: swId, heartbeat_url: hbUrl } = sess;
     if(!tok||!swId) throw new Error("الجلسة ناقصة");
@@ -389,7 +385,7 @@ async function playVideo(videoId, title) {
 
     // master
     var mUrl = "/api/stream?path="+encodeURIComponent("videos/"+swId+"/stream/master.m3u8")+"&t="+encodeURIComponent(tok);
-    var mRes = await fetch(mUrl, { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
+    var mRes = await fetch(mUrl, { credentials: 'include' });
     if(!mRes.ok) throw new Error("master.m3u8 → HTTP "+mRes.status);
     var mText = await mRes.text();
 
@@ -411,7 +407,7 @@ async function playVideo(videoId, title) {
       varUrl="/api/stream?path="+encodeURIComponent(vBase)+"&t="+encodeURIComponent(tok);
     }
 
-    var vRes = await fetch(varUrl, { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
+    var vRes = await fetch(varUrl, { credentials: 'include' });
     if(!vRes.ok) throw new Error("variant → HTTP "+vRes.status);
     var vText = await vRes.text();
 
@@ -431,7 +427,7 @@ async function playVideo(videoId, title) {
       }
     }
 
-    var kRes = await fetch("/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(tok), { credentials: 'include' }); // 🔥 ضفنا الكوكيز هنا
+    var kRes = await fetch("/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(tok), { credentials: 'include' });
     if(!kRes.ok) throw new Error("key → HTTP "+kRes.status);
     var wrapped = new Uint8Array(await kRes.arrayBuffer());
     var kr = await cryptoUtils.decryptPlaybackKey(wrapped, swId);
@@ -557,13 +553,13 @@ function setQuality(levelIndex, btn) {
   document.getElementById('quality-menu').classList.add('hidden');
 }
 
+// 🔥 تم تعديل دالة الوقت لتظهر بالدقائق والثواني فقط (MM:SS)
 function formatTime(sec) {
-  if(isNaN(sec)||sec<0) return '00:00:00';
+  if(isNaN(sec)||sec<0) return '00:00';
   const t = Math.floor(sec);
-  const h = Math.floor(t/3600);
-  const m = Math.floor((t%3600)/60);
+  const m = Math.floor(t/60);
   const s = t%60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
 videoEl.addEventListener('timeupdate', ()=>{
@@ -575,7 +571,7 @@ videoEl.addEventListener('timeupdate', ()=>{
   }
 });
 videoEl.addEventListener('loadedmetadata', ()=>{
-  document.getElementById('time-display').textContent=`00:00:00 / ${formatTime(videoEl.duration)}`;
+  document.getElementById('time-display').textContent=`00:00 / ${formatTime(videoEl.duration)}`;
 });
 
 function seekVideo(e) {
@@ -602,8 +598,7 @@ function toggleFullscreen() {
     document.exitFullscreen();
 }
 
-
-// ==================== 🔥 NEW CLICK & HOLD LOGIC 🔥 ====================
+// ==================== 🔥 CLICK & HOLD LOGIC 🔥 ====================
 let pressTimer = null;
 let isLongPress = false;
 let speedBeforeHold = 1;
@@ -613,7 +608,6 @@ clickLayer.addEventListener('touchstart', startPress, {passive: true});
 
 function startPress(e) {
   isLongPress = false;
-  
   if (videoEl.paused) return;
 
   pressTimer = setTimeout(() => {
@@ -695,7 +689,7 @@ function closePlayer() {
   document.body.style.overflow = "";
   document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden'));
   document.getElementById('seek-indicator').classList.add('hidden');
-  document.getElementById('time-display').textContent = '00:00:00 / 00:00:00';
+  document.getElementById('time-display').textContent = '00:00 / 00:00';
   document.getElementById('progress-filled').style.width = '0%';
 }
 
