@@ -119,42 +119,91 @@ function toggleMute() { videoEl.muted = !videoEl.muted; document.getElementById(
 document.getElementById('volume-slider').addEventListener('input', e=>{ videoEl.volume = e.target.value; videoEl.muted = e.target.value==0; });
 function toggleFullscreen() { if(!document.fullscreenElement) playerContainer.requestFullscreen().catch(err=>console.log(err)); else document.exitFullscreen(); }
 
-// ==================== 🔥 التحكم في ظهور الأدوات 🔥 ====================
+
+// ==================== 🔥 منطق النقرات الجديد (Zero Conflict) 🔥 ====================
+let pressTimer = null; 
+let isLongPress = false; 
+let speedBeforeHold = 1;
 let controlsTimeout = null;
-function showControlsTemporary() {
-  playerContainer.classList.remove('hide-cursor');
+
+// 1. إظهار التحكم لمدة 3 ثواني
+function showControls() {
+  playerContainer.classList.add('show-controls');
   clearTimeout(controlsTimeout);
   if (!videoEl.paused) {
-    controlsTimeout = setTimeout(() => { playerContainer.classList.add('hide-cursor'); }, 3000); // تختفي بعد 3 ثواني
+    controlsTimeout = setTimeout(() => {
+      playerContainer.classList.remove('show-controls');
+    }, 3000);
   }
 }
 
-// ==================== 🔥 CLICK & HOLD LOGIC 🔥 ====================
-let pressTimer = null; let isLongPress = false; let speedBeforeHold = 1;
-clickLayer.addEventListener('mousedown', startPress); clickLayer.addEventListener('touchstart', startPress, {passive: true});
-function startPress(e) { isLongPress = false; if (videoEl.paused) return; pressTimer = setTimeout(() => { isLongPress = true; speedBeforeHold = videoEl.playbackRate; videoEl.playbackRate = 2; }, 400); }
-clickLayer.addEventListener('mouseup', endPress); clickLayer.addEventListener('mouseleave', endPress); clickLayer.addEventListener('touchend', endPress); clickLayer.addEventListener('touchcancel', endPress);
-function endPress() { clearTimeout(pressTimer); if (isLongPress) { videoEl.playbackRate = speedBeforeHold; isLongPress = false; } }
+// 2. منطق الضغط المطول (للتسريع)
+function startPress(e) {
+  if (videoEl.paused) return; // مفيش تسريع لو الفيديو واقف
+  isLongPress = false;
+  
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+    speedBeforeHold = videoEl.playbackRate;
+    videoEl.playbackRate = 2; // تسريع 2x
+  }, 300); // 300ms للضغط المطول
+}
 
-// 🔥 السر هنا: الاعتماد على click فقط 🔥
+function endPress() {
+  clearTimeout(pressTimer);
+  if (isLongPress) {
+    videoEl.playbackRate = speedBeforeHold; // رجع السرعة العادية
+    isLongPress = false;
+  }
+}
+
+// 3. ربط أحداث الماوس واللمس
+clickLayer.addEventListener('mousedown', startPress);
+clickLayer.addEventListener('touchstart', startPress, {passive: true});
+clickLayer.addEventListener('mouseup', endPress);
+clickLayer.addEventListener('mouseleave', endPress);
+clickLayer.addEventListener('touchend', endPress);
+clickLayer.addEventListener('touchcancel', endPress);
+
+// 4. حدث الـ Click (الضغطة العادية)
 clickLayer.addEventListener('click', (e) => {
-  if (isLongPress) return;
-  if (playerContainer.classList.contains('hide-cursor')) { showControlsTemporary(); } // لو مخفي نظهره
-  else { clearTimeout(controlsTimeout); playerContainer.classList.add('hide-cursor'); } // لو ظاهر نخفيه
+  if (isLongPress) return; // لو كان ضغط مطول، متعملش حاجة
+  
+  // لو التحكم ظاهر، نخفيه. لو مخفي، نظهره.
+  if (playerContainer.classList.contains('show-controls')) {
+    clearTimeout(controlsTimeout);
+    playerContainer.classList.remove('show-controls');
+  } else {
+    showControls();
+  }
 });
+
+// 5. حدث الدبل كليك (التقديم والتأخير)
 clickLayer.addEventListener('dblclick', (e) => {
   if (isLongPress) return;
-  const rect = playerContainer.getBoundingClientRect(); const relativeX = e.clientX - rect.left; const width = rect.width;
-  if (relativeX > width * 0.65) { skipTime(10); } else if (relativeX < width * 0.35) { skipTime(-10); } else { togglePlay(); }
+  
+  const rect = playerContainer.getBoundingClientRect(); 
+  const relativeX = e.clientX - rect.left; 
+  const width = rect.width;
+
+  if (relativeX > width * 0.65) { 
+    skipTime(10); 
+  } else if (relativeX < width * 0.35) { 
+    skipTime(-10); 
+  } else { 
+    togglePlay(); 
+  }
 });
+
 function skipTime(sec) { videoEl.currentTime = Math.max(0, Math.min(videoEl.duration||0, videoEl.currentTime+sec)); showSeekIndicator(sec>0?'+10':'-10', sec>0?'⏩':'⏪'); }
 function showSeekIndicator(text, icon) { const el = document.getElementById('seek-indicator'); el.innerHTML = `<span class="seek-icon" style="font-size:24px;">${icon}</span><span>${text}s</span>`; el.classList.remove('hidden'); el.style.animation='none'; el.offsetHeight; el.style.animation=null; if(el._ht) clearTimeout(el._ht); el._ht = setTimeout(()=> el.classList.add('hidden'), 700); }
 
-// حركة الماوس تظهر التحكم تاني
-playerContainer.addEventListener('mousemove', ()=>{ if(!videoEl.paused) showControlsTemporary(); });
+// حركة الماوس تظهر التحكم (للكمبيوتر)
+playerContainer.addEventListener('mousemove', ()=>{ if(!videoEl.paused) showControls(); });
 
+// ==================== Stop & Close ====================
 function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
-function closePlayer() { stopPlayback(); document.getElementById("player-modal").classList.add("hidden"); document.body.style.overflow = ""; document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); document.getElementById('seek-indicator').classList.add('hidden'); document.getElementById('time-display').textContent = '00:00 / 00:00'; document.getElementById('progress-filled').style.width = '0%'; centerPlayBtn.classList.add('hidden'); }
+function closePlayer() { stopPlayback(); document.getElementById("player-modal").classList.add("hidden"); document.body.style.overflow = ""; document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); document.getElementById('seek-indicator').classList.add('hidden'); document.getElementById('time-display').textContent = '00:00 / 00:00'; document.getElementById('progress-filled').style.width = '0%'; centerPlayBtn.classList.add('hidden'); playerContainer.classList.remove('show-controls'); }
 
 document.getElementById("theme-toggle").addEventListener("click", ()=>{ const cur = document.body.getAttribute("data-theme")==="light"?"dark":"light"; document.body.setAttribute("data-theme", cur); });
 loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{}); render();
