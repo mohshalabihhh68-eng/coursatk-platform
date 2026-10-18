@@ -11,15 +11,12 @@
 body { font-size: 1.1rem; line-height: 1.6; background-color: var(--bg); color: var(--text-main); direction: rtl; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
-/* Topbar */
+/* Topbar & Pages (كما هو من قبل) */
 .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 24px; background:var(--bg); position:sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
 .topbar-left, .topbar-right { display:flex; align-items:center; gap:12px; }
 .brand-text p { font-size:0.85rem; color:var(--text-muted); margin-top:1px; }
 .brand-logo { background:#fff; color:var(--brand-orange); font-weight:900 !important; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; box-shadow:0 4px 10px rgba(255,107,0,0.2); }
 .icon-btn { background:var(--bg-card); border:1px solid var(--border); color:var(--text-main); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s; }
-.icon-btn:hover { background:var(--bg-card-light); } .icon-btn svg { width:18px; height:18px; }
-
-/* Pages */
 #app { max-width:1100px; margin:0 auto; padding:24px 24px 60px; }
 .loading { text-align:center; padding:60px; color:var(--text-muted); }
 .page-title-area { text-align:center; margin-bottom:40px; position:relative; }
@@ -67,7 +64,7 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .video-num-badge { position:absolute; top:10px; right:10px; background:#111; color:#fff; font-size:0.85rem; padding:3px 8px; border-radius:6px; border:1px solid rgba(255,255,255,.18); }
 .video-info { padding:16px; text-align:center; display:flex; flex-direction:column; gap:14px; flex:1; }
 
-/* Player */
+/* ==================== 🔥 Player CSS 🔥 ==================== */
 .modal { position:fixed; inset:0; background:rgba(4,6,12,.97); z-index:999; display:flex; flex-direction:column; overflow-y:auto; backdrop-filter:blur(6px); }
 .modal.hidden { display:none; }
 .modal-box { width:100%; max-width:960px; margin:0 auto; padding:20px 20px 40px; display:flex; flex-direction:column; gap:18px; }
@@ -97,26 +94,42 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .seek-indicator.hidden { display:none; }
 @keyframes seekPop { 0% { transform:translate(-50%,-50%) scale(.7); opacity:0; } 100%{ transform:translate(-50%,-50%) scale(1); opacity:1; } }
 
-/* 🔥 شريط التحكم - بيظهر بالكلاس show-controls */
+/* إشعار استكمال الفيديو */
+.resume-notification {
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.85); border:1px solid var(--brand-orange);
+  padding:12px 24px; border-radius:12px; z-index:9;
+  display:flex; align-items:center; gap:16px; color:#fff;
+  backdrop-filter:blur(8px); animation:fadeInDown .3s ease-out;
+}
+.resume-notification p { font-size:0.95rem; margin:0; }
+.resume-notification.hidden { display:none; }
+@keyframes fadeInDown { from { opacity:0; transform:translate(-50%,-20px); } to { opacity:1; transform:translate(-50%,0); } }
+
+/* شريط التحكم - تصميم زجاجي (Glass) */
 .controls-bar { 
   position:absolute; bottom:0; left:0; right:0; 
-  background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.6) 50%, transparent 100%); 
-  padding:40px 18px 14px; display:flex; flex-direction:column; gap:6px; 
+  background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.7) 50%, transparent 100%); 
+  padding:40px 24px 20px; display:flex; flex-direction:column; gap:12px; 
   z-index:5; opacity:0; transition:opacity .3s; pointer-events:none; 
 }
 .custom-player-container.show-controls .controls-bar { opacity:1; pointer-events:auto; }
 .custom-player-container.show-controls { cursor:default; }
 .custom-player-container:not(.show-controls) { cursor:none; }
 
-.progress-container { width:100%; height:20px; display:flex; align-items:center; cursor:pointer; }
-.progress-bar { width:100%; height:4px; background:rgba(255,255,255,.2); border-radius:4px; position:relative; transition:height .15s; }
+/* --- شريط التقدم --- */
+.progress-container { position:relative; width:100%; height:24px; display:flex; align-items:center; cursor:pointer; direction:ltr; }
+.progress-bar { width:100%; height:4px; background:rgba(255,255,255,.25); border-radius:4px; position:relative; transition:height .15s; }
 .progress-container:hover .progress-bar { height:6px; }
-.progress-filled { position:absolute; right:0; top:0; bottom:0; background:var(--brand-orange); border-radius:4px; width:0%; transition:width .1s linear; }
-.progress-filled::after { content:''; position:absolute; left:0; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:#fff; border-radius:50%; opacity:0; transition:opacity .15s; box-shadow:0 2px 8px rgba(0,0,0,.6); }
-.progress-container:hover .progress-filled::after { opacity:1; }
+.progress-filled { position:absolute; left:0; top:0; bottom:0; background:var(--brand-orange); border-radius:4px; width:0%; transition:width .1s linear; }
+.progress-handle { position:absolute; left:0; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:#fff; border-radius:50%; box-shadow:0 2px 8px rgba(0,0,0,.6); opacity:0; transition:opacity .15s, transform .1s; pointer-events:none; }
+.progress-container:hover .progress-handle { opacity:1; }
+.progress-tooltip { position:absolute; bottom:24px; left:0; transform:translateX(-50%); background:rgba(0,0,0,.9); color:#fff; padding:4px 8px; border-radius:6px; font-size:12px; pointer-events:none; direction:ltr; white-space:nowrap; }
+.progress-tooltip.hidden { display:none; }
 
-.controls-row { display:flex; justify-content:space-between; align-items:center; direction:ltr; gap:6px; }
-.controls-left, .controls-right { display:flex; align-items:center; gap:6px; }
+/* --- أزرار التحكم --- */
+.controls-row { display:flex; justify-content:space-between; align-items:center; direction:ltr; gap:8px; }
+.controls-left, .controls-right { display:flex; align-items:center; gap:8px; }
 .ctrl-btn { background:transparent; border:none; color:rgba(255,255,255,.9); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:8px; transition:all .15s; flex-shrink:0; }
 .ctrl-btn:hover { color:#fff; background:rgba(255,255,255,.1); }
 .ctrl-btn svg { width:20px; height:20px; }
@@ -129,21 +142,27 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
 .time-display { color:rgba(255,255,255,.9); font-size:12px; font-family:'Courier New',monospace; white-space:nowrap; direction:ltr; letter-spacing:.4px; background:rgba(0,0,0,.3); padding:3px 8px; border-radius:6px; }
 
+/* --- شريط السرعة الجديد --- */
+.speed-slider-container { display:flex; align-items:center; gap:12px; direction:ltr; padding:4px 8px; background:rgba(255,255,255,.05); border-radius:8px; }
+.speed-label { font-size:12px; font-weight:800; color:var(--brand-orange); min-width:32px; text-align:center; }
+#speed-slider { flex:1; height:4px; -webkit-appearance:none; background:rgba(255,255,255,.2); border-radius:2px; outline:none; cursor:pointer; }
+#speed-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,.5); }
+
+/* --- القوائم المنسدلة --- */
 .dropdown { position:relative; }
 .dropdown-content { position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%); background:rgba(12,16,26,.98); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:6px; display:flex; flex-direction:column; min-width:110px; z-index:20; }
 .dropdown-content.hidden { display:none; }
 .dropdown-content button { background:transparent; border:none; color:rgba(255,255,255,.8); padding:9px 14px; text-align:center; font-size:0.9rem; cursor:pointer; border-radius:8px; transition:background .15s, color .15s; }
 .dropdown-content button:hover { background:rgba(255,107,0,.18); color:#ff9e00; }
 .dropdown-content button.active { color:#ff9e00; background:rgba(255,107,0,.12); }
-
-#quality-btn, #speed-btn { font-size:0.9rem; height:30px; padding:0 10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.85); background:rgba(255,255,255,.06); transition:all .15s; }
-#quality-btn:hover, #speed-btn:hover { background:rgba(255,255,255,.12); border-color:var(--brand-orange); color:#fff; }
+#quality-btn { font-size:0.9rem; height:30px; padding:0 10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.85); background:rgba(255,255,255,.06); transition:all .15s; }
+#quality-btn:hover { background:rgba(255,255,255,.12); border-color:var(--brand-orange); color:#fff; }
 
 @media (max-width:600px) {
   .modal-box { padding:12px; }
   #volume-slider { width:46px; }
   .time-display { font-size:10px; padding:2px 6px; }
-  .controls-bar { padding:28px 10px 10px; }
+  .controls-bar { padding:28px 12px 12px; }
   .center-play-btn { width:60px; height:60px; }
   .center-play-btn svg { width:26px; height:26px; }
-  }
+        }
