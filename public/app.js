@@ -49,7 +49,14 @@ async function render() {
 }
 
 async function renderYears() {
-  const years = await api("/api/years");
+  let years = await api("/api/years");
+  
+  // فلترة السنوات: إزالة 2024 و 2025
+  years = years.filter(y => {
+    const name = String(y.name);
+    return !name.includes("2024") && !name.includes("2025") && !name.includes("٢٠٢٤") && !name.includes("٢٠٢٥");
+  });
+
   let html = `
     <div class="page-title-area">
       <div class="page-badge">📚 مسار علمي علوم</div>
@@ -608,15 +615,8 @@ function toggleFullscreen() {
 }
 
 // ==================== TAP / DOUBLE-TAP / LONG-PRESS ====================
-// قواعد التفاعل:
-// - الضغط المطول (≥400ms)  → 2x طول الضغط، بيرجع عند الرفع
-// - ضغطتين يمين (>65%)     → +10s
-// - ضغطتين شمال (<35%)     → -10s
-// - ضغطتين منتصف           → play/pause
-// - ضغطة واحدة أي مكان     → يُظهر/يُخفي شريط التحكم + زر المنتصف
-// ------------------------------------------------------------
 const LONG_MS   = 400;
-const DTAP_MS   = 280;
+const DTAP_MS   = 300; // زيادة الوقت لـ 300ms عشان يقرا الدبل كليك صح
 
 let tapCount      = 0;
 let tapTimer      = null;
@@ -645,7 +645,7 @@ function pointerDown(e) {
   firstTapX    = cx;
   isLongPress  = false;
 
-  // مؤقت الضغط المطول — يلغي أي tap عالق
+  // مؤقت الضغط المطول
   pressTimer2 = setTimeout(()=>{
     isLongPress = true;
     clearTimeout(tapTimer); tapTimer=null; tapCount=0;
