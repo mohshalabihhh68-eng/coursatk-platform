@@ -32,13 +32,14 @@ body {
 }
 
 /* ==================== Topbar ==================== */
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--bg); position: sticky; top: 0; z-index: 100; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--bg); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
 .brand-text h1 { font-size: 1.2rem; font-weight: 800; }
 .brand-text p { font-size: 0.75rem; color: var(--text-muted); }
 .brand-logo { background: #fff; color: var(--brand-orange); font-weight: 900; padding: 8px 12px; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.2); }
-.icon-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.icon-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+.icon-btn:hover { background: var(--bg-card-light); }
 .icon-btn svg { width: 18px; height: 18px; }
 
 /* ==================== Page Layout ==================== */
@@ -49,7 +50,8 @@ body {
 .page-title-area h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; }
 .page-title-area h1 span { color: var(--brand-orange); }
 .page-title-area p { color: var(--text-muted); font-size: 1rem; }
-.back-btn-top { position: absolute; right: 0; top: 20px; display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-family: inherit; font-size: 0.9rem; }
+.back-btn-top { position: absolute; right: 0; top: 20px; display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-family: inherit; font-size: 0.9rem; transition: background 0.2s; }
+.back-btn-top:hover { background: var(--bg-card-light); }
 @media (max-width: 768px) { .back-btn-top { position: static; margin-bottom: 20px; } }
 
 /* ==================== Cards Grid ==================== */
@@ -93,98 +95,367 @@ body {
 .video-duration-badge { position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.7); color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; }
 .video-num-badge { position: absolute; top: 12px; right: 12px; background: #111; color: white; font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); }
 
-/* ==================== Custom Player ==================== */
-.modal { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; overflow-y: auto; }
+/* ==================== Modal & Player Shell ==================== */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(4, 6, 12, 0.97);
+  z-index: 999;
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  backdrop-filter: blur(6px);
+}
 .modal.hidden { display: none; }
-.modal-box { width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
-.back-btn { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 12px; cursor: pointer; }
+
+.modal-box {
+  width: 100%; max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 20px 40px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.modal-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white; padding: 10px 18px; border-radius: 12px;
+  cursor: pointer; font-family: inherit; font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.12); }
 .back-btn svg { width: 18px; height: 18px; }
-.modal-titles h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px;}
-.modal-titles p { font-size: 0.85rem; color: var(--text-muted);}
-.modal-action-icon { width: 45px; height: 45px; background: var(--brand-orange); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-.modal-action-icon svg { width: 24px; height: 24px; }
 
-.custom-player-container { position: relative; width: 100%; background: #000; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
-.custom-player-container video { width: 100%; height: 100%; object-fit: contain; }
+.modal-titles h3 {
+  font-size: 1.1rem; font-weight: 800;
+  color: white; text-align: center;
+  flex: 1; line-height: 1.4;
+}
 
-/* طبقة النقرات */
-.click-layer { position: absolute; inset: 0; z-index: 4; cursor: pointer; }
+.modal-action-icon {
+  width: 42px; height: 42px;
+  background: var(--brand-orange);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.modal-action-icon svg { width: 22px; height: 22px; }
 
-.player-status { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 10; color: white; font-weight: bold; backdrop-filter: blur(4px); }
+/* ==================== Custom Player ==================== */
+.custom-player-container {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 0 0 1px rgba(255,107,0,0.08),
+    0 24px 60px rgba(0,0,0,0.7);
+}
+
+.custom-player-container video {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* النقر */
+.click-layer {
+  position: absolute; inset: 0;
+  z-index: 4; cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* حالة التحميل */
+.player-status {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; z-index: 10; color: white;
+  font-weight: 700; font-size: 0.95rem;
+  backdrop-filter: blur(6px);
+}
 .player-status.hidden { display: none; }
-.spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 1s linear infinite; }
+
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: var(--brand-orange);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* مؤشر التقديم/التأخير (الدوائر اللي بتظهر في النص) */
+/* ---- مؤشر التقديم / التأخير ---- */
 .seek-indicator {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(255, 107, 0, 0.8); color: white;
-  width: 80px; height: 80px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem; font-weight: 800; z-index: 8;
-  backdrop-filter: blur(5px); pointer-events: none;
-  animation: pulse 0.4s ease-out;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.55);
+  border: 2px solid rgba(255,107,0,0.7);
+  color: white;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  font-size: 1rem; font-weight: 800;
+  z-index: 8;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  animation: seekPop 0.25s ease-out forwards;
 }
+.seek-indicator .seek-icon { font-size: 1.3rem; line-height: 1; }
 .seek-indicator.hidden { display: none; }
-@keyframes pulse {
-  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes seekPop {
+  0%  { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+  100%{ transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* شريط التحكم الزجاجي */
+/* ---- مؤشر التسريع المطول ---- */
+.speed-indicator {
+  position: absolute;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,107,0,0.85);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem; font-weight: 800;
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  letter-spacing: 0.5px;
+}
+.speed-indicator.visible { opacity: 1; }
+
+/* ==================== Controls Bar ==================== */
 .controls-bar {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(10, 14, 26, 0.6);
-  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 10px 20px 15px;
-  display: flex; flex-direction: column; gap: 8px;
-  z-index: 7; opacity: 0; transition: opacity 0.3s;
-  border-radius: 0 0 16px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+  padding: 32px 18px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
 }
-.custom-player-container.hide-cursor .controls-bar { opacity: 0; pointer-events: none; }
-.custom-player-container.hide-cursor { cursor: none; }
+
 .custom-player-container:hover .controls-bar,
-.custom-player-container.paused .controls-bar { opacity: 1; pointer-events: auto; }
-.custom-player-container:hover { cursor: default; }
-
-.progress-container { width: 100%; height: 20px; display: flex; align-items: center; cursor: pointer; }
-.progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; position: relative; transition: height 0.2s; }
-.progress-container:hover .progress-bar { height: 7px; }
-.progress-filled { position: absolute; right: 0; top: 0; bottom: 0; background: var(--brand-orange); border-radius: 4px; width: 0%; }
-.progress-filled::after {
-  content: ''; position: absolute; left: 0; top: 50%; transform: translate(-50%, -50%);
-  width: 14px; height: 14px; background: white; border-radius: 50%;
-  opacity: 0; transition: opacity 0.2s; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+.custom-player-container.paused .controls-bar {
+  opacity: 1;
+  pointer-events: auto;
 }
-.progress-container:hover .progress-filled::after { opacity: 1; }
+.custom-player-container.hide-cursor .controls-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+.custom-player-container.hide-cursor { cursor: none; }
 
-.controls-row { display: flex; justify-content: space-between; align-items: center; direction: ltr; }
-.controls-left, .controls-right { display: flex; align-items: center; gap: 12px; }
+/* ---- شريط التقدم ---- */
+.progress-container {
+  width: 100%; height: 22px;
+  display: flex; align-items: center;
+  cursor: pointer;
+  position: relative;
+}
 
-.ctrl-btn { background: transparent; border: none; color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; border-radius: 50%; }
-.ctrl-btn:hover { color: var(--brand-orange); background: rgba(255,255,255,0.1); }
-.ctrl-btn svg { width: 22px; height: 22px; }
+.progress-bar {
+  width: 100%; height: 3px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+  position: relative;
+  transition: height 0.15s ease;
+}
+.progress-container:hover .progress-bar { height: 5px; }
+
+.progress-filled {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, #ff9e00, #ff3d00);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* رأس الشريط (thumb) */
+.progress-filled::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px; height: 13px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+.progress-container:hover .progress-filled::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ---- صف التحكم ---- */
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: ltr;
+  gap: 8px;
+}
+.controls-left,
+.controls-right {
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ---- أزرار التحكم ---- */
+.ctrl-btn {
+  background: transparent;
+  border: none; color: rgba(255,255,255,0.88);
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, transform 0.1s;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.ctrl-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.08);
+}
+.ctrl-btn:active { transform: scale(0.94); }
+.ctrl-btn svg { width: 20px; height: 20px; }
 .ctrl-btn.hidden { display: none; }
-.text-btn { width: auto; padding: 0 10px; font-size: 14px; font-weight: bold; font-family: inherit; }
 
-.volume-container { display: flex; align-items: center; gap: 8px; }
-#volume-slider { width: 60px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.3); border-radius: 2px; outline: none; }
-#volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: white; cursor: pointer; }
-.time-display { color: white; font-size: 13px; font-family: monospace; margin-left: 8px; direction: ltr; }
+.text-btn {
+  width: auto;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+}
 
+/* ---- صوت ---- */
+.volume-container { display: flex; align-items: center; gap: 6px; }
+#volume-slider {
+  width: 64px; height: 4px;
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: width 0.2s;
+}
+#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+#volume-slider::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: white; border: none;
+}
+
+/* ---- عرض الوقت ---- */
+.time-display {
+  color: rgba(255,255,255,0.9);
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+  direction: ltr;
+  letter-spacing: 0.5px;
+  background: rgba(0,0,0,0.3);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* ---- القوائم المنسدلة ---- */
 .dropdown { position: relative; }
+
 .dropdown-content {
-  position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-  background: rgba(20, 25, 35, 0.95); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px; padding: 8px 0; display: flex; flex-direction: column;
-  min-width: 100px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%; transform: translateX(-50%);
+  background: rgba(12, 16, 26, 0.96);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 6px;
+  display: flex; flex-direction: column;
+  min-width: 110px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  z-index: 20;
 }
 .dropdown-content.hidden { display: none; }
+
 .dropdown-content button {
-  background: transparent; border: none; color: #ddd; padding: 10px 16px;
-  text-align: right; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.2s;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  padding: 9px 14px;
+  text-align: center;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
 }
-.dropdown-content button:hover { background: rgba(255, 107, 0, 0.2); color: var(--brand-orange); }
-.dropdown-content button.active { color: var(--brand-orange); font-weight: bold; background: rgba(255, 107, 0, 0.1); }
+.dropdown-content button:hover {
+  background: rgba(255, 107, 0, 0.18);
+  color: #ff9e00;
+}
+.dropdown-content button.active {
+  color: #ff9e00;
+  font-weight: 800;
+  background: rgba(255, 107, 0, 0.12);
+}
+
+/* ---- مؤشر الجودة/السرعة ---- */
+#quality-btn, #speed-btn {
+  font-size: 12px;
+  font-weight: 800;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.3px;
+  background: rgba(255,255,255,0.06);
+  transition: background 0.15s, border-color 0.15s;
+}
+#quality-btn:hover, #speed-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,107,0,0.5);
+  color: white;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 600px) {
+  .modal-box { padding: 12px 12px 30px; }
+  .custom-player-container { border-radius: 14px; }
+  #volume-slider { width: 48px; }
+  .time-display { font-size: 11px; padding: 2px 6px; }
+  .controls-bar { padding: 28px 12px 10px; }
+  .text-btn { padding: 0 8px; font-size: 11px; }
+  #quality-btn, #speed-btn { padding: 0 7px; font-size: 11px; }
+}
