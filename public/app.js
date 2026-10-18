@@ -439,12 +439,16 @@ async function playVideo(videoId, title) {
       hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         status.classList.add("hidden");
         
-        // ملء قائمة الجودة
+        // حل مشكلة الجودات 0p: بنشوف الجودات الحقيقية بس
         const qMenu = document.getElementById('quality-menu');
-        qMenu.innerHTML = `<button onclick="setQuality(-1, this)" class="active">تلقائي</button>`;
+        let qHtml = `<button onclick="setQuality(-1, this)" class="active">تلقائي</button>`;
+        
         data.levels.forEach((level, i) => {
-          qMenu.innerHTML += `<button onclick="setQuality(${i}, this)">${level.height}p</button>`;
+          if (level.height > 0) { 
+            qHtml += `<button onclick="setQuality(${i}, this)">${level.height}p</button>`;
+          }
         });
+        qMenu.innerHTML = qHtml;
         
         videoEl.play().catch(() => {
           document.getElementById('big-play-btn').classList.remove('hidden');
@@ -594,16 +598,20 @@ clickLayer.addEventListener('mouseleave', handleMouseUp);
 
 function handleMouseDown(e) {
   isLongPress = false;
+  // لو الفيديو واقف مش بنعمل حاجة
+  if (videoEl.paused) return;
+
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   
   // بدء مؤقت التسريع (الضغط المطول)
   pressTimer = setTimeout(() => {
     isLongPress = true;
-    if (!videoEl.paused) {
-      currentSpeedBeforeHold = videoEl.playbackRate;
-      videoEl.playbackRate = 2; // تسريع مؤقت
-      document.getElementById('speed-indicator').classList.remove('hidden');
-    }
+    currentSpeedBeforeHold = videoEl.playbackRate;
+    videoEl.playbackRate = 2; // تسريع مؤقت
+    document.getElementById('speed-indicator').classList.remove('hidden');
+    
+    // إلغاء مؤقت النقر القصير عشان ميتنفذش
+    clearTimeout(clickTimer);
   }, 400); // 400ms للضغط المطول
   
   // التعامل مع النقر العادي (تقدم / تأخير)
@@ -619,9 +627,7 @@ function handleMouseUp(e) {
   clearTimeout(clickTimer);
   
   if (isLongPress) {
-    if (!videoEl.paused) {
-      videoEl.playbackRate = currentSpeedBeforeHold; // إرجاع السرعة العادية
-    }
+    videoEl.playbackRate = currentSpeedBeforeHold; // إرجاع السرعة العادية
     document.getElementById('speed-indicator').classList.add('hidden');
   }
 }
@@ -651,7 +657,7 @@ playerContainer.addEventListener('mousemove', () => {
   if (!videoEl.paused) {
     cursorTimer = setTimeout(() => {
       playerContainer.classList.add('hide-cursor');
-    }, 2000); // إخفاء الماوس بعد ثانيتين
+    }, 2000);
   }
 });
 
@@ -661,6 +667,13 @@ function stopPlayback() {
   if (hls) { hls.destroy(); hls = null; }
   if (currentKeyBlobUrl) { URL.revokeObjectURL(currentKeyBlobUrl); currentKeyBlobUrl = null; }
   if (currentPlaylistBlobUrl) { URL.revokeObjectURL(currentPlaylistBlobUrl); currentPlaylistBlobUrl = null; }
+  
+  // تصفير السرعة عشان ميبوظش الفيديوهات الجديدة
+  videoEl.playbackRate = 1;
+  document.getElementById('speed-btn').textContent = '1x';
+  document.querySelectorAll('#speed-menu button').forEach(b => b.classList.remove('active'));
+  document.querySelector('#speed-menu button:nth-child(3)').classList.add('active');
+
   if (videoEl) { videoEl.removeAttribute("src"); videoEl.load(); }
 }
 
