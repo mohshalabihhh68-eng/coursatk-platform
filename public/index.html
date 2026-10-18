@@ -53,7 +53,7 @@
         <video id="video" playsinline></video>
         
         <!-- شاشة التحميل / الحالة -->
-        <div id="player-status" class="player-status hidden">
+        <div id="player-status" class="player-status">
           <div class="spinner"></div>
           <span>جاري التشغيل...</span>
         </div>
@@ -99,20 +99,20 @@
             <div class="controls-right">
               <!-- زرار السرعة -->
               <div class="dropdown">
-                <button class="ctrl-btn text-btn" onclick="toggleDropdown('speed-menu')">1x</button>
+                <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
                 <div class="dropdown-content hidden" id="speed-menu">
-                  <button onclick="setSpeed(0.5)">0.5x</button>
-                  <button onclick="setSpeed(0.75)">0.75x</button>
-                  <button onclick="setSpeed(1)">Normal</button>
-                  <button onclick="setSpeed(1.25)">1.25x</button>
-                  <button onclick="setSpeed(1.5)">1.5x</button>
-                  <button onclick="setSpeed(2)">2x</button>
+                  <button onclick="setSpeed(0.5, this)">0.5x</button>
+                  <button onclick="setSpeed(0.75, this)">0.75x</button>
+                  <button onclick="setSpeed(1, this)" class="active">Normal</button>
+                  <button onclick="setSpeed(1.25, this)">1.25x</button>
+                  <button onclick="setSpeed(1.5, this)">1.5x</button>
+                  <button onclick="setSpeed(2, this)">2x</button>
                 </div>
               </div>
 
               <!-- زرار الجودة -->
               <div class="dropdown">
-                <button class="ctrl-btn text-btn" onclick="toggleDropdown('quality-menu')" id="quality-btn">جودة</button>
+                <button class="ctrl-btn text-btn" id="quality-btn" onclick="toggleDropdown('quality-menu')">جودة</button>
                 <div class="dropdown-content hidden" id="quality-menu">
                   <!-- بيتم ملئها من الجافاسكريبت -->
                 </div>
