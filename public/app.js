@@ -120,36 +120,34 @@ document.getElementById('volume-slider').addEventListener('input', e=>{ videoEl.
 function toggleFullscreen() { if(!document.fullscreenElement) playerContainer.requestFullscreen().catch(err=>console.log(err)); else document.exitFullscreen(); }
 
 
-// ==================== 🔥 منطق النقرات الجديد (Zero Conflict) 🔥 ====================
-let pressTimer = null; 
-let isLongPress = false; 
-let speedBeforeHold = 1;
+// ==================== 🔥 التحكم الجديد (فصل تام) 🔥 ====================
 let controlsTimeout = null;
-
-// 1. إظهار التحكم لمدة 3 ثواني
-function showControls() {
+function showControlsTemporary() {
   playerContainer.classList.add('show-controls');
   clearTimeout(controlsTimeout);
   if (!videoEl.paused) {
-    controlsTimeout = setTimeout(() => {
-      playerContainer.classList.remove('show-controls');
-    }, 3000);
+    controlsTimeout = setTimeout(() => { playerContainer.classList.remove('show-controls'); }, 3000);
   }
 }
 
-// 2. منطق الضغط المطول (للتسريع)
+let pressTimer = null; let isLongPress = false; let speedBeforeHold = 1;
+
+// 1. بدء الضغط (مسك الشاشة)
 function startPress(e) {
-  if (videoEl.paused) return; // مفيش تسريع لو الفيديو واقف
   isLongPress = false;
+  if (videoEl.paused) return; // مفيش تسريع لو الفيديو واقف
   
+  // ننتظر 300 مللي ثانية. لو المستخدم ساب قبلها يبقى دي ضغطة عادية
   pressTimer = setTimeout(() => {
     isLongPress = true;
     speedBeforeHold = videoEl.playbackRate;
-    videoEl.playbackRate = 2; // تسريع 2x
-  }, 300); // 300ms للضغط المطول
+    videoEl.playbackRate = 2; // تسريع
+    if (navigator.vibrate) navigator.vibrate(50); // اهتزاز بسيط للموبايل (اختياري)
+  }, 300);
 }
 
-function endPress() {
+// 2. سيبان الضغط
+function endPress(e) {
   clearTimeout(pressTimer);
   if (isLongPress) {
     videoEl.playbackRate = speedBeforeHold; // رجع السرعة العادية
@@ -157,7 +155,6 @@ function endPress() {
   }
 }
 
-// 3. ربط أحداث الماوس واللمس
 clickLayer.addEventListener('mousedown', startPress);
 clickLayer.addEventListener('touchstart', startPress, {passive: true});
 clickLayer.addEventListener('mouseup', endPress);
@@ -165,43 +162,35 @@ clickLayer.addEventListener('mouseleave', endPress);
 clickLayer.addEventListener('touchend', endPress);
 clickLayer.addEventListener('touchcancel', endPress);
 
-// 4. حدث الـ Click (الضغطة العادية)
+// 3. لما تدوس دوسة عادية (Click)
 clickLayer.addEventListener('click', (e) => {
-  if (isLongPress) return; // لو كان ضغط مطول، متعملش حاجة
+  if (isLongPress) return; // لو كان ضغط مطول متعملش حاجة
   
-  // لو التحكم ظاهر، نخفيه. لو مخفي، نظهره.
+  // نتحقق لو التحكم ظاهر نخفيه، لو مخفي نظهره
   if (playerContainer.classList.contains('show-controls')) {
     clearTimeout(controlsTimeout);
     playerContainer.classList.remove('show-controls');
   } else {
-    showControls();
+    showControlsTemporary();
   }
 });
 
-// 5. حدث الدبل كليك (التقديم والتأخير)
+// 4. الدبل كليك
 clickLayer.addEventListener('dblclick', (e) => {
   if (isLongPress) return;
-  
   const rect = playerContainer.getBoundingClientRect(); 
   const relativeX = e.clientX - rect.left; 
   const width = rect.width;
-
-  if (relativeX > width * 0.65) { 
-    skipTime(10); 
-  } else if (relativeX < width * 0.35) { 
-    skipTime(-10); 
-  } else { 
-    togglePlay(); 
-  }
+  if (relativeX > width * 0.65) { skipTime(10); } 
+  else if (relativeX < width * 0.35) { skipTime(-10); } 
+  else { togglePlay(); }
 });
 
 function skipTime(sec) { videoEl.currentTime = Math.max(0, Math.min(videoEl.duration||0, videoEl.currentTime+sec)); showSeekIndicator(sec>0?'+10':'-10', sec>0?'⏩':'⏪'); }
 function showSeekIndicator(text, icon) { const el = document.getElementById('seek-indicator'); el.innerHTML = `<span class="seek-icon" style="font-size:24px;">${icon}</span><span>${text}s</span>`; el.classList.remove('hidden'); el.style.animation='none'; el.offsetHeight; el.style.animation=null; if(el._ht) clearTimeout(el._ht); el._ht = setTimeout(()=> el.classList.add('hidden'), 700); }
 
-// حركة الماوس تظهر التحكم (للكمبيوتر)
-playerContainer.addEventListener('mousemove', ()=>{ if(!videoEl.paused) showControls(); });
+// شيلنا mousemove عشان الموبايل ميتلخبطش
 
-// ==================== Stop & Close ====================
 function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
 function closePlayer() { stopPlayback(); document.getElementById("player-modal").classList.add("hidden"); document.body.style.overflow = ""; document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); document.getElementById('seek-indicator').classList.add('hidden'); document.getElementById('time-display').textContent = '00:00 / 00:00'; document.getElementById('progress-filled').style.width = '0%'; centerPlayBtn.classList.add('hidden'); playerContainer.classList.remove('show-controls'); }
 
