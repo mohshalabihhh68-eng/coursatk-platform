@@ -1,7 +1,7 @@
 // ==================== State ====================
 const state = { view: "years", year: null, subject: null, teacher: null, chapter: null, lecture: null, videosList: [], currentVideoIndex: -1 };
 let hls = null; let hbTimer = null; let cryptoUtils = null; let currentKeyBlobUrl = null; let currentPlaylistBlobUrl = null;
-const appEl = document.getElementById("app");
+const appEl = document.getElementById("app"); const videoEl = document.getElementById("video"); const playerContainer = document.getElementById("custom-player"); const clickLayer = document.getElementById("click-layer"); const centerPlayBtn = document.getElementById("center-play-btn");
 
 // ==================== Storage Helpers ====================
 const getStorageKey = (id) => `coursatk_video_${id}`;
@@ -113,92 +113,6 @@ function formatTime(sec) {
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// ==================== Player DOM Elements ====================
-const video = document.getElementById('video');
-const container = document.getElementById('custom-player');
-const bigPlay = document.getElementById('bigPlay');
-const playBtn = document.getElementById('playBtn');
-const playIcon = document.getElementById('playIcon');
-const pauseIcon = document.getElementById('pauseIcon');
-const progressBar = document.getElementById('progressBar');
-const progressFilled = document.getElementById('progressFilled');
-const currentTimeEl = document.getElementById('currentTime');
-const durationEl = document.getElementById('duration');
-const muteBtn = document.getElementById('muteBtn');
-const volumeIcon = document.getElementById('volumeIcon');
-const muteIcon = document.getElementById('muteIcon');
-const volumeSlider = document.getElementById('volumeSlider');
-const speedBtn = document.getElementById('speedBtn');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-const loader = document.getElementById('loader');
-const errorMsg = document.getElementById('errorMsg');
-const errorText = document.getElementById('errorText');
-
-const speeds = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-let speedIndex = 2; 
-
-function togglePlay() { if (video.paused) video.play(); else video.pause(); }
-function updatePlayUI() { 
-  if (video.paused) { playIcon.style.display = 'block'; pauseIcon.style.display = 'none'; bigPlay.classList.remove('hidden'); container.classList.add('paused'); } 
-  else { playIcon.style.display = 'none'; pauseIcon.style.display = 'block'; bigPlay.classList.add('hidden'); container.classList.remove('paused'); } 
-}
-function updateProgress() { 
-  const percent = (video.currentTime / video.duration) * 100 || 0; 
-  progressFilled.style.width = percent + '%'; 
-  currentTimeEl.textContent = formatTime(video.currentTime); 
-}
-
-// Player Events
-bigPlay.addEventListener('click', togglePlay);
-playBtn.addEventListener('click', togglePlay);
-video.addEventListener('click', togglePlay);
-video.addEventListener('play', updatePlayUI);
-video.addEventListener('pause', updatePlayUI);
-video.addEventListener('timeupdate', updateProgress);
-video.addEventListener('loadedmetadata', () => { durationEl.textContent = formatTime(video.duration); });
-video.addEventListener('waiting', () => loader.classList.add('show'));
-video.addEventListener('playing', () => loader.classList.remove('show'));
-
-progressBar.addEventListener('click', (e) => {
-  const rect = progressBar.getBoundingClientRect();
-  const percent = (e.clientX - rect.left) / rect.width;
-  video.currentTime = percent * video.duration;
-});
-
-muteBtn.addEventListener('click', () => {
-  video.muted = !video.muted;
-  volumeIcon.style.display = video.muted ? 'none' : 'block';
-  muteIcon.style.display = video.muted ? 'block' : 'none';
-});
-
-volumeSlider.addEventListener('input', () => {
-  video.volume = volumeSlider.value;
-  video.muted = video.volume === 0;
-});
-
-speedBtn.addEventListener('click', () => {
-  speedIndex = (speedIndex + 1) % speeds.length;
-  video.playbackRate = speeds[speedIndex];
-  speedBtn.textContent = speeds[speedIndex] + '×';
-  localStorage.setItem("coursatk_speed", speeds[speedIndex]);
-});
-
-fullscreenBtn.addEventListener('click', () => {
-  if (!document.fullscreenElement) { container.requestFullscreen?.() || container.webkitRequestFullscreen?.(); } 
-  else { document.exitFullscreen?.(); }
-});
-
-let hideControlsTimeout = null;
-function showControls() { container.classList.add('show-controls'); clearTimeout(hideControlsTimeout); hideControlsTimeout = setTimeout(() => { if (!video.paused) container.classList.remove('show-controls'); }, 3000); }
-container.addEventListener('mousemove', showControls);
-container.addEventListener('touchstart', showControls);
-
-function showLoader() { loader.classList.add('show'); }
-function hideLoader() { loader.classList.remove('show'); }
-function showError(msg) { errorText.textContent = msg; errorMsg.classList.add('show'); hideLoader(); }
-function hideError() { errorMsg.classList.remove('show'); }
-
-// ==================== Play Page Logic ====================
 function openPlayerPage(index) {
   if (index < 0 || index >= state.videosList.length) return;
   document.getElementById("player-page").classList.remove("hidden");
@@ -208,8 +122,8 @@ function openPlayerPage(index) {
 }
 
 function closePlayer() {
-  if (state.videosList[state.currentVideoIndex] && video.currentTime > 0 && video.currentTime < video.duration) {
-    localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), video.currentTime);
+  if (state.videosList[state.currentVideoIndex] && videoEl.currentTime > 0 && videoEl.currentTime < videoEl.duration) {
+    localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
   }
   stopPlayback(); 
   document.getElementById("player-page").classList.add("hidden"); 
@@ -264,9 +178,13 @@ async function playVideo(index) {
   const videoId = videoData.id;
 
   buildSidebar(); 
-  showLoader();
-  hideError();
+
+  const status = document.getElementById("player-status"); 
+  status.classList.remove("hidden"); 
   stopPlayback();
+  
+  document.getElementById("center-play-icon").classList.remove("hidden");
+  document.getElementById("center-replay-icon").classList.add("hidden");
   
   try {
     var sess = await api("/api/video/"+videoId+"/play", {method:"POST"}); 
@@ -293,56 +211,169 @@ async function playVideo(index) {
     hbTimer = setInterval(()=>{ fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include", body:JSON.stringify({url:hbUrl,token:tok})}).catch(()=>{}); }, 25000);
     
     if(window.Hls && Hls.isSupported()){
-      hls = new Hls({enableWorker:false, maxBufferLength:30, maxMaxBufferLength:60}); hls.loadSource(currentPlaylistBlobUrl); hls.attachMedia(video);
+      hls = new Hls({enableWorker:false, maxBufferLength:30, maxMaxBufferLength:60}); hls.loadSource(currentPlaylistBlobUrl); hls.attachMedia(videoEl);
       hls.on(Hls.Events.MANIFEST_PARSED, (event, data)=>{ 
-        hideLoader(); 
+        status.classList.add("hidden"); 
         buildQualityMenu(data.levels); 
         
         const savedSpeed = localStorage.getItem("coursatk_speed");
-        if (savedSpeed) { video.playbackRate = parseFloat(savedSpeed); speedBtn.textContent = savedSpeed + '×'; }
+        if (savedSpeed) { setSpeed(parseFloat(savedSpeed)); }
 
         const savedTime = localStorage.getItem(getStorageKey(videoId));
         if (savedTime && parseFloat(savedTime) > 2) {
-          video.currentTime = parseFloat(savedTime);
+          videoEl.currentTime = parseFloat(savedTime);
         }
         
-        video.play().catch(()=>{});
+        videoEl.play().catch(()=>{ centerPlayBtn.classList.remove('hidden'); });
       });
-      hls.on(Hls.Events.ERROR, (_, data)=>{ if(!data.fatal) return; showError("خطأ HLS: "+data.type); });
-    } else { video.src = currentPlaylistBlobUrl; video.play(); }
-  } catch(e) { showError("فشل: "+e.message); }
+      hls.on(Hls.Events.ERROR, (_, data)=>{ if(!data.fatal) return; status.querySelector('span').textContent = "خطأ HLS: "+data.type; status.classList.remove('hidden'); });
+    } else { videoEl.src = currentPlaylistBlobUrl; videoEl.play(); }
+  } catch(e) { status.querySelector('span').textContent = "فشل: "+e.message; status.classList.remove('hidden'); }
 }
 
 function playNextVideo() { if (state.currentVideoIndex < state.videosList.length - 1) playVideo(state.currentVideoIndex + 1); }
 function playPrevVideo() { if (state.currentVideoIndex > 0) playVideo(state.currentVideoIndex - 1); }
 
+// ==================== Player Controls ====================
 function buildQualityMenu(levels) { const qMenu = document.getElementById('quality-menu'); const items = levels.map((l,i)=>({ index: i, height: l.height||0, bitrate: l.bitrate||0 })).sort((a,b)=> b.height!==a.height ? b.height-a.height : b.bitrate-a.bitrate); let html = `<button onclick="setQuality(-1,this)" class="active">تلقائي</button>`; items.forEach(item=>{ let label = item.height>0 ? item.height+"p" : (item.bitrate>0 ? Math.round(item.bitrate/1000)+"k" : "جودة "+(item.index+1)); html += `<button onclick="setQuality(${item.index},this)">${label}</button>`; }); qMenu.innerHTML = html; }
-
 function toggleDropdown(id) { document.querySelectorAll('.dropdown-content').forEach(el=>{ if(el.id!==id) el.classList.add('hidden'); }); document.getElementById(id).classList.toggle('hidden'); }
-document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')) document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); });
+document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')&&!e.target.closest('.click-layer')) document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.add('hidden')); });
+function togglePlay() { if(videoEl.paused) videoEl.play(); else videoEl.pause(); }
 
-function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('qualityBtn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
-
-// حفظ التقدم
-let saveTimer = null;
-video.addEventListener('timeupdate', () => {
-  if (!saveTimer && state.videosList[state.currentVideoIndex]) {
-    saveTimer = setTimeout(() => {
-      if (video.currentTime > 0) localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), video.currentTime);
-      saveTimer = null;
-    }, 2000);
-  }
-});
-
-video.addEventListener('ended', () => {
+videoEl.addEventListener('play', ()=>{ document.getElementById('play-icon').classList.add('hidden'); document.getElementById('pause-icon').classList.remove('hidden'); playerContainer.classList.remove('paused'); centerPlayBtn.classList.add('hidden'); showControlsTemporary(); });
+videoEl.addEventListener('pause', ()=>{ document.getElementById('play-icon').classList.remove('hidden'); document.getElementById('pause-icon').classList.add('hidden'); playerContainer.classList.add('paused'); playerContainer.classList.remove('hide-cursor'); centerPlayBtn.classList.remove('hidden'); });
+videoEl.addEventListener('ended', () => {
   if (state.videosList[state.currentVideoIndex]) {
     markAsWatched(state.videosList[state.currentVideoIndex].id);
     localStorage.removeItem(getStorageKey(state.videosList[state.currentVideoIndex].id));
     buildSidebar(); 
   }
+  document.getElementById("center-play-icon").classList.add("hidden");
+  document.getElementById("center-replay-icon").classList.remove("hidden");
+  centerPlayBtn.classList.remove("hidden");
+  centerPlayBtn.onclick = function() {
+    videoEl.currentTime = 0; videoEl.play();
+    centerPlayBtn.onclick = togglePlay;
+    document.getElementById("center-play-icon").classList.remove("hidden");
+    document.getElementById("center-replay-icon").classList.add("hidden");
+  };
 });
 
-function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} video.playbackRate = 1; video.removeAttribute("src"); video.load(); }
+function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('quality-btn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
+function setSpeed(speed, btn) { videoEl.playbackRate = speed; localStorage.setItem("coursatk_speed", speed); document.getElementById('speed-btn').textContent = speed===1 ? '1x' : speed+'x'; document.querySelectorAll('#speed-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('speed-menu').classList.add('hidden'); }
+
+videoEl.addEventListener('timeupdate', () => {
+  if (videoEl.duration) {
+    const pct = (videoEl.currentTime / videoEl.duration) * 100;
+    document.getElementById('progress-filled').style.width = pct + '%';
+    document.getElementById('progress-handle').style.left = pct + '%';
+    document.getElementById('time-display').textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
+  }
+});
+
+videoEl.addEventListener('loadedmetadata', ()=>{ document.getElementById('time-display').textContent=`00:00 / ${formatTime(videoEl.duration)}`; });
+
+// حفظ التقدم
+let saveTimer = null;
+videoEl.addEventListener('timeupdate', () => {
+  if (!saveTimer && state.videosList[state.currentVideoIndex]) {
+    saveTimer = setTimeout(() => {
+      if (videoEl.currentTime > 0) localStorage.setItem(getStorageKey(state.videosList[state.currentVideoIndex].id), videoEl.currentTime);
+      saveTimer = null;
+    }, 2000);
+  }
+});
+
+const progressContainer = document.getElementById('progress-container');
+const progressTooltip = document.getElementById('progress-tooltip');
+let isDragging = false;
+function handleSeek(e) {
+  const rect = progressContainer.getBoundingClientRect();
+  let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let pct = (clientX - rect.left) / rect.width;
+  pct = Math.max(0, Math.min(1, pct));
+  if (videoEl.duration) {
+    const newTime = pct * videoEl.duration;
+    if (isDragging) {
+      document.getElementById('progress-filled').style.width = (pct * 100) + '%';
+      document.getElementById('progress-handle').style.left = (pct * 100) + '%';
+      document.getElementById('time-display').textContent = `${formatTime(newTime)} / ${formatTime(videoEl.duration)}`;
+      progressTooltip.textContent = formatTime(newTime);
+      progressTooltip.style.left = (pct * 100) + '%';
+    }
+    if (!isDragging || e.type === 'click') videoEl.currentTime = newTime;
+  }
+}
+progressContainer.addEventListener('mousedown', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); });
+progressContainer.addEventListener('touchstart', (e) => { isDragging = true; progressTooltip.classList.remove('hidden'); handleSeek(e); }, {passive: true});
+document.addEventListener('mousemove', (e) => { if (isDragging) handleSeek(e); });
+document.addEventListener('touchmove', (e) => { if (isDragging) handleSeek(e); }, {passive: true});
+document.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
+document.addEventListener('touchend', () => { if (isDragging) { isDragging = false; progressTooltip.classList.add('hidden'); } });
+
+function toggleMute() { videoEl.muted = !videoEl.muted; document.getElementById('vol-icon').style.opacity = videoEl.muted ? '0.4' : '1'; }
+document.getElementById('volume-slider').addEventListener('input', e=>{ videoEl.volume = e.target.value; videoEl.muted = e.target.value==0; });
+function toggleFullscreen() { if(!document.fullscreenElement) playerContainer.requestFullscreen().catch(err=>console.log(err)); else document.exitFullscreen(); }
+
+// ==================== التحكم في ظهور الأدوات ====================
+let controlsTimeout = null;
+function showControlsTemporary() {
+  playerContainer.classList.add('show-controls');
+  clearTimeout(controlsTimeout);
+  if (!videoEl.paused) {
+    controlsTimeout = setTimeout(() => { playerContainer.classList.remove('show-controls'); }, 3000);
+  }
+}
+
+let pressTimer = null; let isLongPress = false; let speedBeforeHold = 1;
+function startPress(e) {
+  isLongPress = false;
+  if (videoEl.paused) return; 
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+    speedBeforeHold = videoEl.playbackRate;
+    videoEl.playbackRate = 2;
+    if (navigator.vibrate) navigator.vibrate(50);
+  }, 300);
+}
+function endPress(e) {
+  clearTimeout(pressTimer);
+  if (isLongPress) {
+    videoEl.playbackRate = speedBeforeHold;
+    isLongPress = false;
+  }
+}
+clickLayer.addEventListener('mousedown', startPress);
+clickLayer.addEventListener('touchstart', startPress, {passive: true});
+clickLayer.addEventListener('mouseup', endPress);
+clickLayer.addEventListener('mouseleave', endPress);
+clickLayer.addEventListener('touchend', endPress);
+clickLayer.addEventListener('touchcancel', endPress);
+
+clickLayer.addEventListener('click', (e) => {
+  if (isLongPress) return; 
+  if (playerContainer.classList.contains('show-controls')) {
+    clearTimeout(controlsTimeout);
+    playerContainer.classList.remove('show-controls');
+  } else {
+    showControlsTemporary();
+  }
+});
+
+clickLayer.addEventListener('dblclick', (e) => {
+  if (isLongPress) return;
+  const rect = playerContainer.getBoundingClientRect(); 
+  const relativeX = e.clientX - rect.left; 
+  const width = rect.width;
+  if (relativeX > width * 0.65) { skipTime(10); } 
+  else if (relativeX < width * 0.35) { skipTime(-10); } 
+  else { togglePlay(); }
+});
+
+function skipTime(sec) { videoEl.currentTime = Math.max(0, Math.min(videoEl.duration||0, videoEl.currentTime+sec)); showSeekIndicator(sec>0?'+10':'-10', sec>0?'⏩':'⏪'); }
+function showSeekIndicator(text, icon) { const el = document.getElementById('seek-indicator'); el.innerHTML = `<span class="seek-icon" style="font-size:24px;">${icon}</span><span>${text}s</span>`; el.classList.remove('hidden'); el.style.animation='none'; el.offsetHeight; el.style.animation=null; if(el._ht) clearTimeout(el._ht); el._ht = setTimeout(()=> el.classList.add('hidden'), 700); }
+
+function stopPlayback() { if(hbTimer){clearInterval(hbTimer);hbTimer=null;} if(hls){hls.destroy();hls=null;} if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null;} if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null;} videoEl.playbackRate = 1; videoEl.removeAttribute("src"); videoEl.load(); }
 
 document.getElementById("theme-toggle").addEventListener("click", ()=>{ const cur = document.body.getAttribute("data-theme")==="light"?"dark":"light"; document.body.setAttribute("data-theme", cur); });
 loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{}); render();
