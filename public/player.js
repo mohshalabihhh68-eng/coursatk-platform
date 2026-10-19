@@ -6,219 +6,288 @@ const lectureId = qs.get('lectureId');
 const initialVideoId = qs.get('videoId');
 const $ = id => document.getElementById(id);
 const video = $('video');
-const screenEl = $('custom-player');
+const overlay = $('overlay');
+const errorOverlay = $('errorOverlay');
+const errorText = $('errorText');
 
-let videos = [], current = -1, hls = null, hbTimer = null, ready = false;
-let saveTimer = null;
+let videos = [];
+let current = -1;
+let hls = null;
+let hbTimer = null;
+let saveInterval = null;
+let ready = false;
 
-/* Helpers */
+// ==================== API Helper ====================
+async function api(path, opts = {}) {
+  try {
+    const res = await fetch(path, opts);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { data = text; }
+    if (!res.ok || data.success === false) {
+      throw new Error(data.error || data.message || "HTTP " + res.status);
+    }
+    return data.data !== undefined ? data.data : data;
+  } catch (e) {
+    console.error("API Error:", path, e);
+    throw e;
+  }
+}
+
+// ==================== Storage ====================
+function getProgressKey(id) { return 'cstk_w_' + id; }
+function getProgress(id) {
+  try { return JSON.parse(localStorage.getItem(getProgressKey(id)) || 'null'); }
+  catch(e) { return null; }
+}
+function saveProgress() {
+  if (current < 0 || !ready) return;
+  const v = videos[current];
+  if (!v) return;
+  const dur = video.duration || 0;
+  const t = video.currentTime || 0;
+  const pct = dur ? Math.min(100, Math.round((t / dur) * 100)) : 0;
+  try {
+    localStorage.setItem(getProgressKey(v.id), JSON.stringify({
+      videoId: String(v.id),
+      title: v.title,
+      currentTime: t,
+      duration: dur,
+      percent: pct,
+      watched: pct >= 90,
+      updatedAt: Date.now()
+    }));
+    $('saveStatus').textContent = '✅ محفوظ';
+    setTimeout(() => { $('saveStatus').textContent = ''; }, 2000);
+  } catch(e) {}
+}
+
+// ==================== UI ====================
+function showLoading(msg = 'جاري تجهيز الفيديو...') {
+  overlay.classList.remove('hidden');
+  overlay.innerHTML = `<div style="text-align:center;">
+    <div class="spinner"></div>
+    ${msg}
+  </div>`;
+}
+function hideLoading() { overlay.classList.add('hidden'); }
+function showError(msg) {
+  hideLoading();
+  errorText.textContent = msg || 'حصل خطأ أثناء تشغيل الفيديو';
+  errorOverlay.classList.remove('hidden');
+}
+function hideError() { errorOverlay.classList.add('hidden'); }
+
 function formatTime(sec) {
   if (isNaN(sec) || sec < 0) return '00:00';
-  const t = Math.floor(sec); const h = Math.floor(t / 3600); const m = Math.floor((t % 3600) / 60); const s = t % 60;
-  if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const t = Math.floor(sec);
+  const m = Math.floor(t / 60);
+  const s = t % 60;
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
-function getStorageKey(id) { return 'cstk_video_' + id; }
 
-async function api(path, opts = {}) {
-  const res = await fetch(path, opts);
-  const text = await res.text();
-  let data;
-  try { data = JSON.parse(text); } catch (e) { data = text; }
-  if (!res.ok || data.success === false) throw new Error(data.error || data.message || "HTTP " + res.status);
-  return data.data !== undefined ? data.data : data;
-}
-
-/* UI */
-const togglePlay = () => { if (video.paused) video.play(); else video.pause(); };
-
-$('playBtn').addEventListener('click', togglePlay);
-$('bigPlay').addEventListener('click', togglePlay);
-
-video.addEventListener('play', () => {
-  $('playIcon').style.display = 'none';
-  $('pauseIcon').style.display = 'block';
-  $('bigPlay').classList.add('hidden');
-  screenEl.classList.remove('paused');
-});
-video.addEventListener('pause', () => {
-  $('playIcon').style.display = 'block';
-  $('pauseIcon').style.display = 'none';
-  $('bigPlay').classList.remove('hidden');
-  screenEl.classList.add('paused');
-});
-
-video.addEventListener('timeupdate', () => {
+function skip(seconds) {
   if (!video.duration) return;
-  const pct = (video.currentTime / video.duration) * 100;
-  $('progressFilled').style.width = pct + '%';
-  $('time-display').textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-  
-  if (!saveTimer) {
-    saveTimer = setTimeout(() => {
-      if (video.currentTime > 0 && current >= 0) {
-        localStorage.setItem(getStorageKey(videos[current].id), video.currentTime);
-      }
-      saveTimer = null;
-    }, 2000);
-  }
-});
-
-video.addEventListener('loadedmetadata', () => {
-  $('time-display').textContent = `00:00 / ${formatTime(video.duration)}`;
-});
-
-$('progressBar').addEventListener('click', (e) => {
-  const rect = $('progressBar').getBoundingClientRect();
-  const pct = (e.clientX - rect.left) / rect.width;
-  video.currentTime = pct * video.duration;
-});
-
-$('muteBtn').addEventListener('click', () => {
-  video.muted = !video.muted;
-  $('volumeIcon').style.opacity = video.muted ? '0.5' : '1';
-});
-
-$('volumeSlider').addEventListener('input', (e) => {
-  video.volume = e.target.value;
-  video.muted = e.target.value == 0;
-});
-
-$('fullscreenBtn').addEventListener('click', () => {
-  if (!document.fullscreenElement) screenEl.requestFullscreen?.();
-  else document.exitFullscreen?.();
-});
-
-/* Gestures */
-let pressTimer, isLongPress = false, speedBeforeHold = 1;
-const clickLayer = $('click-layer');
-
-clickLayer.addEventListener('mousedown', startPress);
-clickLayer.addEventListener('touchstart', startPress, { passive: true });
-clickLayer.addEventListener('mouseup', endPress);
-clickLayer.addEventListener('mouseleave', endPress);
-clickLayer.addEventListener('touchend', endPress);
-clickLayer.addEventListener('touchcancel', endPress);
-
-function startPress() {
-  isLongPress = false;
-  if (video.paused) return;
-  pressTimer = setTimeout(() => {
-    isLongPress = true;
-    speedBeforeHold = video.playbackRate;
-    video.playbackRate = 2;
-  }, 400);
-}
-function endPress() {
-  clearTimeout(pressTimer);
-  if (isLongPress) {
-    video.playbackRate = speedBeforeHold;
-    isLongPress = false;
-  }
+  video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + seconds));
 }
 
-clickLayer.addEventListener('dblclick', (e) => {
-  if (isLongPress) return;
-  const rect = screenEl.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  if (x > rect.width * 0.65) video.currentTime += 10;
-  else if (x < rect.width * 0.35) video.currentTime -= 10;
-});
+function changeSpeed(val) {
+  video.playbackRate = parseFloat(val);
+}
 
-/* Show Controls */
-let hideTimeout;
-screenEl.addEventListener('mousemove', () => {
-  screenEl.classList.add('show-controls');
-  clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(() => {
-    if (!video.paused) screenEl.classList.remove('show-controls');
-  }, 3000);
-});
-screenEl.addEventListener('touchstart', () => {
-  screenEl.classList.add('show-controls');
-  clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(() => {
-    if (!video.paused) screenEl.classList.remove('show-controls');
-  }, 3000);
-}, { passive: true });
+// ==================== Playlist ====================
+function renderPlaylist() {
+  const container = $('playlist');
+  if (!videos.length) {
+    container.innerHTML = '<div style="color:var(--muted); padding:20px; text-align:center;">لا توجد فيديوهات</div>';
+    return;
+  }
+  container.innerHTML = videos.map((v, i) => {
+    const prog = getProgress(v.id);
+    const isDone = prog && (prog.watched || prog.percent >= 90);
+    const isActive = i === current;
+    return `
+      <div class="playlist-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}" onclick="playVideoByIndex(${i})">
+        <div class="playlist-num">${isDone ? '✓' : i + 1}</div>
+        <div class="playlist-info">
+          <div class="playlist-title">${escape(v.title)}</div>
+          <div class="playlist-meta">${v.duration ? formatTime(v.duration) : '—'} ${isDone ? '· مكتمل' : ''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-/* Play Video */
-async function playVideo(index) {
+// ==================== Play Video ====================
+async function playVideoByIndex(index) {
   if (index < 0 || index >= videos.length) return;
+  saveProgress();
+  
   current = index;
-  const videoData = videos[index];
-  const videoId = videoData.id;
+  const v = videos[index];
+  ready = false;
+  hideError();
+  showLoading('جاري تجهيز الفيديو...');
   
-  $('video-title').textContent = videoData.title;
-  $('loader').classList.add('show');
-  
+  // تنظيف المشغل القديم
   if (hls) { hls.destroy(); hls = null; }
-  video.pause(); video.removeAttribute('src'); video.load();
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  
+  $('videoTitle').textContent = v.title || 'فيديو';
+  $('lectureName').textContent = window._lectureName || '';
+  
+  renderPlaylist();
   
   try {
-    const sess = await api("/api/video/" + videoId + "/play", { method: "POST" });
-    const tok = sess.token || sess.session_token;
-    const swId = sess.video_id;
-    const hbUrl = sess.heartbeat_url;
+    // جلب جلسة التشغيل من السيرفر بتاعك
+    const session = await api('/api/video/' + v.id + '/play', { method: 'POST' });
+    const tok = session.token || session.session_token;
+    const swId = session.video_id;
+    const hbUrl = session.heartbeat_url;
     
-    if (!tok || !swId) throw new Error("الجلسة ناقصة");
+    if (!tok || !swId) throw new Error('جلسة التشغيل ناقصة');
     
-    const mUrl = "/api/stream?path=" + encodeURIComponent("videos/" + swId + "/stream/master.m3u8") + "&t=" + encodeURIComponent(tok);
-    const mRes = await fetch(mUrl);
-    const mText = await mRes.text();
-    const varRel = mText.split("\n").map(l => l.trim()).find(l => l && l.charAt(0) !== "#");
-    if (!varRel) throw new Error("مفيش variant");
+    // جلب الـ master playlist
+    const masterUrl = '/api/stream?path=' + encodeURIComponent('videos/' + swId + '/stream/master.m3u8') + '&t=' + encodeURIComponent(tok);
+    const masterRes = await fetch(masterUrl);
+    if (!masterRes.ok) throw new Error('فشل تحميل master playlist');
+    const masterText = await masterRes.text();
     
-    const vBase = "videos/" + swId + "/stream/" + varRel;
-    const varUrl = "/api/stream?path=" + encodeURIComponent(vBase) + "&t=" + encodeURIComponent(tok);
+    // استخراج variant
+    const variantRel = masterText.split('\n').map(l => l.trim()).find(l => l && l.charAt(0) !== '#');
+    if (!variantRel) throw new Error('مفيش variant');
     
+    const variantBasePath = 'videos/' + swId + '/stream/' + variantRel;
+    const variantUrl = '/api/stream?path=' + encodeURIComponent(variantBasePath) + '&t=' + encodeURIComponent(tok);
+    
+    // قراءة التقدم المحفوظ
+    const saved = getProgress(v.id);
+    const resumeAt = saved && saved.currentTime > 2 && !saved.watched ? saved.currentTime : 0;
+    
+    // تشغيل الـ HLS
     if (window.Hls && Hls.isSupported()) {
-      hls = new Hls({ enableWorker: false });
-      hls.loadSource(varUrl);
+      hls = new Hls({ enableWorker: false, maxBufferLength: 30 });
+      hls.loadSource(variantUrl);
       hls.attachMedia(video);
+      
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        $('loader').classList.remove('show');
-        const savedTime = localStorage.getItem(getStorageKey(videoId));
-        if (savedTime && parseFloat(savedTime) > 2) video.currentTime = parseFloat(savedTime);
+        hideLoading();
+        ready = true;
+        if (resumeAt > 0) {
+          video.currentTime = resumeAt;
+          console.log('تم الاستئناف من:', formatTime(resumeAt));
+        }
         video.play().catch(() => {});
       });
-    } else {
-      video.src = varUrl;
+      
+      hls.on(Hls.Events.ERROR, (e, data) => {
+        if (!data.fatal) return;
+        showError('خطأ في تحميل الفيديو: ' + data.type);
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = variantUrl;
       video.addEventListener('loadedmetadata', () => {
-        $('loader').classList.remove('show');
-        const savedTime = localStorage.getItem(getStorageKey(videoId));
-        if (savedTime && parseFloat(savedTime) > 2) video.currentTime = parseFloat(savedTime);
+        hideLoading();
+        ready = true;
+        if (resumeAt > 0) video.currentTime = resumeAt;
         video.play().catch(() => {});
       }, { once: true });
+    } else {
+      throw new Error('المتصفح لا يدعم HLS');
     }
     
-    hbTimer = setInterval(() => {
-      fetch("/api/heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: hbUrl, token: tok })
-      }).catch(() => {});
-    }, 25000);
+    // heartbeat
+    if (hbUrl) {
+      if (hbTimer) clearInterval(hbTimer);
+      hbTimer = setInterval(() => {
+        fetch('/api/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: hbUrl, token: tok })
+        }).catch(() => {});
+      }, 25000);
+    }
     
   } catch (e) {
-    $('loader').classList.remove('show');
-    alert("خطأ: " + e.message);
+    showError(e.message || 'فشل تشغيل الفيديو');
   }
 }
 
-/* Init */
+// ==================== Save Progress ====================
+function startSaveInterval() {
+  if (saveInterval) clearInterval(saveInterval);
+  saveInterval = setInterval(() => {
+    if (!video.paused && ready) saveProgress();
+  }, 5000);
+}
+
+video.addEventListener('play', () => {
+  startSaveInterval();
+});
+video.addEventListener('pause', () => {
+  saveProgress();
+});
+video.addEventListener('ended', () => {
+  saveProgress();
+  // الانتقال للتالي تلقائياً
+  if (current < videos.length - 1) {
+    setTimeout(() => playVideoByIndex(current + 1), 1500);
+  }
+});
+video.addEventListener('loadedmetadata', () => {
+  ready = true;
+});
+
+// حفظ قبل ما يقفل الصفحة
+window.addEventListener('beforeunload', () => {
+  saveProgress();
+});
+
+// ==================== Helpers ====================
+function escape(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// expose للـ onclick
+window.playVideoByIndex = playVideoByIndex;
+window.skip = skip;
+window.changeSpeed = changeSpeed;
+
+// ==================== Init ====================
 async function init() {
+  if (!localStorage.getItem('cstk_tok')) {
+    window.location.href = 'index.html';
+    return;
+  }
+  
+  if (!lectureId) {
+    showError('رابط المشغل ناقص رقم المحاضرة');
+    return;
+  }
+  
   try {
-    const content = await api("/api/lectures/" + lectureId + "/content");
-    videos = content.videos || (Array.isArray(content) ? content : []);
-    if (!videos.length) { alert("لا توجد فيديوهات"); return; }
+    const data = await api('/api/lectures/' + lectureId + '/content');
+    videos = data.videos || (Array.isArray(data) ? data : []);
+    window._lectureName = data.lecture?.name || data.name || 'المحاضرة';
+    
+    if (!videos.length) {
+      showError('لا توجد فيديوهات في المحاضرة دي');
+      return;
+    }
+    
+    // ابحث عن الفيديو المطلوب
     let idx = videos.findIndex(v => String(v.id) === String(initialVideoId));
     if (idx < 0) idx = 0;
-    await playVideo(idx);
+    
+    await playVideoByIndex(idx);
+    
   } catch (e) {
-    alert("خطأ: " + e.message);
+    showError(e.message || 'فشل تحميل المحاضرة');
   }
 }
+
 init();
 
 })();
