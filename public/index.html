@@ -5,151 +5,343 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>كورساتك - منصة تعليمية</title>
   <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body data-theme="dark">
 
-  <header class="topbar">
+  <!-- ==================== LANDING PAGE (الواجهة الجديدة) ==================== -->
+  <div id="landing-page" class="landing-page">
+    
+    <header class="lp-header">
+      <div class="lp-nav-right">
+        <button class="lp-btn-login">تسجيل الدخول <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg></button>
+        <button class="lp-btn-outline">الأسعار</button>
+      </div>
+      <div class="lp-nav-center">
+        <a href="#" class="active">الرئيسية</a>
+        <a href="#">الأسعار</a>
+        <a href="#">التواصل</a>
+        <a href="#">الأسئلة الشائعة</a>
+      </div>
+      <div class="lp-nav-left">
+        <div class="lp-brand">
+          <h1>Dorosak Plus</h1>
+          <div class="lp-logo-icon">📚</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="lp-hero">
+      <h1 class="lp-main-title">
+        ارغل بكورس،<br>
+        <span class="lp-highlight">وكل مذاكرتك من هيت وقفت.</span>
+      </h1>
+      <p class="lp-sub-title">
+        كل المواد والملخصات بتاعتك في مكان واحد، منظمين، من أي جهاز. من غير لف ودوران ولا كتب تبعزق.
+      </p>
+
+      <div class="lp-hero-actions">
+        <button class="lp-btn-primary" onclick="showContent()">سجّل وخد كورسك البرتقالي</button>
+        <button class="lp-btn-dark">شوف الأسعار</button>
+      </div>
+
+      <div class="lp-badges">
+        <span>✓ سعر واضح</span>
+        <span>✓ تجربة مجانية</span>
+        <span>✓ دعم مباشر من المدرسين</span>
+      </div>
+
+      <div class="lp-hero-visual">
+        <div class="lp-video-placeholder">
+           <div class="lp-play-btn">▶</div>
+           <div class="lp-video-tag-top">محاضرة ٢٤ . الباب الأول</div>
+           <div class="lp-video-tag-bottom">مراجعة الباب الأول<br><small>كل من الفيزياء</small></div>
+           <div class="lp-progress-bar"><div class="lp-progress-fill"></div></div>
+        </div>
+        <div class="lp-float-badge">🔥 أيام مذاكرة ورا بعض</div>
+        <div class="lp-float-bottom">⚡ ٧ أرقام وتعمل منفي باسورد</div>
+      </div>
+    </section>
+
+    <section class="lp-features-bar">
+      <div class="lp-feature-item">
+        <h3>٢٠٠ جنيه</h3>
+        <p>سعر أقل بكتير</p>
+      </div>
+      <div class="lp-feature-item">
+        <h3>٣ باقات</h3>
+        <p>اختار اللي يناسبك</p>
+      </div>
+      <div class="lp-feature-item">
+        <h3>دعم مباشر</h3>
+        <p>تواصل مع فريقنا</p>
+      </div>
+    </section>
+
+    <section class="lp-steps">
+      <h2>٣ خطوات وتبدأ تذاكر</h2>
+      <p class="lp-section-sub">من أول زيارة لحد أول محاضرة في دقايق.</p>
+
+      <div class="lp-steps-grid">
+        <div class="lp-step-card">
+          <div class="lp-step-icon">🛒</div>
+          <div class="lp-step-num">الخطوة ١</div>
+          <h3>اختار باقتك</h3>
+          <p>شوف الأسعار واختار الباقة اللي تناسبك.</p>
+        </div>
+        <div class="lp-step-arrow">←</div>
+        <div class="lp-step-card">
+          <div class="lp-step-icon">💬</div>
+          <div class="lp-step-num">الخطوة ٢</div>
+          <h3>كلم الأدمن</h3>
+          <p>من الشات أو الواتساب أو على تليجرام.</p>
+        </div>
+        <div class="lp-step-arrow">←</div>
+        <div class="lp-step-card">
+          <div class="lp-step-icon">🔑</div>
+          <div class="lp-step-num">الخطوة ٣</div>
+          <h3>اكتب كودك</h3>
+          <p>هتلاقي كودك في المحادثة، افتحه وابدأ.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-step-details">
+      <div class="lp-step-badge">الخطوة الأولى 1</div>
+      <h2>اختار باقتك من غير أي تعقيد.</h2>
+      <p class="lp-section-sub">الأسعار بتتحدد تلقائياً من الإدارة.</p>
+    </section>
+
+    <section class="lp-step-details">
+      <div class="lp-step-badge">الخطوة الثانية 2</div>
+      <h2>كلم الأدمن وابعت كودك.</h2>
+      <p class="lp-section-sub">اختار الطريقة اللي تريحك.</p>
+
+      <div class="lp-contact-grid">
+        <div class="lp-contact-card">
+          <div class="lp-contact-icon">✈️</div>
+          <h3>تلجرام</h3>
+          <p>اختار الأدمن وكلمه على طول</p>
+        </div>
+        <div class="lp-contact-card active">
+          <div class="lp-contact-icon">💬</div>
+          <h3>شات مباشر من الموقع</h3>
+          <p>ابعت رسالتك للأدمن فوراً</p>
+          <span class="lp-free-badge">الأسئلة</span>
+        </div>
+      </div>
+
+      <div class="lp-trial-card">
+        <h3>مش متأكد إنك عايز تشترك؟</h3>
+        <p>جرب المحاضرة الأولى مجاناً. اطلبها من الأدمن.</p>
+        <button class="lp-btn-trial" onclick="showContent()">اطلب التجربة</button>
+      </div>
+
+      <div class="lp-admin-contact">
+        <span>تواصل مع الأدمن مباشرة</span>
+        <strong>DorosakPlus@ تليجرام</strong>
+      </div>
+    </section>
+
+    <section class="lp-step-details">
+      <div class="lp-step-badge">الخطوة الثالثة 3</div>
+      <h2>اكتب كودك وادخل.</h2>
+      <p class="lp-section-sub">٧ أرقام بس، من غير أي تعقيد.</p>
+
+      <button class="lp-btn-primary" onclick="showContent()">سجّل دخولك</button>
+
+      <div class="lp-otp-box">
+        <div class="lp-otp-input">4</div>
+        <div class="lp-otp-input">8</div>
+        <div class="lp-otp-input">2</div>
+        <div class="lp-otp-input">9</div>
+        <div class="lp-otp-input">1</div>
+        <div class="lp-otp-input">7</div>
+        <div class="lp-otp-input">0</div>
+        <div class="lp-otp-input">6</div>
+      </div>
+    </section>
+
+    <section class="lp-why-us">
+      <h2>اللي هتفرق معاك</h2>
+      
+      <div class="lp-why-grid">
+        <div class="lp-why-card">
+          <div class="lp-why-icon">📺</div>
+          <h3>كل حاجة في مكانها</h3>
+          <p>مواد وفصول ومحاضرات مرتبة بشكل بسيط.</p>
+        </div>
+        <div class="lp-why-card">
+          <div class="lp-why-icon">▶️</div>
+          <h3>كل من هيت وقفت</h3>
+          <p>افتح المحاضرة من أي مكان وفي أي وقت.</p>
+        </div>
+        <div class="lp-why-card">
+          <div class="lp-why-icon">🛡️</div>
+          <h3>دعم فوري ومباشر</h3>
+          <p>مفيش أي إجراء معقد.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-faq">
+      <h2>أسئلة بتتكرر</h2>
+      
+      <div class="lp-faq-item">
+        <div class="lp-faq-q">إزاي أشترك في الكورس؟ <span>+</span></div>
+      </div>
+      <div class="lp-faq-item">
+        <div class="lp-faq-q">إزاي أطلب على كورس الاشتراك؟ <span>+</span></div>
+      </div>
+      <div class="lp-faq-item">
+        <div class="lp-faq-q">هل فيه تجربة مجانية؟ <span>+</span></div>
+      </div>
+      <div class="lp-faq-item">
+        <div class="lp-faq-q">أسعار الاشتراك كام؟ <span>+</span></div>
+      </div>
+      <div class="lp-faq-item">
+        <div class="lp-faq-q">هل كل المواد هتشتغل بعد التجربة؟ <span>+</span></div>
+      </div>
+    </section>
+
+    <footer class="lp-footer">
+      <div class="lp-footer-right">
+        <span>Dorosak Plus — كله مذاكرة في مكان واحد.</span>
+      </div>
+      <div class="lp-footer-left">
+        <span>© جميع الحقوق محفوظة 2026</span>
+      </div>
+    </footer>
+
+    <button class="lp-chat-float">💬 كلم الأدمن</button>
+  </div>
+
+  <!-- ==================== MAIN APP (القائمة القديمة) ==================== -->
+  <header class="topbar hidden" id="main-header">
     <div class="topbar-right">
-      <button class="icon-btn" id="theme-toggle" title="تبديل الثيم">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/>
-          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-        </svg>
+      <button class="icon-btn" id="theme-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
     </div>
     <div class="topbar-left" onclick="goHome()" style="cursor:pointer">
       <div class="brand-text">
         <h1>كورساتك</h1>
-        <p>منتداكر بطعم الضحك</p>
+        <p>هنذاكر بطعم الضحك</p>
       </div>
       <div class="brand-logo">C</div>
     </div>
   </header>
 
-  <main id="app">
-    <div class="loading">جاري التحميل...</div>
-  </main>
+  <main id="app" class="hidden"></main>
 
-  <!-- ================ Player Modal ================ -->
-  <div id="player-modal" class="modal hidden">
-    <div class="modal-box">
+  <!-- شاشة المشاهدة -->
+  <div id="player-page" class="player-page hidden">
+    
+    <div class="player-header-nav">
+      <button class="back-btn" onclick="closePlayer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg> رجوع
+      </button>
+      <div class="brand-mini">
+        <div class="brand-text"><h1>كورساتك</h1><p>مشغل المحاضرات</p></div>
+        <div class="brand-logo">C</div>
+      </div>
+    </div>
 
-      <div class="modal-header">
-        <button class="back-btn" onclick="closePlayer()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="m15 18-6-6 6-6"/>
-          </svg>
-          رجوع
-        </button>
-        <div class="modal-titles">
-          <h3 id="player-title"></h3>
+    <div class="player-layout">
+      
+      <!-- الفيديو (يمين) -->
+      <div class="player-main-col">
+        
+        <!-- إطار المشغل -->
+        <div class="video-frame">
+          <div class="custom-player-container" id="custom-player">
+            <video id="video" playsinline></video>
+            
+            <div class="click-layer" id="click-layer"></div>
+
+            <button class="big-play" id="bigPlay">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+
+            <div class="loader" id="loader"></div>
+
+            <div class="controls-bar" id="controls-bar">
+              <div class="progress-container" id="progressBar">
+                <div class="progress-filled" id="progressFilled"></div>
+              </div>
+
+              <div class="controls-row">
+                <div class="controls-left">
+                  <button class="ctrl-btn" id="playBtn">
+                    <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+
+                  <div class="volume-container">
+                    <button class="ctrl-btn" id="muteBtn">
+                      <svg id="volumeIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                      <svg id="muteIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                    </button>
+                    <input type="range" class="ctrl-btn" style="padding:0" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+                  </div>
+
+                  <div class="time-display" style="background:transparent;">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                  </div>
+                </div>
+
+                <div class="controls-right">
+                  <button class="ctrl-btn text-btn" id="speedBtn">1×</button>
+                  
+                  <div class="dropdown">
+                    <button class="ctrl-btn text-btn" id="qualityBtn" onclick="toggleDropdown('quality-menu')">جودة</button>
+                    <div class="dropdown-content hidden" id="quality-menu"></div>
+                  </div>
+                  
+                  <button class="ctrl-btn" id="fullscreenBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <div class="modal-action-icon">
-          <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+
+        <!-- تفاصيل الفيديو -->
+        <div class="video-details">
+          <div class="details-header">
+             <h2 id="video-details-title">عنوان المحاضرة</h2>
+             <div class="video-meta-tags">
+               <span class="tag-badge" id="video-count-tag">0 فيديو</span>
+               <span class="tag-badge" id="watched-count-tag">0 تمت مشاهدته</span>
+             </div>
+          </div>
+          
+          <div class="video-nav-btns">
+            <button class="btn-nav prev" onclick="playPrevVideo()">السابق <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
+            <button class="btn-nav next" onclick="playNextVideo()">التالي <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+          </div>
         </div>
       </div>
 
-      <div class="custom-player-container" id="custom-player">
-        <video id="video" playsinline
-               disablePictureInPicture
-               controlsList="nodownload nofullscreen noremoteplayback"
-               style="background:#000;"></video>
-
-        <!-- طبقة النقرات -->
-        <div class="click-layer" id="click-layer"></div>
-
-        <!-- تحميل -->
-        <div id="player-status" class="player-status">
-          <div class="spinner"></div>
-          <span>جاري التشغيل...</span>
-        </div>
-
-        <!-- زر التشغيل/الإيقاف في المنتصف -->
-        <button id="center-play-btn" class="center-play-btn hidden">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </button>
-
-        <!-- مؤشر التقديم/التأخير -->
-        <div id="seek-indicator" class="seek-indicator hidden">
-          <span class="seek-icon">⏩</span>
-          <span>+10s</span>
-        </div>
-
-        <!-- مؤشر التسريع المطول -->
-        <div id="speed-indicator" class="speed-indicator">⚡ 2x</div>
-
-        <!-- شريط التحكم -->
-        <div class="controls-bar" id="controls-bar">
-
-          <div class="progress-container" onclick="seekVideo(event)">
-            <div class="progress-bar" id="progress-bar">
-              <div class="progress-filled" id="progress-filled"></div>
-            </div>
+      <!-- القائمة الجانبية (شمال) -->
+      <div class="player-side-col">
+        <div class="side-header">
+          <div class="side-title">
+            <h3>محتوي المحاضرة</h3>
+            <p id="side-subtitle">0 فيديو</p>
           </div>
+        </div>
+        
+        <div class="side-list" id="side-videos-list"></div>
+      </div>
 
-          <div class="controls-row">
-
-            <div class="controls-left">
-              <button class="ctrl-btn" onclick="togglePlay()" id="play-pause-btn">
-                <svg id="play-icon"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden">
-                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-              </button>
-
-              <div class="volume-container">
-                <button class="ctrl-btn" onclick="toggleMute()">
-                  <svg id="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-                  </svg>
-                </button>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
-              </div>
-
-              <span class="time-display" id="time-display">00:00:00 / 00:00:00</span>
-            </div>
-
-            <div class="controls-right">
-
-              <div class="dropdown">
-                <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
-                <div class="dropdown-content hidden" id="speed-menu">
-                  <button onclick="setSpeed(0.5,  this)">0.5x</button>
-                  <button onclick="setSpeed(0.75, this)">0.75x</button>
-                  <button onclick="setSpeed(1,    this)" class="active">1x</button>
-                  <button onclick="setSpeed(1.25, this)">1.25x</button>
-                  <button onclick="setSpeed(1.5,  this)">1.5x</button>
-                  <button onclick="setSpeed(2,    this)">2x</button>
-                </div>
-              </div>
-
-              <div class="dropdown">
-                <button class="ctrl-btn text-btn" id="quality-btn" onclick="toggleDropdown('quality-menu')">جودة</button>
-                <div class="dropdown-content hidden" id="quality-menu">
-                  <button onclick="setQuality(-1,this)" class="active">تلقائي</button>
-                </div>
-              </div>
-
-              <button class="ctrl-btn" onclick="toggleFullscreen()" title="ملء الشاشة">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                </svg>
-              </button>
-
-            </div>
-          </div>
-        </div><!-- /controls-bar -->
-      </div><!-- /custom-player-container -->
-
-    </div><!-- /modal-box -->
-  </div><!-- /player-modal -->
+    </div>
+  </div>
 
   <script src="/app.js"></script>
+  <script src="/player.js"></script>
 </body>
 </html>
