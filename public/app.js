@@ -116,8 +116,7 @@ function formatTime(sec) {
 // ==================== Player DOM Elements ====================
 const video = document.getElementById('video');
 const container = document.getElementById('custom-player');
-const clickLayer = document.getElementById('click-layer');
-const bigPlay = document.getElementById('bigPlay');
+const bigPlay = document.getElementById('center-play-btn');
 const playBtn = document.getElementById('playBtn');
 const playIcon = document.getElementById('playIcon');
 const pauseIcon = document.getElementById('pauseIcon');
@@ -131,7 +130,7 @@ const muteIcon = document.getElementById('muteIcon');
 const volumeSlider = document.getElementById('volumeSlider');
 const speedBtn = document.getElementById('speedBtn');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
-const loader = document.getElementById('loader');
+const loader = document.getElementById('player-status');
 const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
 
@@ -156,8 +155,8 @@ video.addEventListener('play', updatePlayUI);
 video.addEventListener('pause', updatePlayUI);
 video.addEventListener('timeupdate', updateProgress);
 video.addEventListener('loadedmetadata', () => { durationEl.textContent = formatTime(video.duration); });
-video.addEventListener('waiting', () => loader.classList.add('show'));
-video.addEventListener('playing', () => loader.classList.remove('show'));
+video.addEventListener('waiting', () => loader.classList.remove('hidden'));
+video.addEventListener('playing', () => loader.classList.add('hidden'));
 
 progressBar.addEventListener('click', (e) => {
   const rect = progressBar.getBoundingClientRect();
@@ -193,8 +192,8 @@ function showControls() { container.classList.add('show-controls'); clearTimeout
 container.addEventListener('mousemove', showControls);
 container.addEventListener('touchstart', showControls);
 
-function showLoader() { loader.classList.add('show'); }
-function hideLoader() { loader.classList.remove('show'); }
+function showLoader() { loader.classList.remove('hidden'); }
+function hideLoader() { loader.classList.add('hidden'); }
 function showError(msg) { errorText.textContent = msg; errorMsg.classList.add('show'); hideLoader(); }
 function hideError() { errorMsg.classList.remove('show'); }
 
@@ -219,14 +218,14 @@ function endPress(e) {
   }
 }
 
-clickLayer.addEventListener('mousedown', startPress);
-clickLayer.addEventListener('touchstart', startPress, {passive: true});
-clickLayer.addEventListener('mouseup', endPress);
-clickLayer.addEventListener('mouseleave', endPress);
-clickLayer.addEventListener('touchend', endPress);
-clickLayer.addEventListener('touchcancel', endPress);
+container.addEventListener('mousedown', startPress);
+container.addEventListener('touchstart', startPress, {passive: true});
+container.addEventListener('mouseup', endPress);
+container.addEventListener('mouseleave', endPress);
+container.addEventListener('touchend', endPress);
+container.addEventListener('touchcancel', endPress);
 
-clickLayer.addEventListener('click', (e) => {
+container.addEventListener('click', (e) => {
   if (isLongPress) return; 
   if (container.classList.contains('show-controls')) {
     clearTimeout(hideControlsTimeout);
@@ -236,7 +235,7 @@ clickLayer.addEventListener('click', (e) => {
   }
 });
 
-clickLayer.addEventListener('dblclick', (e) => {
+container.addEventListener('dblclick', (e) => {
   if (isLongPress) return;
   const rect = container.getBoundingClientRect(); 
   const relativeX = e.clientX - rect.left; 
