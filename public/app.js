@@ -116,6 +116,7 @@ function formatTime(sec) {
 // ==================== Player DOM Elements ====================
 const video = document.getElementById('video');
 const container = document.getElementById('custom-player');
+const clickLayer = document.getElementById('click-layer');
 const bigPlay = document.getElementById('bigPlay');
 const playBtn = document.getElementById('playBtn');
 const playIcon = document.getElementById('playIcon');
@@ -151,7 +152,6 @@ function updateProgress() {
 // Player Events
 bigPlay.addEventListener('click', togglePlay);
 playBtn.addEventListener('click', togglePlay);
-video.addEventListener('click', togglePlay);
 video.addEventListener('play', updatePlayUI);
 video.addEventListener('pause', updatePlayUI);
 video.addEventListener('timeupdate', updateProgress);
@@ -197,6 +197,54 @@ function showLoader() { loader.classList.add('show'); }
 function hideLoader() { loader.classList.remove('show'); }
 function showError(msg) { errorText.textContent = msg; errorMsg.classList.add('show'); hideLoader(); }
 function hideError() { errorMsg.classList.remove('show'); }
+
+// ==================== 🔥 Gestures (Hold & Double Click) 🔥 ====================
+let pressTimer = null; let isLongPress = false; let speedBeforeHold = 1;
+
+function startPress(e) {
+  isLongPress = false;
+  if (video.paused) return; 
+  pressTimer = setTimeout(() => {
+    isLongPress = true;
+    speedBeforeHold = video.playbackRate;
+    video.playbackRate = 2;
+    if (navigator.vibrate) navigator.vibrate(50);
+  }, 300);
+}
+function endPress(e) {
+  clearTimeout(pressTimer);
+  if (isLongPress) {
+    video.playbackRate = speedBeforeHold;
+    isLongPress = false;
+  }
+}
+
+clickLayer.addEventListener('mousedown', startPress);
+clickLayer.addEventListener('touchstart', startPress, {passive: true});
+clickLayer.addEventListener('mouseup', endPress);
+clickLayer.addEventListener('mouseleave', endPress);
+clickLayer.addEventListener('touchend', endPress);
+clickLayer.addEventListener('touchcancel', endPress);
+
+clickLayer.addEventListener('click', (e) => {
+  if (isLongPress) return; 
+  if (container.classList.contains('show-controls')) {
+    clearTimeout(hideControlsTimeout);
+    container.classList.remove('show-controls');
+  } else {
+    showControls();
+  }
+});
+
+clickLayer.addEventListener('dblclick', (e) => {
+  if (isLongPress) return;
+  const rect = container.getBoundingClientRect(); 
+  const relativeX = e.clientX - rect.left; 
+  const width = rect.width;
+  if (relativeX > width * 0.65) { video.currentTime += 10; } 
+  else if (relativeX < width * 0.35) { video.currentTime -= 10; } 
+  else { togglePlay(); }
+});
 
 // ==================== Play Page Logic ====================
 function openPlayerPage(index) {
@@ -323,7 +371,6 @@ document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')) docum
 
 function setQuality(levelIndex, btn) { if(!hls) return; hls.currentLevel = levelIndex; let text = 'تلقائي'; if(levelIndex!==-1 && hls.levels[levelIndex]){ var l = hls.levels[levelIndex]; text = l.height>0 ? l.height+'p' : (l.bitrate>0 ? Math.round(l.bitrate/1000)+'k' : 'جودة '+(levelIndex+1)); } document.getElementById('qualityBtn').textContent = text; document.querySelectorAll('#quality-menu button').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.getElementById('quality-menu').classList.add('hidden'); }
 
-// حفظ التقدم
 let saveTimer = null;
 video.addEventListener('timeupdate', () => {
   if (!saveTimer && state.videosList[state.currentVideoIndex]) {
