@@ -3,412 +3,135 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>HLS Player</title>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17"></script>
-  <style>
-    :root {
-      --bg: #0b0f1a;
-      --card: #111827;
-      --primary: #3b82f6;
-      --text: #f3f4f6;
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background:var(--bg); color:var(--text);
-      font-family:'Segoe UI',sans-serif;
-      min-height:100vh;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      padding:20px;
-    }
-    .player-container {
-      width:100%; max-width:1100px;
-      background:var(--card);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);
-    }
-    .video-wrapper {
-      position:relative;
-      background:#000;
-      aspect-ratio:16/9;
-    }
-    video {
-      width:100%; height:100%;
-      display:block; outline:none;
-    }
-
-    .overlay, .controls {
-      position:absolute; inset:0;
-      background:rgba(0,0,0,0.4);
-      transition:opacity .25s;
-    }
-    .video-wrapper:hover .overlay,
-    .video-wrapper.show-controls .overlay,
-    .video-wrapper.show-controls .controls {
-      opacity:1;
-      pointer-events:auto;
-    }
-
-    .big-play {
-      width:72px; height:72px;
-      background:rgba(59,130,246,0.9);
-      border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer;
-      transition:transform .2s;
-    }
-    .big-play:hover { transform:scale(1.08); }
-
-    .controls {
-      padding:16px 18px 14px;
-      display:flex; align-items:center; gap:12px;
-      background:linear-gradient(transparent,rgba(0,0,0,0.85));
-      opacity:0;
-    }
-    .progress-container {
-      height:6px; background:rgba(255,255,0.2);
-      border-radius:4px; cursor:pointer; margin-bottom:12px; position:relative;
-    }
-    .progress-buffered { position:absolute; height:100%; background:rgba(255,255,0.35); width:0%; border-radius:4px; }
-    .progress-played { position:absolute; height:100%; background:var(--primary); width:0%; border-radius:4px; }
-    .progress-handle { position:absolute; top:50%; transform:translate(-50%,-50%);
-      width:14px; height:14px; background:white; border-radius:50%; opacity:0; transition:opacity .15s; }
-    .progress-container:hover .progress-handle { opacity:1; }
-
-    .controls-row { display:flex; align-items:center; gap:12px; flex:1; }
-    .btn { background:transparent; border:none; color:white; cursor:pointer; padding:6px; border-radius:6px; }
-    .btn:hover { background:rgba(255,255,0.12); }
-    .btn svg { width:22px; height:22px; fill:currentColor; }
-    .time { font-size:13px; color:#e5e7eb; min-width:90px; text-align:center; }
-
-    .top-bar {
-      padding:14px 18px;
-      background:#0f172a;
-      display:flex; gap:12px; align-items:center;
-    }
-    .top-bar input {
-      flex:1; background:#1e293b; border:1px solid #334155;
-      color:white; padding:10px 14px; border-radius:10px;
-    }
-    .top-bar button {
-      background:var(--primary); color:white; border:none;
-      padding:10px 18px; border-radius:10px; font-weight:600;
-      cursor:pointer;
-    }
-
-    .loading {
-      position:absolute; inset:0;
-      display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,0.5);
-    }
-    .loading.active { display:flex; }
-    .spinner {
-      width:42px; height:42px;
-      border:3px solid rgba(255,255,0.2);
-      border-top-color:var(--primary);
-      border-radius:50%; animation:spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform:rotate(360deg); } }
-  </style>
+  <title>كورساتك - منصة تعليمية</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-theme="dark">
 
-<div class="player-container">
-  <div class="top-bar">
-    <input type="text" id="urlInput" placeholder="الصق رابط الـ m3u8 هنا..." />
-    <button onclick="loadStream()">تشغيل</button>
+  <header class="topbar">
+    <div class="topbar-right">
+      <button class="icon-btn" id="theme-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
+    <div class="topbar-left" onclick="goHome()" style="cursor:pointer">
+      <div class="brand-text">
+        <h1>كورساتك</h1>
+        <p>هنذاكر بطعم الضحك</p>
+      </div>
+      <div class="brand-logo">C</div>
+    </div>
+  </header>
+
+  <main id="app"><div class="loading">جاري التحميل...</div></main>
+
+  <!-- شاشة المشاهدة -->
+  <div id="player-page" class="player-page hidden">
+    
+    <div class="player-header-nav">
+      <button class="back-btn" onclick="closePlayer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg> رجوع
+      </button>
+      <div class="brand-mini">
+        <div class="brand-text"><h1>كورساتك</h1><p>مشغل المحاضرات</p></div>
+        <div class="brand-logo">C</div>
+      </div>
+    </div>
+
+    <div class="player-layout">
+      
+      <!-- الفيديو (يمين) -->
+      <div class="player-main-col">
+        
+        <!-- إطار المشغل -->
+        <div class="video-frame">
+          <div class="custom-player-container" id="custom-player">
+            <video id="video" playsinline></video>
+            
+            <div class="click-layer" id="click-layer"></div>
+
+            <button class="big-play" id="bigPlay">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+
+            <div class="loader" id="loader"></div>
+
+            <div class="controls-bar" id="controls-bar">
+              <div class="progress-container" id="progressBar">
+                <div class="progress-filled" id="progressFilled"></div>
+              </div>
+
+              <div class="controls-row">
+                <div class="controls-left">
+                  <button class="ctrl-btn" id="playBtn">
+                    <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+
+                  <div class="volume-container">
+                    <button class="ctrl-btn" id="muteBtn">
+                      <svg id="volumeIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                      <svg id="muteIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="time-display" style="background:transparent;">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                  </div>
+                </div>
+
+                <div class="controls-right">
+                  <button class="ctrl-btn text-btn" id="speedBtn">1×</button>
+                  
+                  <div class="dropdown">
+                    <button class="ctrl-btn text-btn" id="qualityBtn" onclick="toggleDropdown('quality-menu')">جودة</button>
+                    <div class="dropdown-content hidden" id="quality-menu"></div>
+                  </div>
+                  
+                  <button class="ctrl-btn" id="fullscreenBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- تفاصيل الفيديو -->
+        <div class="video-details">
+          <div class="details-header">
+             <h2 id="video-details-title">عنوان المحاضرة</h2>
+             <div class="video-meta-tags">
+               <span class="tag-badge" id="video-count-tag">0 فيديو</span>
+               <span class="tag-badge" id="watched-count-tag">0 تمت مشاهدته</span>
+             </div>
+          </div>
+          
+          <div class="video-nav-btns">
+            <button class="btn-nav prev" onclick="playPrevVideo()">السابق <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
+            <button class="btn-nav next" onclick="playNextVideo()">التالي <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- القائمة الجانبية (شمال) -->
+      <div class="player-side-col">
+        <div class="side-header">
+          <div class="side-title">
+            <h3>محتوي المحاضرة</h3>
+            <p id="side-subtitle">0 فيديو</p>
+          </div>
+        </div>
+        
+        <div class="side-list" id="side-videos-list"></div>
+      </div>
+
+    </div>
   </div>
 
-  <div class="video-wrapper" id="wrapper">
-    <video id="video" playsinline></video>
-
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="overlay">
-      <div class="big-play" id="bigPlay">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </div>
-    </div>
-
-    <div class="controls" id="controls">
-      <div class="progress-container" id="progressContainer">
-        <div class="progress-buffered" id="buffered"></div>
-        <div class="progress-played" id="played"></div>
-        <div class="progress-handle" id="handle"></div>
-      </div>
-
-      <div class="controls-row">
-        <button class="btn" id="playBtn">
-          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-
-        <button class="btn" id="muteBtn">
-          <svg id="volumeIcon" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71v2.06c4.01-.91 7-4.49 7-8.77z"/>
-          </svg>
-        </button>
-
-        <div class="time" id="timeDisplay">00:00 / 00:00</div>
-
-        <div class="spacer"></div>
-
-        <select id="speedSelect">
-          <option value="0.5">0.5x</option>
-          <option value="0.75">0.75x</option>
-          <option value="1" selected>1x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2">2x</option>
-        </select>
-
-        <select id="qualitySelect">
-          <option value="-1">Auto</option>
-        </select>
-
-        <button class="btn" id="pipBtn">
-          <svg viewBox="0 0 24 24"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-        </button>
-
-        <button class="btn" id="fsBtn">
-          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-        </button>
-
-        <button class="btn" id="scanBtn">
-          <svg viewBox="0 0 24 24"><path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="status" id="status">جاهز • الصق الرابط واضغط تشغيل</div>
-</div>
-
-<script>
-  const video = document.getElementById('video');
-  const wrapper = document.getElementById('wrapper');
-  const urlInput = document.getElementById('urlInput');
-  const playBtn = document.getElementById('playBtn');
-  const playIcon = document.getElementById('playIcon');
-  const bigPlay = document.getElementById('bigPlay');
-  const muteBtn = document.getElementById('muteBtn');
-  const volumeIcon = document.getElementById('volumeIcon');
-  const timeDisplay = document.getElementById('timeDisplay');
-  const progressContainer = document.getElementById('progressContainer');
-  const played = document.getElementById('played');
-  const buffered = document.getElementById('buffered');
-  const handle = document.getElementById('handle');
-  const speedSelect = document.getElementById('speedSelect');
-  const qualitySelect = document.getElementById('qualitySelect');
-  const pipBtn = document.getElementById('pipBtn');
-  const fsBtn = document.getElementById('fsBtn');
-  const scanBtn = document.getElementById('scanBtn');
-  const loading = document.getElementById('loading');
-  const status = document.getElementById('status');
-
-  let hls = null;
-  let isPlaying = false;
-  let hoverTimeout;
-  let speedInterval = null;
-  let lastRight = 0;
-  let lastLeft = 0;
-
-  function formatTime(sec) {
-    if (!sec) return '00:00';
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `\( {m}: \){s < 10 ? '0' : ''}${s}`;
-  }
-
-  function setStatus(msg, type = '') {
-    status.textContent = msg;
-    status.className = 'status ' + type;
-  }
-
-  function showLoading(show) {
-    loading.classList.toggle('active', show);
-  }
-
-  // === السرعة الثابتة 2x أثناء الـ Hover ===
-  function startSpeedHover() {
-    if (speedInterval) return;
-    speedInterval = setInterval(() => {
-      if (wrapper.matches(':hover') && !video.paused) {
-        video.playbackRate = 2;
-      }
-    }, 100);
-  }
-
-  function stopSpeedHover() {
-    if (speedInterval) {
-      clearInterval(speedInterval);
-      speedInterval = null;
-      if (!video.paused) video.playbackRate = parseFloat(speedSelect.value);
-    }
-  }
-
-  // === السرعة 2x عند النقر المطول (Hold) ===
-  let pressTimer = null;
-  function startPress(e) {
-    if (video.paused) return;
-    pressTimer = setTimeout(() => { video.playbackRate = 2; }, 300);
-  }
-  function endPress() {
-    clearTimeout(pressTimer);
-    if (!video.paused) video.playbackRate = parseFloat(speedSelect.value);
-  }
-  wrapper.addEventListener('mousedown', startPress);
-  wrapper.addEventListener('touchstart', startPress);
-  wrapper.addEventListener('mouseup', endPress);
-  wrapper.addEventListener('mouseleave', endPress);
-
-  // === Double Tap Controls ===
-  let lastTap = 0;
-  wrapper.addEventListener('dblclick', (e) => {
-    const now = Date.now();
-    const timeDiff = now - lastTap;
-    const x = e.clientX;
-    const w = wrapper.offsetWidth;
-
-    if (timeDiff < 350) {
-      if (x > w * 0.6) video.currentTime = Math.min(video.duration, video.currentTime + 10);
-      else if (x < w * 0.4) video.currentTime = Math.max(0, video.currentTime - 10);
-      e.preventDefault();
-    }
-    lastTap = now;
-  });
-
-  function updatePlayIcon() {
-    playIcon.innerHTML = video.paused
-      ? '<path d="M8 5v14l11-7z"/>'
-      : '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-  }
-
-  function loadStream() {
-    const url = urlInput.value.trim();
-    if (!url) { setStatus('من فضلك أدخل رابط m3u8', 'error'); return; }
-
-    if (hls) hls.destroy();
-    showLoading(true);
-    setStatus('جاري التحميل...');
-
-    if (Hls.isSupported()) {
-      hls = new Hls({ enableWorker: true, lowLatencyMode: false });
-      hls.loadSource(url);
-      hls.attachMedia(video);
-
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        showLoading(false);
-        setStatus('تم التحميل • جاهز');
-        qualitySelect.innerHTML = '<option value="-1">Auto</option>';
-        hls.levels.forEach((l, i) => {
-          const o = document.createElement('option');
-          o.value = i;
-          o.textContent = `${l.height || '?'}p`;
-          qualitySelect.appendChild(o);
-        });
-      });
-
-      hls.on(Hls.Events.ERROR, (e, d) => {
-        if (d.fatal) {
-          showLoading(false);
-          hls.destroy();
-          if (d.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
-        }
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = url;
-    } else {
-      setStatus('المتصفح لا يدعم HLS', 'error');
-    }
-  }
-
-  playBtn.addEventListener('click', () => { video.paused ? video.play() : video.pause(); });
-  bigPlay.addEventListener('click', () => video.paused ? video.play() : video.pause());
-  video.addEventListener('play', updatePlayIcon);
-  video.addEventListener('pause', updatePlayIcon);
-
-  muteBtn.addEventListener('click', () => {
-    video.muted = !video.muted;
-    volumeIcon.innerHTML = video.muted
-      ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
-      : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71v2.06c4.01-.91 7-4.49 7-8.77z"/>';
-  });
-
-  speedSelect.addEventListener('change', () => {
-    video.playbackRate = parseFloat(speedSelect.value);
-  });
-
-  qualitySelect.addEventListener('change', () => {
-    if (hls) hls.currentLevel = parseInt(qualitySelect.value);
-  });
-
-  scanBtn.addEventListener('click', () => {
-    let scanned = 0;
-    for (let i = 1; i <= 50; i++) {
-      const next = video.currentTime + i * 30;
-      if (next >= video.duration) break;
-      video.currentTime = next;
-      setTimeout(() => scanned++, 50);
-    }
-    setStatus(`تم مسح ${scanned} ثانية!`, 'success');
-  });
-
-  video.addEventListener('timeupdate', () => {
-    const p = video.duration ? (video.currentTime / video.duration * 100) : 0;
-    played.style.width = p + '%';
-    handle.style.left = p + '%';
-    timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-  });
-
-  progressContainer.addEventListener('click', e => {
-    const rect = progressContainer.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    video.currentTime = pos * video.duration;
-  });
-
-  pipBtn.addEventListener('click', async () => {
-    try {
-      if (document.pictureInPictureElement) await document.exitPictureInPicture();
-      else await video.requestPictureInPicture();
-    } catch {}
-  });
-
-  fsBtn.addEventListener('click', () => document.fullscreenElement ? document.exitFullscreen() : wrapper.requestFullscreen());
-
-  document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-    if (e.key.toLowerCase() === ' ') { e.preventDefault(); video.paused ? video.play() : video.pause(); }
-    if (e.key.toLowerCase() === 'm') muteBtn.click();
-    if (e.key.toLowerCase() === 'f') fsBtn.click();
-    if (e.key === 'ArrowRight') video.currentTime += 5;
-    if (e.key === 'ArrowLeft') video.currentTime -= 5;
-  });
-
-  // Show controls
-  function showControls() {
-    wrapper.classList.add('show-controls');
-    clearTimeout(hoverTimeout);
-    hoverTimeout = setTimeout(() => { if (!video.paused) wrapper.classList.remove('show-controls'); }, 3000);
-  }
-  wrapper.addEventListener('mousemove', showControls);
-  wrapper.addEventListener('touchstart', showControls);
-
-  video.addEventListener('play', () => {
-    hideControlsTimeout = setTimeout(() => {
-      if (!video.paused) wrapper.classList.remove('show-controls');
-    }, 2500);
-  });
-
-  // Hover + Hold
-  wrapper.addEventListener('mouseenter', startSpeedHover);
-  wrapper.addEventListener('mouseleave', stopSpeedHover);
-
-  setStatus('جاهز • الصق الرابط واضغط تشغيل');
-</script>
+  <script src="/app.js"></script>
 </body>
 </html>
