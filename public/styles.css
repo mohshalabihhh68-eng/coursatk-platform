@@ -68,7 +68,7 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .progress-info-badge { background: rgba(255,255,255,.08); border: 1px solid var(--border); color: #e2e8f0; padding: 10px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: auto; font-weight: 700; }
 .progress-info-badge span:first-child { color: var(--brand-orange); }
 
-/* ==================== 🔥 PLAYER PAGE 🔥 ==================== */
+/* ==================== 🔥 PLAYER PAGE (NEW) 🔥 ==================== */
 .player-page { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: flex; flex-direction: column; overflow: hidden; }
 .player-page.hidden { display: none; }
 .player-header-nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(10, 17, 34, 0.98); border-bottom: 1px solid var(--border); z-index: 10; backdrop-filter: blur(10px); }
@@ -123,7 +123,6 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
 .time-display { font-size: 13px; color: var(--text-muted); min-width: 100px; font-variant-numeric: tabular-nums; direction: ltr; }
 
-/* القائمة المنسدلة للجودة */
 .dropdown { position: relative; }
 .dropdown-content { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: rgba(18, 28, 51, 0.98); border: 1px solid var(--border); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; min-width: 120px; z-index: 100; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .dropdown-content.hidden { display: none; }
@@ -131,7 +130,6 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .dropdown-content button:hover { background: rgba(255,107,0,.2); color: var(--brand-orange); }
 .dropdown-content button.active { color: var(--brand-orange); background: rgba(255,107,0,.1); }
 
-/* تفاصيل الفيديو */
 .video-details { padding: 24px 20px; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; max-width: 1100px; margin: 0 auto; width: 100%; }
 .details-header h2 { font-size: 1.4rem; margin-bottom: 12px; }
 .video-meta-tags { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -142,7 +140,6 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 .btn-nav:hover { background: #233459; }
 .btn-nav svg { width: 16px; height: 16px; }
 
-/* القائمة الجانبية */
 .side-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 5; }
 .side-title h3 { font-size: 1.1rem; color: #fff; margin-bottom: 4px; }
 .side-title p { font-size: 0.85rem; color: var(--text-muted); }
@@ -175,4 +172,4 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
   .btn-nav { flex: 1; justify-content: center; }
   .controls-bar { padding: 20px 12px 12px; }
   #volumeSlider { width: 40px; }
-           }
+}
