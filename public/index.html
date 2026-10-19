@@ -3,146 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>كورساتك — منصة تعليمية</title>
+  <title>المواد الدراسية | كورساتك</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  
-  <!-- الصفحة الرئيسية -->
-  <div id="landing-page">
-    <header class="nav">
-      <div class="container navin">
-        <a class="brand" href="#">
-          <span class="logo">📚</span>
-          <span>كورساتك<small>كل محاضراتك في مكان واحد</small></span>
-        </a>
-        <nav class="navlinks">
-          <a href="#about">عن المنصة</a>
-          <a href="#features">المميزات</a>
-          <a href="#faq">الأسئلة الشائعة</a>
-        </nav>
-        <div class="navactions">
-          <button class="btn btn-primary" onclick="openAuth()">
-            تسجيل الدخول
-          </button>
-        </div>
+
+  <!-- الهيدر -->
+  <header class="nav">
+    <div class="container navin">
+      <a class="brand" href="index.html">
+        <span class="logo">📚</span>
+        <span>كورساتك<small>منصة تعليمية</small></span>
+      </a>
+      <div class="navactions">
+        <button class="btn btn-soft" onclick="goProfile()">حسابي</button>
+        <button class="btn btn-primary" onclick="logout()">خروج</button>
       </div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <div class="eyebrow"><i></i> منصة كورساتك · كل اللي محتاجه في مكان واحد</div>
-            <h1>كل محاضراتك،<br><span class="gradient">في مكان واحد.</span></h1>
-            <p>بدل ما تتشتت بين منصات كتير، اجمع محتوى المدرسين والشعب في مكان واحد. اختار خطتك، تابع محاضراتك، وركّز في اللي يهمك: <strong>مستقبلك.</strong></p>
-            <div class="hero-actions">
-              <button class="btn btn-primary btn-lg" onclick="openAuth()">ابدأ بتسجيل الدخول</button>
-              <a class="btn btn-soft btn-lg" href="#features">اعرف المزيد</a>
-            </div>
-          </div>
-          <div class="hero-art">
-            <div class="dashboard">
-              <div class="dash-top">
-                <div class="dash-title">مساحة مذاكرتك</div>
-                <span class="live-pill">● جاهز للمذاكرة</span>
-              </div>
-              <div class="dash-welcome"><small>أهلاً بيك في رحلتك</small><b>ابدأ محاضراتك الجاية ✨</b></div>
-              <div class="mini-cards">
-                <div class="mini-card"><b>المواد الدراسية</b><small>كل مادة في قسمها</small></div>
-                <div class="mini-card"><b>المحاضرات</b><small>تابع وقت ما تحب</small></div>
-                <div class="mini-card"><b>نظّم وقتك</b><small>كمّل من حيث وقفت</small></div>
-                <div class="mini-card"><b>اشتراك شهري</b><small>سعر واضح وبسيط</small></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="features">
-        <div class="container">
-          <div class="section-head">
-            <div class="eyebrow">ليه كورساتك؟</div>
-            <h2>مذاكرتك تبقى <span class="gradient">أبسط وأرتب.</span></h2>
-          </div>
-          <div class="features">
-            <article class="feature"><div class="feature-icon">📚</div><h3>كل مادة في مكانها</h3><p>تقسيم واضح للمواد والفصول والمحاضرات.</p></article>
-            <article class="feature"><div class="feature-icon">📺</div><h3>تابع المحاضرات</h3><p>افتح المحاضرة من حسابك وكمّل مذاكرتك.</p></article>
-            <article class="feature"><div class="feature-icon">⏰</div><h3>سعر واضح</h3><p>اشتراك شهري ثابت، من غير باقات إضافية.</p></article>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="container footer-in">
-        <div><b>كورساتك</b> — خلّي مذاكرتك في مكان واحد.</div>
-        <div>© <span id="year"></span> كورساتك</div>
-      </div>
-    </footer>
-  </div>
-
-  <!-- شاشة تسجيل الدخول -->
-  <section id="auth-screen">
-    <div class="auth-container">
-      <header class="auth-top">
-        <a class="brand" href="#"><span class="logo">📚</span><span>كورساتك<small>منصة تعليمية</small></span></a>
-        <button class="auth-back" onclick="closeAuth()">← الرجوع للصفحة الرئيسية</button>
-      </header>
-      <main class="auth-layout">
-        <section class="auth-intro">
-          <span class="eyebrow"><i></i> دخول آمن وسريع</span>
-          <h1>مستعد ترجع<br><span class="gradient">لمحاضراتك؟</span></h1>
-          <p>اكتب كودك وخلّي الباقي علينا.</p>
-        </section>
-        <section class="auth-panel">
-          <div class="auth-head"><h2>أهلاً بيك في <span class="gradient">كورساتك</span></h2></div>
-          <form id="auth-form">
-            <div class="auth-field">
-              <label>كود الدخول (7 أرقام)</label>
-              <input id="auth-code" inputmode="numeric" maxlength="7" placeholder="0000000" required>
-            </div>
-            <button class="auth-btn" id="auth-submit" type="submit">تسجيل الدخول</button>
-            <div class="auth-status" id="auth-status"></div>
-          </form>
-        </section>
-      </main>
     </div>
-  </section>
+  </header>
 
+  <!-- محتوى الصفحة -->
+  <main id="app" class="container" style="padding-top: 30px; padding-bottom: 60px;">
+    <div style="text-align:center; padding:60px; color:var(--muted);">
+      جاري التحميل...
+    </div>
+  </main>
+
+  <script src="app.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    function openAuth() {
-      document.getElementById('auth-screen').classList.add('show');
-      document.body.style.overflow = 'hidden';
+    // دالة البروفايل
+    function goProfile() {
+      window.location.href = 'profile.html';
     }
-    function closeAuth() {
-      document.getElementById('auth-screen').classList.remove('show');
-      document.body.style.overflow = '';
+    // دالة الخروج
+    function logout() {
+      localStorage.removeItem('cstk_tok');
+      window.location.href = 'index.html';
     }
-    document.getElementById('auth-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const code = document.getElementById('auth-code').value.trim();
-      const status = document.getElementById('auth-status');
-      const btn = document.getElementById('auth-submit');
-      if (!/^\d{7}$/.test(code)) {
-        status.className = 'auth-status show error';
-        status.textContent = 'اكتب كود صحيح مكوّن من 7 أرقام.';
-        return;
-      }
-      btn.disabled = true;
-      status.className = 'auth-status show loading';
-      status.textContent = 'جاري التحقق...';
-      setTimeout(() => {
-        localStorage.setItem('cstk_tok', 'auth_ok');
-        status.className = 'auth-status show success';
-        status.textContent = 'تم الدخول بنجاح! جاري تحويلك...';
-        setTimeout(() => {
-          window.location.href = 'subjects.html';
-        }, 800);
-      }, 800);
-    });
+    // لو المستخدم مش مسجل دخول، نرجعه للصفحة الرئيسية
+    if (!localStorage.getItem('cstk_tok')) {
+      window.location.href = 'index.html';
+    }
   </script>
 </body>
 </html>
