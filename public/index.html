@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>كورساتك - منصة تعليمية</title>
   <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15/dist/hls.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body data-theme="dark">
@@ -45,75 +45,70 @@
       <!-- الفيديو (يمين) -->
       <div class="player-main-col">
         
-        <!-- إطار المشغل الجديد -->
+        <!-- إطار المشغل -->
         <div class="video-frame">
           <div class="custom-player-container" id="custom-player">
             <video id="video" playsinline></video>
-            <div class="click-layer" id="click-layer"></div>
+            
+            <button class="big-play" id="bigPlay">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
 
-            <div id="player-status" class="player-status hidden">
-              <div class="spinner"></div>
+            <div class="loader" id="loader"></div>
+
+            <div class="error-msg" id="errorMsg">
+              <div style="font-size:40px">⚠️</div>
+              <div id="errorText">حصل خطأ في تشغيل الفيديو</div>
+              <button id="retryBtn">إعادة المحاولة</button>
             </div>
-
-            <div id="center-play-btn" class="center-play-btn hidden" onclick="togglePlay()">
-              <svg id="center-play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              <svg id="center-replay-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-            </div>
-
-            <div id="seek-indicator" class="seek-indicator hidden"></div>
 
             <div class="controls-bar" id="controls-bar">
-              <div class="progress-container" id="progress-container">
-                <div class="progress-buffered" id="buffered"></div>
-                <div class="progress-filled" id="progress-filled"></div>
-                <div class="progress-handle" id="progress-handle"></div>
-                <div class="progress-tooltip hidden" id="progress-tooltip">00:00</div>
+              <div class="progress-container" id="progressBar">
+                <div class="progress-filled" id="progressFilled"></div>
               </div>
 
               <div class="controls-row">
                 <div class="controls-left">
-                  <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">
-                    <svg id="play-icon"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  <button class="ctrl-btn" id="playBtn">
+                    <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                   </button>
-                  
+
                   <div class="volume-container">
-                    <button class="ctrl-btn" onclick="toggleMute()">
-                      <svg id="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-                      <svg id="vol-mute-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                    <button class="ctrl-btn" id="muteBtn">
+                      <svg id="volumeIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                      <svg id="muteIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
                     </button>
-                    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
+                    <input type="range" class="ctrl-btn" style="padding:0" id="volumeSlider" min="0" max="1" step="0.05" value="1">
                   </div>
 
-                  <span class="time-display" id="time-display">00:00 / 00:00</span>
+                  <div class="time-display" style="background:transparent;">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                  </div>
                 </div>
 
                 <div class="controls-right">
+                  <button class="ctrl-btn text-btn" id="speedBtn">1×</button>
+                  
                   <div class="dropdown">
-                    <button class="ctrl-btn text-btn" id="speed-btn" onclick="toggleDropdown('speed-menu')">1x</button>
-                    <div class="dropdown-content hidden" id="speed-menu">
-                      <button onclick="setSpeed(0.5, this)">0.5x</button><button onclick="setSpeed(0.75, this)">0.75x</button><button onclick="setSpeed(1, this)" class="active">1x</button><button onclick="setSpeed(1.25, this)">1.25x</button><button onclick="setSpeed(1.5, this)">1.5x</button><button onclick="setSpeed(1.75, this)">1.75x</button><button onclick="setSpeed(2, this)">2x</button>
-                    </div>
-                  </div>
-
-                  <div class="dropdown">
-                    <button class="ctrl-btn text-btn" id="quality-btn" onclick="toggleDropdown('quality-menu')">جودة</button>
+                    <button class="ctrl-btn text-btn" id="qualityBtn" onclick="toggleDropdown('quality-menu')">جودة</button>
                     <div class="dropdown-content hidden" id="quality-menu"></div>
                   </div>
-
-                  <button class="ctrl-btn" onclick="toggleFullscreen()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                  
+                  <button class="ctrl-btn" id="fullscreenBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                   </button>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
         <!-- تفاصيل الفيديو -->
         <div class="video-details">
           <div class="details-header">
-             <h2 id="video-details-title"></h2>
+             <h2 id="video-details-title">عنوان المحاضرة</h2>
              <div class="video-meta-tags">
                <span class="tag-badge" id="video-count-tag">0 فيديو</span>
                <span class="tag-badge" id="watched-count-tag">0 تمت مشاهدته</span>
