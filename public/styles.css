@@ -125,7 +125,7 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
 
 .time-display { font-size: 13px; color: var(--text-muted); min-width: 100px; font-variant-numeric: tabular-nums; direction: ltr; }
 
-/* 🔥 القائمة المنسدلة للجودة */
+/* القائمة المنسدلة للجودة */
 .dropdown { position: relative; }
 .dropdown-content { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: rgba(18, 28, 51, 0.98); border: 1px solid var(--border); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; min-width: 120px; z-index: 100; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .dropdown-content.hidden { display: none; }
@@ -177,4 +177,4 @@ h1, h2, h3, .brand-text h1, .card-title { font-weight: 800 !important; }
   .btn-nav { flex: 1; justify-content: center; }
   .controls-bar { padding: 20px 12px 12px; }
   #volumeSlider { width: 40px; }
-}
+                      }
