@@ -1,181 +1,461 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar-EG" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
 <title>المواد الدراسية | كورساتك</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
 /* تنسيقات خاصة بصفحة المواد */
-#app { padding-top: 30px; padding-bottom: 60px; max-width: 1160px; margin: auto; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:20px; }
-.card {
-  background: var(--panel); border-radius: 20px; border: 1px solid var(--line);
-  overflow: hidden; cursor: pointer; transition: transform .3s, box-shadow .3s;
+body { padding-bottom: 40px; }
+.app-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 60px; }
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: var(--text-secondary);
 }
-.card:hover { transform: translateY(-5px); box-shadow: 0 14px 34px rgba(0,0,0,.45); border-color: rgba(255,107,26,.4); }
-.card-img-wrapper {
-  position: relative; height: 160px;
-  background: linear-gradient(135deg, #2b1a00, #1a1000);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 3rem; color: var(--orange2);
-}
-.card-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.card-title { font-size: 1.15rem; font-weight: 800; line-height: 1.4; }
-.card-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.85rem; }
-.btn-gradient {
-  width: 100%; background: linear-gradient(90deg, var(--orange), var(--orange3));
-  color: #fff; border: none; padding: 12px; border-radius: 12px;
-  font-size: 0.95rem; font-weight: 800; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: opacity .25s;
-}
-.btn-gradient:hover { opacity: 0.9; }
-.back-btn-top {
-  position: absolute; right: 0; top: 20px;
-  display: flex; align-items: center; gap: 8px;
-  background: var(--panel); border: 1px solid var(--line);
-  color: var(--text); padding: 8px 16px; border-radius: 12px;
-  cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: .2s;
-}
-.back-btn-top:hover { background: rgba(255,255,255,.05); border-color: var(--orange); }
-.page-title-area { text-align: center; margin-bottom: 40px; position: relative; }
-.page-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,107,26,0.1); color: var(--orange2);
-  padding: 6px 16px; border-radius: 20px; font-size: 0.85rem;
-  margin-bottom: 12px; border: 1px solid rgba(255,107,26,0.2);
-  font-weight: 800;
-}
-.page-title-area h1 { font-size: 2rem; margin-bottom: 8px; line-height: 1.25; font-weight: 900; }
-.page-title-area h1 span { color: var(--orange); }
-.page-title-area p { color: var(--muted); font-size: 0.95rem; }
-.teacher-card {
-  background: var(--panel); border-radius: 20px; border: 1px solid var(--line);
-  padding: 20px; display: flex; flex-direction: column; gap: 16px; cursor: pointer;
-  transition: .3s;
-}
-.teacher-card:hover { border-color: rgba(255,107,26,.4); transform: translateY(-4px); }
-.teacher-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.teacher-info { display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 4px; }
-.teacher-role { font-size: 0.8rem; color: var(--orange2); font-weight: 800; }
-.teacher-name { font-size: 1.15rem; font-weight: 800; line-height: 1.3; }
-.teacher-avatar {
-  width: 70px; height: 70px; border-radius: 16px; object-fit: cover;
-  border: 2px solid var(--line); flex-shrink: 0;
-  background: linear-gradient(135deg, #2b1a00, #1a1000);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--orange2); font-size: 1.5rem;
-}
-.teacher-stats {
-  background: rgba(255,255,255,.03); padding: 10px 16px; border-radius: 12px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-weight: 700; font-size: 0.9rem;
-}
-.count-badge {
-  background: linear-gradient(90deg, var(--orange), var(--orange3));
-  color: #fff; width: 30px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; font-size: 0.85rem; font-weight: 800;
-}
-.loading-state { text-align: center; padding: 60px 20px; color: var(--muted); }
 .spinner {
-  width: 44px; height: 44px; border: 3px solid rgba(255,255,255,.15);
-  border-top-color: var(--orange); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Video cards */
-.video-card {
-  background: var(--panel); border-radius: 16px; overflow: hidden;
-  border: 1px solid var(--line); display: flex; flex-direction: column;
-  cursor: pointer; transition: .25s;
+/* Breadcrumbs & Navigation */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
 }
-.video-card:hover { transform: translateY(-4px); border-color: rgba(255,107,26,.4); }
-.video-thumbnail {
-  position: relative; height: 150px;
-  background: linear-gradient(135deg, #2b1a00, #1a1000);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--orange2); font-size: 2rem;
+.breadcrumbs a, .breadcrumbs button {
+  color: var(--orange-light);
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  transition: var(--transition);
 }
-.video-num-badge {
-  position: absolute; top: 10px; right: 10px;
-  background: rgba(0,0,0,.7); color: #fff; font-size: 0.8rem;
-  padding: 4px 10px; border-radius: 6px; font-weight: 700;
+.breadcrumbs a:hover, .breadcrumbs button:hover {
+  color: var(--orange);
+  text-decoration: underline;
 }
-.video-duration-badge {
-  position: absolute; bottom: 10px; left: 10px;
-  background: rgba(0,0,0,.7); color: #fff; font-size: 0.8rem;
-  padding: 3px 8px; border-radius: 6px; font-weight: 700;
-}
-.video-info { padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
-.video-title { font-size: 0.95rem; font-weight: 800; line-height: 1.4; }
+.breadcrumbs .sep { color: var(--text-muted); }
+.breadcrumbs .current { color: var(--text-primary); font-weight: 700; }
 
-.section-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line);
+/* Page header */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
 }
-.section-header h2 { font-size: 1.3rem; font-weight: 800; }
+.page-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 107, 26, 0.1);
+  border: 1px solid rgba(255, 107, 26, 0.3);
+  color: var(--orange-light);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.page-header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.page-header h1 span { color: var(--orange-light); }
+.page-header p { color: var(--text-secondary); font-size: 1rem; }
 
-.content-icon-box { background: rgba(255,255,255,.03); padding: 12px; border-radius: 12px; display: flex; gap: 8px; }
-.content-icon-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 6px; border-radius: 8px; background: rgba(255,255,255,.03); font-size: 0.9rem; font-weight: 800; }
-.content-icon-item svg { width: 20px; height: 20px; color: var(--orange); margin-bottom: 4px; }
-.content-icon-item small { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+/* Grids */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+  .app-container { padding: 20px 16px 40px; }
+}
 
-.lecture-card { background: var(--panel); border-radius: 20px; border: 1px solid var(--line); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.lecture-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.lecture-year { font-size: 0.85rem; color: var(--orange2); font-weight: 800; }
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+.card-image {
+  height: 160px;
+  background: linear-gradient(135deg, rgba(255, 107, 26, 0.3), rgba(255, 107, 26, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  color: var(--orange-light);
+  position: relative;
+}
+.card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+.card-cta {
+  width: 100%;
+  padding: 12px;
+  background: var(--orange);
+  color: white;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 8px;
+  transition: var(--transition);
+}
+.card:hover .card-cta {
+  background: var(--orange-light);
+  box-shadow: 0 8px 24px var(--orange-glow);
+}
+
+/* Teacher cards */
+.teacher-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.teacher-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+.teacher-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.teacher-info { display: flex; flex-direction: column; align-items: flex-end; text-align: right; gap: 4px; }
+.teacher-role { font-size: 0.8rem; color: var(--orange-light); font-weight: 800; }
+.teacher-name { font-size: 1.15rem; font-weight: 800; }
+.teacher-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: white;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.teacher-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.count-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+}
+
+/* Lecture / Video cards */
+.lecture-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: var(--transition);
+}
+.lecture-card:hover {
+  border-color: var(--border-hover);
+}
+.lecture-header { display: flex; flex-direction: column; gap: 4px; }
+.lecture-num { font-size: 0.8rem; color: var(--orange-light); font-weight: 800; }
 .lecture-title { font-size: 1.1rem; font-weight: 800; line-height: 1.4; }
 
-/* Back to top button */
-.back-to-top {
-  position: fixed; bottom: 24px; left: 24px;
-  background: var(--panel); border: 1px solid var(--line);
-  color: var(--text); width: 44px; height: 44px;
-  border-radius: 50%; display: grid; place-items: center;
-  cursor: pointer; z-index: 50; font-size: 1.2rem;
-  transition: .2s;
+.content-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
-.back-to-top:hover { border-color: var(--orange); color: var(--orange); }
+.content-stat {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.content-stat-icon { font-size: 1.3rem; }
+.content-stat-value { font-size: 1.1rem; font-weight: 900; color: var(--orange-light); }
+.content-stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; }
+
+/* Videos */
+.video-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.video-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+.video-thumb {
+  height: 160px;
+  background: linear-gradient(135deg, rgba(255, 107, 26, 0.4), rgba(255, 107, 26, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+  position: relative;
+}
+.video-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.video-duration {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.video-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.video-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.video-play-btn {
+  padding: 10px;
+  background: var(--orange);
+  color: white;
+  border-radius: 10px;
+  font-weight: 800;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* PDF cards */
+.pdf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+}
+.pdf-card:hover { border-color: var(--border-hover); }
+.pdf-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 107, 26, 0.2), rgba(255, 107, 26, 0.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+.pdf-info { flex: 1; min-width: 0; }
+.pdf-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdf-cta {
+  background: var(--orange);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Header user */
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.user-chip:hover { border-color: var(--orange); }
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 0.9rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+.empty-state-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
+.empty-state h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); }
+
+/* Error state */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.error-state-icon { font-size: 3rem; margin-bottom: 16px; }
+.error-state h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: #ff8a80; }
+.error-state p { color: var(--text-secondary); margin-bottom: 20px; }
+.error-state button {
+  background: var(--orange);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 800;
+}
 </style>
 </head>
 <body>
 
-<header class="nav">
-  <div class="container navin">
-    <a class="brand" href="index.html">
-      <span class="logo">🎓</span>
-      <span>كورساتك<small>منصة تعليمية</small></span>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="subjects.html" class="nav-brand">
+      <span class="brand-icon">🎓</span>
+      <span class="brand-text">كورساتك</span>
     </a>
-    <div class="navactions">
-      <button class="btn btn-soft" onclick="goProfile()">👤 حسابي</button>
-      <button class="btn btn-primary" onclick="logout()">🚪 خروج</button>
+    <div class="user-header">
+      <div class="user-chip" onclick="window.location.href='index.html'">
+        <span class="user-avatar">👤</span>
+        <span>حسابي</span>
+      </div>
+      <button class="btn-login" onclick="logout()">خروج</button>
     </div>
   </div>
-</header>
+</nav>
 
-<main id="app" class="container">
-  <div class="loading-state">
+<main class="app-container">
+  <div class="loading-screen">
     <div class="spinner"></div>
-    جاري تحميل المواد...
+    <p>جاري تحميل البيانات...</p>
   </div>
 </main>
 
-<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="لأعلى">↑</button>
-
-<script>
-function goProfile() { window.location.href = 'profile.html'; }
-function logout() {
-  if (!confirm('متأكد إنك عايز تسجّل الخروج؟')) return;
-  localStorage.removeItem('cstk_tok');
-  window.location.href = 'index.html';
-}
-if (!localStorage.getItem('cstk_tok')) {
-  window.location.href = 'index.html';
-}
-</script>
 <script src="app.js"></script>
 
 </body>
