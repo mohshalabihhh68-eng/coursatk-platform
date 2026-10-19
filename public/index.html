@@ -4,182 +4,285 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0f">
-<title>كورساتك — كل محاضراتك في مكان واحد</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>كورساتك — منصتك التعليمية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="nav"><div class="container navin">
-<a class="brand" href="#home"><span class="logo">🎓</span><span>كورساتك<small>مستقبلك الدراسي في مكان واحد</small></span></a>
-<nav class="navlinks"><a href="#about">عن المنصة</a><a href="#plans">الاشتراك الشهري</a><a href="#trial">التجربة المجانية</a><a href="#faq">الأسئلة الشائعة</a></nav>
-<div class="navactions"><a class="btn btn-soft" href="#plans">شوف الأسعار</a><button class="btn btn-primary" type="button" data-open-login>تسجيل الدخول <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button></div>
-</div></header>
 
-<main id="home">
-<section class="hero"><div class="container hero-grid">
-<div class="hero-copy">
-<div class="eyebrow"><i></i> كورساتك · كل اللي محتاجه في مكان واحد</div>
-<h1>كل محاضراتك،<br><span class="gradient">بسعر على قدّك.</span></h1>
-<p>بدل ما تتشتت بين منصات كتير، اجمع محتوى المدرسين والشعب في مكان واحد. اختار خطتك، تابع محاضراتك، وركّز في اللي يهمك: <strong>مستقبلك.</strong></p>
-<div class="hero-actions"><button class="btn btn-primary btn-lg" type="button" data-open-login>ابدأ بتسجيل الدخول <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><a class="btn btn-soft btn-lg" href="#plans"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> اعرف الاشتراك الشهري</a></div>
-<div class="trust"><div class="avatars"><span>✓</span><span>✓</span><span>✓</span></div><span>سعر واضح · تجربة مجانية · دعم من الأدمن</span></div>
-</div>
-<div class="hero-art">
-<div class="orb"></div>
-<div class="float-tag tag-one"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>كل حاجة منظمة<small>المواد والمحاضرات في مكان واحد</small></span></div>
-<div class="dashboard"><div class="dash-top"><div><div class="dash-title">مساحة مذاكرتك</div><div class="dash-sub">كورساتك التعليمية</div></div><span class="live-pill">● جاهز للمذاكرة</span></div>
-<div class="dash-welcome"><small>أهلاً بيك في رحلتك</small><b>ابدأ محاضرتك الجاية ✨</b></div>
-<div class="mini-cards">
-<div class="mini-card"><div class="mini-icon">📚</div><b>المواد الدراسية</b><small>كل مادة في قسمها</small></div>
-<div class="mini-card"><div class="mini-icon">📺</div><b>المحاضرات</b><small>تابع وقت ما تحب</small></div>
-<div class="mini-card"><div class="mini-icon">⏰</div><b>نظّم وقتك</b><small>كمّل من حيث وقفت</small></div>
-<div class="mini-card"><div class="mini-icon">⭐</div><b>اشتراك شهري</b><small>سعر واضح وبسيط</small></div>
-</div><div class="dash-bottom"><span>خطوتك الجاية؟ افتح موادك وابدأ</span><strong>يلا نذاكر ←</strong></div></div>
-<div class="float-tag tag-two"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg><span>اشتراك واضح<small>سعر شهري ثابت</small></span></div>
-</div></div></section>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="#" class="nav-brand">
+      <span class="brand-icon">🎓</span>
+      <span class="brand-text">كورساتك</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">المميزات</a>
+      <a href="#about">عن المنصة</a>
+      <a href="#faq">الأسئلة الشائعة</a>
+    </div>
+    <button class="btn-login" onclick="showLogin()">تسجيل الدخول</button>
+  </div>
+</nav>
 
-<section class="stats"><div class="container stats-grid reveal"><div class="stat"><b>اشتراك شهري</b><span>سعر بسيط وواضح</span></div><div class="stat"><b>شهر واحد</b><span>نظام اشتراك بسيط وواضح</span></div><div class="stat"><b>دعم مباشر</b><span>تواصل مع فريق الإدارة</span></div></div></section>
-
-<section class="section" id="about"><div class="container"><div class="section-head reveal"><div class="eyebrow">حكاية كورساتك</div><h2>اشتراك واحد بسعر واضح <span class="gradient">من غير تعقيد.</span></h2><p>فكرتنا بسيطة: نخلي الوصول للمحتوى الدراسي أوضح وأسهل، باشتراك شهري ثابت.</p></div>
-<div class="quote-card reveal"><div class="quote-mark"><svg viewBox="0 0 24 24"><path d="M4 19c4-2 6-6 6-12H4v7h4M14 19c4-2 6-6 6-12h-6v7h4"/></svg></div>
-<h3>مذاكرتك في مكان واحد، باشتراك شهري واضح.</h3>
-<p>إحنا في كورساتك بنسهّل عليك الوصول للمحتوى الدراسي من مكان واحد.</p>
-</div></div></section>
-
-<section class="section" id="plans"><div class="container"><div class="section-head reveal"><div class="eyebrow">الاشتراك الشهري</div><h2>اشتراك شهري واحد <span class="gradient">من غير حيرة.</span></h2><p>سعر ثابت وواضح، من غير اشتراك ترم أو سنة.</p></div>
-<div class="prices" style="grid-template-columns:minmax(0,520px);justify-content:center">
-<article class="price-card featured reveal"><span class="popular">الاشتراك المتاح</span><div class="price-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></div><h3>اشتراك شهر</h3><p class="desc">كل شهر بتجدد براحتك، بسعر ثابت وواضح.</p><div class="price">150 <small>جنيه / شهر</small></div><div class="price-note">لا توجد باقات ترم أو سنة</div><ul><li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>مدة الاشتراك شهر واحد</li><li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>الوصول للمحتوى المفعّل لحسابك</li><li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>تواصل مع الإدارة عند الحاجة</li></ul><button class="btn btn-primary" data-login-link type="button">عندي كود اشتراك</button></article>
-</div><p class="note">الاشتراك المتاح حاليًا شهري فقط.</p>
-</div></section>
-
-<section class="section"><div class="container"><div class="section-head reveal"><div class="eyebrow">ليه كورساتك؟</div><h2>مذاكرتك تبقى <span class="gradient">أبسط وأرتب.</span></h2><p>بنرتّب تجربة استخدام تساعدك توصل للمحتوى من غير لف كتير.</p></div>
-<div class="features"><article class="feature reveal"><div class="feature-icon">📚</div><h3>كل مادة في مكانها</h3><p>تقسيم واضح للمواد والفصول والمحاضرات عشان توصل للي محتاجه بسهولة.</p></article><article class="feature reveal"><div class="feature-icon">📺</div><h3>تابع المحاضرات</h3><p>افتح المحاضرة من حسابك وكمّل مذاكرتك حسب المحتوى المتاح ليك.</p></article><article class="feature reveal"><div class="feature-icon">⏰</div><h3>سعر واضح</h3><p>اشتراك شهري ثابت، من غير باقات إضافية.</p></article><article class="feature reveal"><div class="feature-icon">🔑</div><h3>دخول بكود الاشتراك</h3><p>تسجيل دخول بسيط باستخدام كودك، وبعد نجاح الدخول تنتقل لصفحة المواد.</p></article><article class="feature reveal"><div class="feature-icon">💬</div><h3>تواصل مع الإدارة</h3><p>لو حابب تجربة مجانية، تقدر تكلم أحد الأدمن.</p></article><article class="feature reveal"><div class="feature-icon">🎁</div><h3>تجربة قبل الاشتراك</h3><p>اسأل الإدارة عن التجربة المجانية المتاحة قبل اتخاذ قرار الاشتراك.</p></article></div>
-</div></section>
-
-<section class="trial" id="trial"><div class="container"><div class="trial-box reveal"><div class="trial-copy"><h2>طب وأنا إيش ضمني إنكم مش نصابين؟ 👀</h2><p>من حقك تطمّن قبل ما تشترك. متاح تجربة مجانية للموقع؛ جرّب براحتك، وكلم فريق الإدارة من روابط تيليجرام الموجودة هنا.</p></div><div class="trial-cta"><a class="btn btn-lg" href="#admins">شوف طرق التواصل</a></div></div>
-<div id="admins"><div class="section-head reveal" style="margin-top:35px;margin-bottom:18px"><h2 style="font-size:24px">الأدمنز <span class="gradient">المتاحين للتواصل</span></h2><p>تواصل مع الإدارة مباشرة عبر تيليجرام.</p></div>
-<div class="admins"><a class="admin-card" href="https://t.me/E3Fayomy" target="_blank" rel="noopener"><div class="admin-avatar">✈️</div><div><b>@E3Fayomy</b><small>تواصل على تيليجرام ↗</small></div></a><a class="admin-card" href="https://t.me/Mohmed3Abdo" target="_blank" rel="noopener"><div class="admin-avatar">✈️</div><div><b>@Mohmed3Abdo</b><small>تواصل على تيليجرام ↗</small></div></a></div></div></div></section>
-
-<section class="section" id="faq"><div class="container"><div class="section-head reveal"><div class="eyebrow">محتاج تعرف إيه؟</div><h2>أسئلة <span class="gradient">بتتكرر.</span></h2></div><div class="faq reveal">
-<details><summary>إزاي أسجّل الدخول؟</summary><p>اضغط على تسجيل الدخول واكتب كود الاشتراك المكوّن من 7 أرقام.</p></details>
-<details><summary>هل فيه تجربة مجانية؟</summary><p>أيوه، التجربة المجانية متاحة حسب ترتيبات الإدارة.</p></details>
-<details><summary>أسعار الاشتراك كام؟</summary><p>الاشتراك الشهري بسعر ثابت وواضح.</p></details>
-<details><summary>هل كل المواد بتظهر بعد تسجيل الدخول؟</summary><p>المواد اللي بتظهر مرتبطة بالصلاحيات والمحتوى المفعّل لحسابك.</p></details>
-</div></div></section>
-</main>
-
-<footer class="footer"><div class="container footer-in"><div><b>كورساتك</b> — خلّي مذاكرتك في مكان واحد.</div><div>الأسعار بالجنيه المصري · © <span id="year"></span> كورساتك</div></div></footer>
-
-<!-- Auth Screen -->
-<section id="auth-screen">
-<div class="auth-wrap">
-<header class="auth-top">
-<a class="brand" href="#" data-home-link><span class="logo">🎓</span><span>كورساتك</span></a>
-<a class="back" href="#" data-home-link>← الرجوع للصفحة الرئيسية</a>
-</header>
-<main class="auth-layout">
-<section class="intro">
-<span class="eyebrow"><span class="dot"></span> دخول آمن وسريع</span>
-<h1>مستعد ترجع<br><span class="gradient">لمحاضراتك؟</span></h1>
-<p>اكتب كودك وخلّي الباقي علينا. بنراجع الكود ولو كل حاجة سليمة هتدخل على المواد والمحاضرات الخاصة بحسابك.</p>
-<div class="benefits">
-<div class="benefit"><span class="check"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>دخول للمحتوى المفعّل ليك</div>
-<div class="benefit"><span class="check"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>كل المواد في مكان واحد</div>
-<div class="benefit"><span class="check"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>تجربة سهلة على الموبايل</div>
-<div class="benefit"><span class="check"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>دخول سريع بخطوات بسيطة</div>
-</div>
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">✨ منصة تعليمية متكاملة</div>
+    <h1 class="hero-title">
+      مذاكرتك <span class="highlight">أسهل</span><br>
+      في مكان واحد
+    </h1>
+    <p class="hero-subtitle">
+      كل المواد والمحاضرات والملخصات في منصة واحدة. 
+      ابدأ رحلتك التعليمية وانتظم في مذاكرتك.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary btn-large" onclick="showLogin()">
+        ابدأ الآن
+        <span class="arrow">←</span>
+      </button>
+      <a href="#features" class="btn-secondary btn-large">اكتشف المزيد</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number">+50</span>
+        <span class="stat-label">مادة دراسية</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">+200</span>
+        <span class="stat-label">محاضرة</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">+10</span>
+        <span class="stat-label">مدرس</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="visual-card">
+      <div class="card-header">
+        <div class="card-icon">📚</div>
+        <div class="card-title">المواد الدراسية</div>
+      </div>
+      <div class="card-body">
+        <div class="mini-subject"><span>📖</span> الرياضيات</div>
+        <div class="mini-subject"><span>🔬</span> الفيزياء</div>
+        <div class="mini-subject"><span>🧪</span> الكيمياء</div>
+        <div class="mini-subject"><span>📝</span> اللغة العربية</div>
+      </div>
+    </div>
+    <div class="visual-card-2">
+      <div class="progress-circle">85%</div>
+      <div class="progress-label">معدل التقدم</div>
+    </div>
+  </div>
 </section>
-<section class="panel">
-<div class="panel-head">
-<div class="logo">🎓</div>
-<h2>أهلاً بيك في <span class="gradient">كورساتك</span></h2>
-<p>اختار العملية اللي عاوز تعملها واكتب الكود بتاعك.</p>
-</div>
-<form id="code-form">
-<div class="field">
-<label for="code">كود الدخول (7 أرقام)</label>
-<input id="code" class="code" inputmode="numeric" maxlength="7" placeholder="0000000" required>
-<div class="hint">اكتب كود الاشتراك المكوّن من 7 أرقام.</div>
-</div>
-<button class="primary" id="submit-btn" type="submit">تسجيل الدخول</button>
-<div class="status" id="status"></div>
-</form>
+
+<!-- Features -->
+<section id="features" class="features-section">
+  <div class="section-header">
+    <h2>ليه <span class="highlight">كورساتك</span>؟</h2>
+    <p>بنقدملك تجربة تعليمية مختلفة</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📺</div>
+      <h3>محاضرات فيديو عالية الجودة</h3>
+      <p>شاهد المحاضرات بجودة عالية مع إمكانية التحكم في السرعة والجودة.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💾</div>
+      <h3>حفظ تلقائي للتقدم</h3>
+      <p>المنصة بتحفظ مكانك تلقائياً في كل فيديو عشان تكمل من حيث وقفت.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>شغال على كل الأجهزة</h3>
+      <p>تقدر تذاكر من الموبايل أو اللابتوب أو التابلت بنفس التجربة.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>منظم ومرتب</h3>
+      <p>المواد والفصول والمحاضرات مرتبة بشكل يخلي الوصول أسهل.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <h3>سريع في التحميل</h3>
+      <p>بنستخدم أحدث تقنيات البث عشان تجربة سلسة بدون تقطيع.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>محتوى آمن</h3>
+      <p>محتوى مشفر ومحمي، ومتاح بس للمشتركين المسجلين.</p>
+    </div>
+  </div>
 </section>
-</main>
-</div>
+
+<!-- FAQ -->
+<section id="faq" class="faq-section">
+  <div class="section-header">
+    <h2>أسئلة <span class="highlight">شائعة</span></h2>
+    <p>محتاج تعرف إيه؟</p>
+  </div>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>إزاي أسجّل الدخول؟</summary>
+      <p>اضغط على "تسجيل الدخول" واكتب كود الاشتراك المكوّن من 7 أرقام. لو الكود صحيح هتنتقل لصفحة المواد.</p>
+    </details>
+    <details class="faq-item">
+      <summary>المنصة شغالة على الموبايل؟</summary>
+      <p>أيوه، المنصة متوافقة 100% مع الموبايل والتابلت والكمبيوتر.</p>
+    </details>
+    <details class="faq-item">
+      <summary>إزاي أعرف إن في محاضرات جديدة؟</summary>
+      <p>المحاضرات بتظهر تلقائياً في صفحة المواد بتاعتك أول ما الإدارة تضيفها.</p>
+    </details>
+    <details class="faq-item">
+      <summary>نسيت كود الاشتراك بتاعي؟</summary>
+      <p>تواصل مع الإدارة وهي هتساعدك ترجعه.</p>
+    </details>
+  </div>
 </section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <span class="brand-icon">🎓</span>
+      <span class="brand-text">كورساتك</span>
+    </div>
+    <p class="footer-copy">© 2026 كورساتك - جميع الحقوق محفوظة</p>
+  </div>
+</footer>
+
+<!-- Login Modal -->
+<div class="login-modal" id="loginModal">
+  <div class="login-backdrop" onclick="hideLogin()"></div>
+  <div class="login-card">
+    <button class="login-close" onclick="hideLogin()">✕</button>
+    <div class="login-icon">🎓</div>
+    <h2>أهلاً بيك</h2>
+    <p class="login-subtitle">اكتب كود الاشتراك بتاعك عشان تدخل</p>
+    <form id="loginForm">
+      <input 
+        type="text" 
+        id="codeInput" 
+        class="code-input" 
+        placeholder="0000000" 
+        maxlength="7" 
+        inputmode="numeric"
+        autocomplete="off"
+      >
+      <button type="submit" class="btn-primary btn-full" id="loginBtn">
+        دخول
+      </button>
+      <p class="login-status" id="loginStatus"></p>
+    </form>
+    <p class="login-hint">الكود مكوّن من 7 أرقام. لو مش عندك كود، تواصل مع الإدارة.</p>
+  </div>
+</div>
 
 <script>
-document.getElementById('year').textContent = new Date().getFullYear();
+// ==================== Login ====================
+const API_BASE = 'https://coursattk-production.up.railway.app';
+const TOKEN_KEY = 'cstk_tok';
 
-function openLogin() {
-  const s = document.getElementById('auth-screen');
-  s.classList.add('show');
+function showLogin() {
+  document.getElementById('loginModal').classList.add('show');
   document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('codeInput').focus(), 300);
 }
-function closeLogin() {
-  const s = document.getElementById('auth-screen');
-  s.classList.remove('show');
+function hideLogin() {
+  document.getElementById('loginModal').classList.remove('show');
   document.body.style.overflow = '';
 }
-document.querySelectorAll('[data-open-login], [data-login-link]').forEach(b => b.addEventListener('click', openLogin));
-document.querySelectorAll('[data-home-link]').forEach(b => b.addEventListener('click', e => {
-  e.preventDefault();
-  closeLogin();
-}));
 
-const form = document.getElementById('code-form');
-const codeInput = document.getElementById('code');
-const statusBox = document.getElementById('status');
-const submitBtn = document.getElementById('submit-btn');
+// لو فيه توكن محفوظ، ادخل على طول
+if (localStorage.getItem(TOKEN_KEY)) {
+  window.location.replace('subjects.html');
+}
 
-codeInput.addEventListener('input', () => {
-  codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 7);
-  if (statusBox.classList.contains('error')) {
-    statusBox.className = 'status';
-    statusBox.textContent = '';
+document.getElementById('codeInput').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 7);
+  const status = document.getElementById('loginStatus');
+  if (status.classList.contains('error')) {
+    status.className = 'login-status';
+    status.textContent = '';
   }
 });
 
-form.addEventListener('submit', e => {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const code = codeInput.value.trim();
+  const code = document.getElementById('codeInput').value.trim();
+  const status = document.getElementById('loginStatus');
+  const btn = document.getElementById('loginBtn');
+  
   if (!/^\d{7}$/.test(code)) {
-    statusBox.className = 'status show error';
-    statusBox.textContent = 'اكتب كود صحيح مكوّن من 7 أرقام.';
+    status.className = 'login-status error';
+    status.textContent = 'اكتب كود صحيح مكوّن من 7 أرقام';
     return;
   }
-  submitBtn.disabled = true;
-  statusBox.className = 'status show loading';
-  statusBox.textContent = 'جاري التحقق...';
   
-  setTimeout(() => {
-    localStorage.setItem('cstk_tok', 'auth_ok');
-    statusBox.className = 'status show success';
-    statusBox.textContent = 'تم الدخول بنجاح! جاري تحويلك...';
+  btn.disabled = true;
+  btn.textContent = 'جاري التحقق...';
+  status.className = 'login-status loading';
+  status.textContent = 'بنراجع الكود بتاعك مع السيرفر...';
+  
+  try {
+    const res = await fetch(API_BASE + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ 
+        code: code, 
+        deviceId: getDeviceId(),
+        deviceName: navigator.userAgent.slice(0, 60)
+      })
+    });
+    
+    const data = await res.json().catch(() => ({}));
+    
+    if (!res.ok || data.success === false) {
+      throw new Error(data.message || data.error || 'الكود غلط');
+    }
+    
+    const token = data.data?.token || data.token || data.accessToken;
+    if (!token) {
+      throw new Error('السيرفر مارجّعش توكن');
+    }
+    
+    localStorage.setItem(TOKEN_KEY, token);
+    status.className = 'login-status success';
+    status.textContent = '✅ تم الدخول بنجاح! جاري التحويل...';
+    
     setTimeout(() => {
       window.location.href = 'subjects.html';
-    }, 800);
-  }, 800);
+    }, 600);
+    
+  } catch (err) {
+    status.className = 'login-status error';
+    status.textContent = '❌ ' + err.message;
+    btn.disabled = false;
+    btn.textContent = 'دخول';
+  }
 });
 
-// الـ reveal animations
-const reveals = document.querySelectorAll('.reveal');
-if ('IntersectionObserver' in window) {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(en => {
-      if (en.isIntersecting) {
-        en.target.classList.add('visible');
-        obs.unobserve(en.target);
-      }
-    });
-  }, { threshold: 0.08 });
-  reveals.forEach(r => obs.observe(r));
-} else {
-  reveals.forEach(r => r.classList.add('visible'));
+function getDeviceId() {
+  let id = localStorage.getItem('cstk_device');
+  if (!id) {
+    id = 'web_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('cstk_device', id);
+  }
+  return id;
 }
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hideLogin();
+});
 </script>
+
 </body>
- </html>
+</html>
