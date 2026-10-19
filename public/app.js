@@ -1,26 +1,39 @@
-const state = { view: "years", year: null, subject: null, teacher: null, chapter: null, lecture: null };
-const appEl = document.getElementById("app");
+/* ==================== Config ==================== */
+const state = {
+  view: "years",
+  year: null,
+  subject: null,
+  teacher: null,
+  chapter: null,
+  lecture: null,
+};
+const container = document.querySelector('main');
+const TOKEN_KEY = 'cstk_tok';
 
-// ==================== API Helper ====================
+if (!localStorage.getItem(TOKEN_KEY)) {
+  window.location.href = 'index.html';
+}
+
+/* ==================== API Helper ==================== */
 async function api(path, opts = {}) {
   try {
     const res = await fetch(path, opts);
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); } catch (e) { data = text; }
-    if (!res.ok || data.success === false) {
-      throw new Error(data.error || data.message || "HTTP " + res.status);
+    if (!res.ok) {
+      throw new Error((data && (data.error || data.message)) || 'HTTP ' + res.status);
     }
     return data.data !== undefined ? data.data : data;
   } catch (e) {
-    console.error("API Error:", path, e);
+    console.error('API Error:', path, e);
     throw e;
   }
 }
 
-// ==================== Navigation ====================
+/* ==================== Navigation ==================== */
 function goHome() {
-  Object.assign(state, { view:"years", year:null, subject:null, teacher:null, chapter:null, lecture:null });
+  Object.assign(state, { view: "years", year: null, subject: null, teacher: null, chapter: null, lecture: null });
   render();
 }
 function setView(view, extra) {
@@ -29,331 +42,349 @@ function setView(view, extra) {
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+function logout() {
+  if (!confirm('متأكد إنك عايز تسجّل الخروج؟')) return;
+  localStorage.removeItem(TOKEN_KEY);
+  window.location.href = 'index.html';
+}
+window.goHome = goHome;
+window.setView = setView;
+window.logout = logout;
 
-// ==================== Render Router ====================
+/* ==================== Helpers ==================== */
+function esc(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function extractArray(data, key) {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data[key])) return data[key];
+  if (data && Array.isArray(data.data)) return data.data;
+  return [];
+}
+
+/* ==================== Render Router ==================== */
 async function render() {
-  if (!appEl) return;
-  appEl.innerHTML = '<div class="loading-state"><div class="spinner"></div>جاري التحميل...</div>';
+  container.innerHTML = `<div class="loading-screen"><div class="spinner"></div><p>جاري التحميل...</p></div>`;
   try {
-    if (state.view === "years") await renderYears();
-    else if (state.view === "subjects") await renderSubjects();
-    else if (state.view === "teachers") await renderTeachers();
-    else if (state.view === "chapters") await renderChapters();
-    else if (state.view === "lectures") await renderLectures();
-    else if (state.view === "content") await renderContent();
+    if (state.view === 'years') await renderYears();
+    else if (state.view === 'subjects') await renderSubjects();
+    else if (state.view === 'teachers') await renderTeachers();
+    else if (state.view === 'chapters') await renderChapters();
+    else if (state.view === 'lectures') await renderLectures();
+    else if (state.view === 'content') await renderContent();
   } catch (e) {
-    appEl.innerHTML = `<div style="color:#ff8a80; text-align:center; padding:50px; font-weight:bold;">
-      <div style="font-size:2rem; margin-bottom:12px;">⚠️</div>
-      خطأ: ${e.message}
-      <div style="margin-top:20px;">
-        <button onclick="render()" style="background:var(--orange); color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:800;">إعادة المحاولة</button>
-      </div>
-    </div>`;
+    renderError(e.message);
   }
 }
 
-// ==================== Pages ====================
-async function renderYears() {
-  let years = await api("/api/years");
-  // الـ API ممكن يرجّع array مباشرة أو object فيه years
-  let list = Array.isArray(years) ? years : (years.years || []);
-  
-  if (!list.length) {
-    appEl.innerHTML = `<div class="page-title-area"><div class="page-badge">📚 السنة الدراسية</div><h1>لا توجد سنوات متاحة</h1></div>`;
-    return;
-  }
-
-  let html = `
-    <div class="page-title-area">
-      <div class="page-badge">📚 السنة الدراسية</div>
-      <h1>اختار <span>سنتك الدراسية</span></h1>
-      <p>هتقدر تشوف المواد والمدرسين والمحاضرات بعد ما تختار.</p>
+function renderError(msg) {
+  container.innerHTML = `
+    <div class="error-state">
+      <div class="error-state-icon">⚠️</div>
+      <h3>حصل خطأ</h3>
+      <p>${esc(msg)}</p>
+      <button onclick="render()">إعادة المحاولة</button>
     </div>
-    <div class="grid">`;
+  `;
+}
+
+function renderEmpty(icon, title, desc) {
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">${icon}</div>
+      <h3>${esc(title)}</h3>
+      <p>${esc(desc || '')}</p>
+    </div>
+  `;
+}
+
+/* ==================== Pages ==================== */
+
+async function renderYears() {
+  const data = await api('/api/years');
+  const years = extractArray(data, 'years');
   
-  list.forEach(y => {
-    html += `
-      <div class="card" onclick='setView("subjects", ${JSON.stringify({year: y}).replace(/'/g, "&#39;")})'>
-        <div class="card-img-wrapper">📚</div>
-        <div class="card-body">
-          <div class="card-title">${esc(y.name)}</div>
-          <div class="card-meta">
-            <span>${y.subjects_count || y.subjects?.length || '—'} مادة</span>
-            <span>2027</span>
+  if (!years.length) {
+    return renderEmpty('📚', 'لا توجد سنوات', 'لسه مفيش بيانات متاحة');
+  }
+  
+  container.innerHTML = `
+    <div class="page-header">
+      <div class="page-badge">📚 السنة الدراسية</div>
+      <h1>اختار <span>سنتك</span></h1>
+      <p>هتقدر تشوف المواد والمدرسين والمحاضرات بعد كده</p>
+    </div>
+    <div class="grid">
+      ${years.map(y => `
+        <div class="card" onclick='setView("subjects", ${JSON.stringify({ year: y })})'>
+          <div class="card-image">📚</div>
+          <div class="card-body">
+            <div class="card-title">${esc(y.name)}</div>
+            <div class="card-meta">
+              <span>${y.subjects_count || '—'} مادة</span>
+              <span>2027</span>
+            </div>
+            <div class="card-cta">عرض المواد ←</div>
           </div>
-          <button class="btn-gradient">عرض المواد ←</button>
         </div>
-      </div>`;
-  });
-  
-  appEl.innerHTML = html + "</div>";
+      `).join('')}
+    </div>
+  `;
 }
 
 async function renderSubjects() {
-  const data = await api("/api/subjects/" + state.year.id);
-  let list = Array.isArray(data) ? data : (data.subjects || []);
+  const data = await api('/api/subjects/' + state.year.id);
+  const subjects = extractArray(data, 'subjects');
   
-  if (!list.length) {
-    appEl.innerHTML = `
-      <div class="page-title-area">
-        <button class="back-btn-top" onclick="goHome()">← رجوع</button>
-        <div class="page-badge">🗂️ السنة</div>
-        <h1>لا توجد مواد متاحة</h1>
-        <p>كلم الإدارة عشان تفعّل موادك.</p>
-      </div>`;
-    return;
+  if (!subjects.length) {
+    return renderEmpty('📖', 'لا توجد مواد', 'لسه مفيش مواد في السنة دي');
   }
   
-  let html = `
-    <div class="page-title-area">
-      <button class="back-btn-top" onclick="goHome()">← رجوع للسنوات</button>
-      <div class="page-badge">🗂️ السنة</div>
+  container.innerHTML = `
+    ${renderBreadcrumbs([{ label: 'الرئيسية', action: 'goHome()' }, { label: state.year.name, current: true }])}
+    <div class="page-header">
+      <div class="page-badge">📖 المواد</div>
       <h1>مواد <span>${esc(state.year.name)}</span></h1>
-      <p>اختار المادة اللي عايز تبدأ فيها.</p>
+      <p>اختار المادة اللي عايز تبدأ فيها</p>
     </div>
-    <div class="grid">`;
-  
-  list.forEach(s => {
-    html += `
-      <div class="card" onclick='setView("teachers", ${JSON.stringify({subject: s}).replace(/'/g, "&#39;")})'>
-        <div class="card-img-wrapper">📖</div>
-        <div class="card-body">
-          <div class="card-title">${esc(s.name)}</div>
-          <div class="card-meta">
-            <span>${s.teachers_count || s.teachers?.length || '—'} مدرس</span>
-            <span>📚</span>
+    <div class="grid">
+      ${subjects.map(s => `
+        <div class="card" onclick='setView("teachers", ${JSON.stringify({ subject: s })})'>
+          <div class="card-image">📖</div>
+          <div class="card-body">
+            <div class="card-title">${esc(s.name)}</div>
+            <div class="card-meta">
+              <span>${s.teachers_count || '—'} مدرس</span>
+              <span>📚</span>
+            </div>
+            <div class="card-cta">عرض المدرسين ←</div>
           </div>
-          <button class="btn-gradient">عرض المدرسين ←</button>
         </div>
-      </div>`;
-  });
-  
-  appEl.innerHTML = html + "</div>";
+      `).join('')}
+    </div>
+  `;
 }
 
 async function renderTeachers() {
-  const data = await api("/api/subjects/" + state.subject.id + "/teachers");
-  const teachers = data.teachers || (Array.isArray(data) ? data : []);
+  const data = await api('/api/subjects/' + state.subject.id + '/teachers');
+  const teachers = extractArray(data, 'teachers');
   
   if (!teachers.length) {
-    appEl.innerHTML = `
-      <div class="page-title-area">
-        <button class="back-btn-top" onclick='setView("subjects", ${JSON.stringify({year: state.year})})'>← رجوع</button>
-        <div class="page-badge">السنة</div>
-        <h1>لا يوجد مدرسين</h1>
-        <p>لسه مفيش مدرسين مضافين للمادة دي.</p>
-      </div>`;
-    return;
+    return renderEmpty('👨‍🏫', 'لا يوجد مدرسين', 'لسه مفيش مدرسين مضافين للمادة دي');
   }
   
-  let html = `
-    <div class="page-title-area">
-      <button class="back-btn-top" onclick='setView("subjects", ${JSON.stringify({year: state.year})})'>← رجوع للمواد</button>
+  container.innerHTML = `
+    ${renderBreadcrumbs([
+      { label: 'الرئيسية', action: 'goHome()' },
+      { label: state.year.name, action: `setView("subjects", ${JSON.stringify({ year: state.year })})` },
+      { label: state.subject.name, current: true }
+    ])}
+    <div class="page-header">
       <div class="page-badge">👨‍🏫 المدرسين</div>
       <h1>مدرسين <span>${esc(state.subject.name)}</span></h1>
-      <p>اختار المدرس اللي تحب تتابع معاه.</p>
+      <p>اختار المدرس اللي تحب تتابع معاه</p>
     </div>
-    <div class="grid">`;
-  
-  teachers.forEach(t => {
-    html += `
-      <div class="teacher-card" onclick='setView("chapters", ${JSON.stringify({teacher: t}).replace(/'/g, "&#39;")})'>
-        <div class="teacher-top">
-          <div class="teacher-info">
-            <div class="teacher-role">مدرس المادة</div>
-            <div class="teacher-name">${esc(t.name)}</div>
+    <div class="grid">
+      ${teachers.map(t => `
+        <div class="teacher-card" onclick='setView("chapters", ${JSON.stringify({ teacher: t })})'>
+          <div class="teacher-top">
+            <div class="teacher-info">
+              <div class="teacher-role">مدرس المادة</div>
+              <div class="teacher-name">${esc(t.name)}</div>
+            </div>
+            <div class="teacher-avatar">👨‍🏫</div>
           </div>
-          <div class="teacher-avatar">👨‍🏫</div>
+          <div class="teacher-stats">
+            <span class="count-badge">${t.chapter_count || 0}</span>
+            <span>الفصول المتاحة 📚</span>
+          </div>
+          <div class="card-cta">اكتشف الفصول ←</div>
         </div>
-        <div class="teacher-stats">
-          <span class="count-badge">${t.chapter_count || 0}</span>
-          <span>الفصول المتاحة 📚</span>
-        </div>
-        <button class="btn-gradient">اكتشف الفصول ←</button>
-      </div>`;
-  });
-  
-  appEl.innerHTML = html + "</div>";
+      `).join('')}
+    </div>
+  `;
 }
 
 async function renderChapters() {
-  const data = await api("/api/teachers/" + state.teacher.id + "/chapters");
-  const chapters = Array.isArray(data) ? data : (data.chapters || []);
+  const data = await api('/api/teachers/' + state.teacher.id + '/chapters');
+  const chapters = extractArray(data, 'chapters');
   
   if (!chapters.length) {
-    appEl.innerHTML = `
-      <div class="page-title-area">
-        <button class="back-btn-top" onclick='setView("teachers", ${JSON.stringify({subject: state.subject})})'>← رجوع</button>
-        <div class="page-badge">📖 الفصول</div>
-        <h1>لا توجد فصول</h1>
-      </div>`;
-    return;
+    return renderEmpty('📖', 'لا توجد فصول', 'لسه مفيش فصول متاحة');
   }
   
-  let html = `
-    <div class="page-title-area">
-      <button class="back-btn-top" onclick='setView("teachers", ${JSON.stringify({subject: state.subject})})'>← رجوع للمدرسين</button>
+  container.innerHTML = `
+    ${renderBreadcrumbs([
+      { label: 'الرئيسية', action: 'goHome()' },
+      { label: state.year.name, action: `setView("subjects", ${JSON.stringify({ year: state.year })})` },
+      { label: state.subject.name, action: `setView("teachers", ${JSON.stringify({ subject: state.subject })})` },
+      { label: state.teacher.name, current: true }
+    ])}
+    <div class="page-header">
       <div class="page-badge">📖 الفصول</div>
       <h1>فصول <span>${esc(state.teacher.name)}</span></h1>
-      <p>اختار الفصل اللي عايز تبدأ فيه.</p>
+      <p>اختار الفصل اللي عايز تبدأ فيه</p>
     </div>
-    <div class="grid">`;
-  
-  chapters.forEach(c => {
-    html += `
-      <div class="teacher-card" onclick='setView("lectures", ${JSON.stringify({chapter: c}).replace(/'/g, "&#39;")})'>
-        <div class="teacher-top">
-          <div class="teacher-info">
-            <div class="teacher-role">الفصل ${c.order || ''}</div>
-            <div class="teacher-name">${esc(c.name)}</div>
-            <div class="teacher-role" style="color: var(--muted);">م. ${esc(state.teacher.name)}</div>
+    <div class="grid">
+      ${chapters.map(c => `
+        <div class="teacher-card" onclick='setView("lectures", ${JSON.stringify({ chapter: c })})'>
+          <div class="teacher-top">
+            <div class="teacher-info">
+              <div class="teacher-role">الفصل ${c.order || ''}</div>
+              <div class="teacher-name">${esc(c.name)}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">م. ${esc(state.teacher.name)}</div>
+            </div>
+            <div class="teacher-avatar">📖</div>
           </div>
-          <div class="teacher-avatar">📖</div>
+          <div class="teacher-stats">
+            <span class="count-badge">${c.lecture_count || 0}</span>
+            <span>عدد المحاضرات ⏱</span>
+          </div>
+          <div class="card-cta">مشاهدة المحاضرات ←</div>
         </div>
-        <div class="teacher-stats">
-          <span class="count-badge">${c.lecture_count || 0}</span>
-          <span>عدد المحاضرات ⏱</span>
-        </div>
-        <button class="btn-gradient">مشاهدة المحاضرات ←</button>
-      </div>`;
-  });
-  
-  appEl.innerHTML = html + "</div>";
+      `).join('')}
+    </div>
+  `;
 }
 
 async function renderLectures() {
-  const data = await api("/api/chapters/" + state.chapter.id + "/lectures");
-  const lectures = Array.isArray(data) ? data : (data.lectures || []);
+  const data = await api('/api/chapters/' + state.chapter.id + '/lectures');
+  const lectures = extractArray(data, 'lectures');
   
   if (!lectures.length) {
-    appEl.innerHTML = `
-      <div class="page-title-area">
-        <button class="back-btn-top" onclick='setView("chapters", ${JSON.stringify({teacher: state.teacher})})'>← رجوع</button>
-        <h1>لا توجد محاضرات</h1>
-      </div>`;
-    return;
+    return renderEmpty('📺', 'لا توجد محاضرات', 'لسه مفيش محاضرات متاحة في الفصل ده');
   }
   
-  let html = `
-    <div class="page-title-area">
-      <button class="back-btn-top" onclick='setView("chapters", ${JSON.stringify({teacher: state.teacher})})'>← رجوع للفصول</button>
+  container.innerHTML = `
+    ${renderBreadcrumbs([
+      { label: 'الرئيسية', action: 'goHome()' },
+      { label: state.year.name, action: `setView("subjects", ${JSON.stringify({ year: state.year })})` },
+      { label: state.subject.name, action: `setView("teachers", ${JSON.stringify({ subject: state.subject })})` },
+      { label: state.teacher.name, action: `setView("chapters", ${JSON.stringify({ teacher: state.teacher })})` },
+      { label: state.chapter.name, current: true }
+    ])}
+    <div class="page-header">
       <div class="page-badge">📺 المحاضرات</div>
       <h1>${esc(state.chapter.name)}</h1>
-      <p>اختار المحاضرة اللي عايز تفتحها.</p>
+      <p>اختار المحاضرة اللي عايز تفتحها</p>
     </div>
-    <div class="grid">`;
-  
-  lectures.forEach((l, idx) => {
-    html += `
-      <div class="lecture-card">
-        <div class="lecture-header">
-          <div>
-            <div class="lecture-year">المحاضرة ${idx + 1}</div>
+    <div class="grid">
+      ${lectures.map((l, idx) => `
+        <div class="lecture-card">
+          <div class="lecture-header">
+            <div class="lecture-num">المحاضرة ${idx + 1}</div>
             <div class="lecture-title">${esc(l.name)}</div>
           </div>
+          <div class="content-stats">
+            <div class="content-stat">
+              <div class="content-stat-icon">📺</div>
+              <div class="content-stat-value">${l.video_count || 0}</div>
+              <div class="content-stat-label">فيديو</div>
+            </div>
+            <div class="content-stat">
+              <div class="content-stat-icon">📄</div>
+              <div class="content-stat-value">${l.pdf_count || 0}</div>
+              <div class="content-stat-label">ملف</div>
+            </div>
+            <div class="content-stat">
+              <div class="content-stat-icon">📝</div>
+              <div class="content-stat-value">${l.exam_count || 0}</div>
+              <div class="content-stat-label">امتحان</div>
+            </div>
+          </div>
+          <div class="card-cta" onclick='setView("content", ${JSON.stringify({ lecture: l })})'>
+            محتوى المحاضرة ←
+          </div>
         </div>
-        <div class="content-icon-box">
-          <div class="content-icon-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>${l.video_count || 0}</span><small>فيديو</small>
-          </div>
-          <div class="content-icon-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <span>${l.pdf_count || 0}</span><small>ملف</small>
-          </div>
-          <div class="content-icon-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-            <span>${l.exam_count || 0}</span><small>امتحان</small>
-          </div>
-        </div>
-        <button class="btn-gradient" onclick='setView("content", ${JSON.stringify({lecture: l}).replace(/'/g, "&#39;")})'>محتوي المحاضرة ←</button>
-      </div>`;
-  });
-  
-  appEl.innerHTML = html + "</div>";
+      `).join('')}
+    </div>
+  `;
 }
 
 async function renderContent() {
-  const data = await api("/api/lectures/" + state.lecture.id + "/content");
+  const data = await api('/api/lectures/' + state.lecture.id + '/content');
   const videos = data.videos || (Array.isArray(data) ? data : []);
   const pdfs = data.pdfs || [];
   
   let html = `
-    <div class="page-title-area" style="text-align:right;">
-      <button class="back-btn-top" onclick='setView("lectures", ${JSON.stringify({chapter: state.chapter})})'>← رجوع للمحاضرات</button>
+    ${renderBreadcrumbs([
+      { label: 'الرئيسية', action: 'goHome()' },
+      { label: state.subject.name, action: `setView("teachers", ${JSON.stringify({ subject: state.subject })})` },
+      { label: state.teacher.name, action: `setView("chapters", ${JSON.stringify({ teacher: state.teacher })})` },
+      { label: state.chapter.name, action: `setView("lectures", ${JSON.stringify({ chapter: state.chapter })})` },
+      { label: state.lecture.name, current: true }
+    ])}
+    <div class="page-header">
       <div class="page-badge">📺 محتوى المحاضرة</div>
       <h1>${esc(state.lecture.name)}</h1>
-      <p>اختار الفيديو اللي عايز تشغله أو الملف اللي عايز تفتحه.</p>
-    </div>`;
+      <p>اختار الفيديو اللي عايز تشغله أو الملف اللي عايز تفتحه</p>
+    </div>
+  `;
   
   if (videos.length) {
     html += `
-      <div class="section-header">
-        <h2>📺 الفيديوهات</h2>
-        <span class="page-badge">${videos.length} فيديو</span>
+      <h2 style="font-size:1.3rem; font-weight:900; margin:24px 0 16px;">📺 الفيديوهات (${videos.length})</h2>
+      <div class="grid">
+        ${videos.map((v, i) => `
+          <div class="video-card" onclick="openPlayer(${i})">
+            <div class="video-thumb">
+              📺
+              <div class="video-badge">فيديو #${i + 1}</div>
+              <div class="video-duration">⏱ ${v.duration || '00:00'}</div>
+            </div>
+            <div class="video-info">
+              <div class="video-title">${esc(v.title)}</div>
+              <div class="video-play-btn">▶ تشغيل</div>
+            </div>
+          </div>
+        `).join('')}
       </div>
-      <div class="grid">`;
-    
-    videos.forEach((v, i) => {
-      html += `
-        <div class="video-card" onclick="openPlayerPage(${i})">
-          <div class="video-thumbnail">
-            📺
-            <div class="video-num-badge">فيديو #${i + 1}</div>
-            <div class="video-duration-badge">⏱ ${v.duration || '00:00'}</div>
-          </div>
-          <div class="video-info">
-            <div class="video-title">${esc(v.title)}</div>
-            <button class="btn-gradient">▶ تشغيل</button>
-          </div>
-        </div>`;
-    });
-    html += `</div>`;
+    `;
   }
   
   if (pdfs.length) {
     html += `
-      <div class="section-header" style="margin-top:30px;">
-        <h2>📄 الملفات</h2>
-        <span class="page-badge">${pdfs.length} ملف</span>
-      </div>
-      <div class="grid">`;
-    
-    pdfs.forEach(p => {
-      const url = p.url || p.link || p.file_url || '';
-      html += `
-        <div class="lecture-card">
-          <div class="lecture-header">
-            <div>
-              <div class="lecture-year">📄 ملف PDF</div>
-              <div class="lecture-title">${esc(p.title || 'ملف')}</div>
+      <h2 style="font-size:1.3rem; font-weight:900; margin:32px 0 16px;">📄 الملفات (${pdfs.length})</h2>
+      <div class="grid">
+        ${pdfs.map(p => `
+          <div class="pdf-card">
+            <div class="pdf-icon">📄</div>
+            <div class="pdf-info">
+              <div class="pdf-title">${esc(p.title)}</div>
             </div>
+            <a href="${esc(p.url || '#')}" target="_blank" rel="noopener" class="pdf-cta">فتح</a>
           </div>
-          <a href="${esc(url)}" target="_blank" rel="noopener" class="btn-gradient" style="text-decoration:none;">📥 فتح الملف</a>
-        </div>`;
-    });
-    html += `</div>`;
+        `).join('')}
+      </div>
+    `;
   }
   
   if (!videos.length && !pdfs.length) {
-    html += `<div class="loading-state">لا يوجد محتوى في المحاضرة دي لسه.</div>`;
+    html += `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>لا يوجد محتوى</h3><p>لسه مفيش محتوى في المحاضرة دي</p></div>`;
   }
   
-  appEl.innerHTML = html;
+  container.innerHTML = html;
   
-  window._currentVideosList = videos;
+  window._currentVideos = videos;
   window._currentLecture = state.lecture;
 }
 
-function openPlayerPage(index) {
-  if (!window._currentVideosList || !window._currentVideosList[index]) return;
-  const v = window._currentVideosList[index];
+function openPlayer(index) {
+  if (!window._currentVideos || !window._currentVideos[index]) return;
+  const v = window._currentVideos[index];
   window.location.href = `player.html?lectureId=${window._currentLecture.id}&videoId=${v.id}`;
 }
+window.openPlayer = openPlayer;
 
-function esc(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function renderBreadcrumbs(items) {
+  return `<div class="breadcrumbs">${items.map((it, i) => {
+    const sep = i > 0 ? '<span class="sep">/</span>' : '';
+    if (it.current) return `${sep}<span class="current">${esc(it.label)}</span>`;
+    return `${sep}<button onclick="${it.action}">${esc(it.label)}</button>`;
+  }).join('')}</div>`;
 }
 
-// Start
+/* ==================== Start ==================== */
 render();
