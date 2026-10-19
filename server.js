@@ -125,8 +125,7 @@ async function proxyJson(url, opts) {
   }
 }
 
-// ==================== Routes ====================
-
+// Routes
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
   res.status(r.status).json(r.body);
