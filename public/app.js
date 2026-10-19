@@ -116,7 +116,7 @@ function formatTime(sec) {
 // ==================== Player DOM Elements ====================
 const video = document.getElementById('video');
 const container = document.getElementById('custom-player');
-const bigPlay = document.getElementById('center-play-btn');
+const bigPlay = document.getElementById('bigPlay');
 const playBtn = document.getElementById('playBtn');
 const playIcon = document.getElementById('playIcon');
 const pauseIcon = document.getElementById('pauseIcon');
@@ -130,7 +130,7 @@ const muteIcon = document.getElementById('muteIcon');
 const volumeSlider = document.getElementById('volumeSlider');
 const speedBtn = document.getElementById('speedBtn');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
-const loader = document.getElementById('player-status');
+const loader = document.getElementById('loader');
 const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
 
@@ -155,8 +155,8 @@ video.addEventListener('play', updatePlayUI);
 video.addEventListener('pause', updatePlayUI);
 video.addEventListener('timeupdate', updateProgress);
 video.addEventListener('loadedmetadata', () => { durationEl.textContent = formatTime(video.duration); });
-video.addEventListener('waiting', () => loader.classList.remove('hidden'));
-video.addEventListener('playing', () => loader.classList.add('hidden'));
+video.addEventListener('waiting', () => loader.classList.add('show'));
+video.addEventListener('playing', () => loader.classList.remove('show'));
 
 progressBar.addEventListener('click', (e) => {
   const rect = progressBar.getBoundingClientRect();
@@ -192,8 +192,8 @@ function showControls() { container.classList.add('show-controls'); clearTimeout
 container.addEventListener('mousemove', showControls);
 container.addEventListener('touchstart', showControls);
 
-function showLoader() { loader.classList.remove('hidden'); }
-function hideLoader() { loader.classList.add('hidden'); }
+function showLoader() { loader.classList.add('show'); }
+function hideLoader() { loader.classList.remove('show'); }
 function showError(msg) { errorText.textContent = msg; errorMsg.classList.add('show'); hideLoader(); }
 function hideError() { errorMsg.classList.remove('show'); }
 
