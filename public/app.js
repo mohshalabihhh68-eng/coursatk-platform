@@ -10,10 +10,8 @@ const videoEl     = document.getElementById("video");
 const playerWrap  = document.getElementById("player-wrap");
 const clickLayer  = document.getElementById("click-layer");
 
-/* ── icon helper ── */
 function ic(p,w){w=w||18;return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${w}" height="${w}">${p}</svg>`}
 
-/* ── api ── */
 async function api(path,opts){
   opts=opts||{};
   const tok=(() => { try{return localStorage.getItem("cstk_tok")||sessionStorage.getItem("cstk_tok")||null}catch(_){return null} })();
@@ -33,9 +31,6 @@ function goHome(){
 }
 function setView(v,extra){ if(extra)Object.assign(state,extra); state.view=v; render(); window.scrollTo(0,0) }
 
-/* ─────────────────────────────────────
-   RENDER ROUTER
-───────────────────────────────────── */
 async function render(){
   appEl.innerHTML=`<div class="loading-screen">
     <div class="spinner-ring"></div>
@@ -57,9 +52,6 @@ async function render(){
   }
 }
 
-/* ─────────────────────────────────────
-   PAGES
-───────────────────────────────────── */
 async function renderYears(){
   const years=await api("/api/years");
   let html=`<div class="page-head reveal">
@@ -251,9 +243,6 @@ async function renderContent(){
   appEl.innerHTML=html; _observe();
 }
 
-/* ─────────────────────────────────────
-   INTERSECTION OBSERVER
-───────────────────────────────────── */
 function _observe(){
   if(!("IntersectionObserver" in window)){
     document.querySelectorAll(".reveal").forEach(el=>el.classList.add("visible")); return;
@@ -264,9 +253,6 @@ function _observe(){
   document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 }
 
-/* ─────────────────────────────────────
-   PLAYER — CRYPTO & DECRYPT
-───────────────────────────────────── */
 function findCrypto(){
   if(window.DecryptionUtils&&typeof window.DecryptionUtils.decryptPlaybackKey==="function")return window.DecryptionUtils;
   for(const n of Object.getOwnPropertyNames(window)){
@@ -327,15 +313,13 @@ async function playVideo(videoId,title){
   st.classList.remove("hidden");
   stopPlayback();
   try{
-    /* POST /api/video/:id/play */
-    const session=await api("/api/video/"+videoId+"/play",{method:"POST",headers:{"Content-Length":"0"},body:""});
+    const session=await api("/api/video/"+videoId+"/play",{method:"POST"});
     const streamToken=session.token, swVideoId=session.video_id, hbUrl=session.heartbeat_url;
     if(!streamToken||!swVideoId)throw new Error("جلسة ناقصة");
 
     st.querySelector("span").textContent="جاري تحضير التشغيل...";
     if(!cryptoUtils)cryptoUtils=await loadPlayerScript();
 
-    /* GET /api/stream — master m3u8 */
     const masterUrl="/api/stream?path="+encodeURIComponent("videos/"+swVideoId+"/stream/master.m3u8")+"&t="+encodeURIComponent(streamToken);
     const masterRes=await fetch(masterUrl);
     if(!masterRes.ok)throw new Error("master.m3u8 → HTTP "+masterRes.status);
@@ -392,7 +376,6 @@ async function playVideo(videoId,title){
 
     st.querySelector("span").textContent="جاري التشغيل...";
 
-    /* POST /api/heartbeat every 25s */
     hbTimer=setInterval(()=>{
       fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:hbUrl,token:streamToken})}).catch(()=>{});
     },25000);
@@ -421,9 +404,6 @@ async function playVideo(videoId,title){
   }
 }
 
-/* ─────────────────────────────────────
-   PLAYER UI
-───────────────────────────────────── */
 function toggleDropdown(id){
   document.querySelectorAll(".dropdown-panel").forEach(el=>{if(el.id!==id)el.classList.add("hidden")});
   document.getElementById(id).classList.toggle("hidden");
@@ -478,7 +458,6 @@ function toggleMute(){videoEl.muted=!videoEl.muted;document.getElementById("vol-
 document.getElementById("volume-slider").addEventListener("input",e=>{videoEl.volume=e.target.value;videoEl.muted=+e.target.value===0});
 function toggleFullscreen(){!document.fullscreenElement?playerWrap.requestFullscreen().catch(()=>{}):document.exitFullscreen()}
 
-/* click layer */
 let clickTimer=null,pressTimer=null,isLongPress=false,speedBeforeHold=1;
 clickLayer.addEventListener("mousedown",handleDown);
 clickLayer.addEventListener("touchstart",handleDown,{passive:true});
@@ -512,7 +491,6 @@ playerWrap.addEventListener("mousemove",()=>{
   if(!videoEl.paused)cursorTimer=setTimeout(()=>playerWrap.classList.add("hide-cursor"),2500);
 });
 
-/* stop & close */
 function stopPlayback(){
   if(hbTimer){clearInterval(hbTimer);hbTimer=null}
   if(hls){hls.destroy();hls=null}
@@ -529,12 +507,10 @@ function closePlayer(){
   document.getElementById("seek-indicator").classList.add("hidden");
 }
 
-/* theme */
 document.getElementById("theme-toggle").addEventListener("click",()=>{
   const next=document.body.getAttribute("data-theme")==="light"?"dark":"light";
   document.body.setAttribute("data-theme",next);
 });
 
-/* init */
 loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{});
 render();
