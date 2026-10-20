@@ -216,7 +216,7 @@ app.get("/api/video/:lectureId/play", async function (req, res) {
   }
 });
 
-// ====================== الـ proxy الرئيسي (ما غيرتش أي حاجة) ======================
+// ====================== الـ proxy الرئيسي ======================
 app.get("/api/stream", async function (req, res) {
   try {
     var swPath = (req.query.path || "").replace(/^\/+/, "");
@@ -284,7 +284,7 @@ app.get("/api/stream", async function (req, res) {
   }
 });
 
-// ====================== الـ heartbeat والـ cdn والـ rest (ما غيرتش أي حاجة) ======================
+// ====================== الـ heartbeat والـ cdn ======================
 app.post("/api/heartbeat", async function (req, res) {
   try {
     var url = req.body && req.body.url;
@@ -321,12 +321,13 @@ app.get("/api/cdn", async function (req, res) {
   }
 });
 
+// ⚠️ ملحوظة: الـ Route ده مكرر مع اللي فوق (نفس المسار) - Express هيتجاهله
 // الـ redirect من "تشغيل" للـ player كامل
 app.get("/api/video/:lectureId/play", async function (req, res) {
   const { lectureId } = req.params;
   const videoId = req.query.videoId;
   const base = req.protocol + '://' + req.get('host');
-  res.redirect(302, `\( {base}/player?lecturedId= \){lectureId}&videold=${videoId}`);
+  res.redirect(302, `${base}/player?lectureId=${lectureId}&videoId=${videoId}`);
 });
 
 // الـ catch all للـ index
@@ -334,6 +335,22 @@ app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(PORT, function () {
+// ====================== تشغيل السيرفر + Graceful Shutdown ======================
+const server = app.listen(PORT, function () {
   console.log("Server running on port " + PORT);
+});
+
+// معالج SIGTERM عشان السيرفر يقفل بأمان على Railway
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received, shutting down gracefully...");
+  server.close(() => {
+    console.log("HTTP server closed. Process terminated.");
+    process.exit(0);
+  });
+
+  // لو السيرفر علّق أكتر من 10 ثواني، اقفل بالقوة
+  setTimeout(() => {
+    console.error("Forced shutdown after timeout");
+    process.exit(1);
+  }, 10000);
 });
