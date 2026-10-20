@@ -1,1 +1,79 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشغل المحاضرة</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+    <style>
+        body { margin:0; background:#000; font-family: Arial, sans-serif; overflow: hidden; }
+        #video-container { position: relative; width: 100%; height: 100vh; }
+        #video { width: 100%; height: 100%; object-fit: contain; }
+        .controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" autoplay playsinline controls></video>
+        <div class="controls">
+            <button onclick="togglePlay()" id="playBtn">⏸️</button>
+            <input type="range" id="progress" min="0" max="100" value="0" style="width:300px;">
+            <span id="time">00:00 / 00:00</span>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('video');
+        let hls;
+        let currentKey = null;
+        let isPaused = false;
+
+        function playIndex(lectureId, videoId) {
+            const base = window.location.origin;
+            const proxyUrl = `\( {base}/api/video/ \){lectureId}/play?videoId=${videoId}`;
+
+            if (Hls.isSupported()) {
+                hls = new Hls({
+                    maxBufferSize: 10 * 1024 * 1024,
+                    debug: false,
+                    maxBufferHole: 1,
+                    autoStartLoad: false,
+                    startLevel: -1
+                });
+                hls.loadSource(proxyUrl);
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(() => {});
+                    console.log('✅ HLS شغال مع الـ decryption');
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS Error:', data);
+                });
+            } else {
+                video.src = proxyUrl;
+                video.play().catch(() => {});
+            }
+
+            video.onended = () => { if (!isPaused) video.currentTime = 0; };
+        }
+
+        function togglePlay() {
+            if (isPaused) { video.play(); isPaused = false; } else { video.pause(); isPaused = true; }
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const lectureId = params.get('lecturedId') || params.get('lectureId');
+        const videoId = params.get('videold') || params.get('videoId');
+
+        if (lectureId && videoId) {
+            playIndex(lectureId, videoId);
+        } else {
+            console.error('❌ مفيش lectureId أو videold');
+        }
+    </script>
+</body>
+</html>
