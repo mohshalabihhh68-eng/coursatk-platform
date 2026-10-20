@@ -4,18 +4,13 @@ const path = require("path");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-const STUDENT_TOKEN =
-  process.env.COURSATK_TOKEN ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
-
+const STUDENT_TOKEN = process.env.COURSATK_TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
 function headers() {
   return {
@@ -145,6 +140,79 @@ app.post("/api/video/:id/play", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
+// مسار الفيديو (لـ Vercel عشان يبث الفيديو)
+app.get("/api/video-proxy/:videoId", async function (req, res) {
+  try {
+    const videoId = req.params.videoId;
+    
+    const sessionReq = await proxyJson(API + "/api/v1/video/" + videoId + "/stream-weave/play", {
+      method: "POST",
+      headers: { "Content-Length": "0" },
+      body: "",
+    });
+    
+    if (sessionReq.status !== 200 || !sessionReq.body || !sessionReq.body.data) {
+        return res.status(500).send("فشل جلب الجلسة");
+    }
+    
+    const sessionData = sessionReq.body.data;
+    const streamToken = sessionData.token;
+    const swVideoId = sessionData.video_id;
+    
+    if (!streamToken || !swVideoId) return res.status(500).send("بيانات الجلسة غير مكتملة");
+
+    const masterUrl = SW + "/api/v1/videos/" + swVideoId + "/stream/master.m3u8";
+    const masterReq = await fetch(masterUrl, { headers: browserHeaders({ Authorization: "Bearer " + streamToken }) });
+    
+    if (!masterReq.ok) return res.status(500).send("فشل جلب master");
+    const masterText = await masterReq.text();
+    
+    const variantLine = masterText.split('\n').find(l => l.trim() && l.trim().charAt(0) !== '#');
+    if (!variantLine) return res.status(500).send("مفيش variant");
+    
+    const variantUrl = SW + "/api/v1/videos/" + swVideoId + "/stream/" + variantLine;
+    const variantReq = await fetch(variantUrl, { headers: browserHeaders({ Authorization: "Bearer " + streamToken }) });
+    
+    if (!variantReq.ok) return res.status(500).send("فشل جلب variant");
+    const variantText = await variantReq.text();
+
+    const newVariantText = variantText.split('\n').map(line => {
+        const s = line.trim();
+        if (!s) return line;
+        if (s.startsWith('#EXT-X-KEY')) return '';
+        if (s.startsWith('#')) return line;
+        return "/api/segment-proxy/" + videoId + "/" + encodeURIComponent(s) + "?t=" + streamToken;
+    }).join('\n');
+
+    res.set("Content-Type", "application/vnd.apple.mpegurl");
+    res.set("Access-Control-Allow-Origin", "*");
+    res.send(newVariantText);
+
+  } catch (e) {
+    res.status(500).send("خطأ: " + e.message);
+  }
+});
+
+app.get("/api/segment-proxy/:videoId/:segmentName", async function (req, res) {
+    try {
+        const videoId = req.params.videoId;
+        const segmentName = req.params.segmentName;
+        const streamToken = req.query.t;
+
+        const segmentUrl = SW + "/api/v1/videos/" + videoId + "/stream/" + segmentName;
+        const segmentReq = await fetch(segmentUrl, { 
+            headers: browserHeaders({ Authorization: "Bearer " + streamToken }) 
+        });
+
+        if (!segmentReq.ok) return res.status(404).send("الجزء مش موجود");
+        const buffer = Buffer.from(await segmentReq.arrayBuffer());
+        res.set("Content-Type", "video/MP2T");
+        res.send(buffer);
+    } catch (e) {
+        res.status(500).send("خطأ: " + e.message);
+    }
+});
+
 app.get("/api/cdn", async function (req, res) {
   try {
     var target = req.query.url || "";
@@ -156,7 +224,7 @@ app.get("/api/cdn", async function (req, res) {
     var buf = Buffer.from(await upstream.arrayBuffer());
     res.set("Cache-Control", "public, max-age=30");
     pipeUpstream(res, upstream, buf);
-  } catch (e) { res.status(502).send("cdn error: " + e.message); }
+  } catch (e) { res.status(502).send("cdn error"); }
 });
 
 app.get("/api/stream", async function (req, res) {
@@ -215,10 +283,4 @@ app.post("/api/heartbeat", async function (req, res) {
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
-app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.listen(PORT, function () {
-  console.log("Running on port " + PORT);
-});
+module.exports = app;
