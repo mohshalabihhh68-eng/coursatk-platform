@@ -141,6 +141,15 @@ app.post("/api/video/:id/play", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
+app.post("/api/play/:id", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST",
+    headers: { "Content-Length": "0" },
+    body: "",
+  });
+  res.status(r.status).json(r.body);
+});
+
 app.get("/api/cdn", async function (req, res) {
   try {
     var target = req.query.url || "";
@@ -217,5 +226,4 @@ app.get("*", function (req, res) {
 
 app.listen(PORT, function () {
   console.log("✅ Server running on port " + PORT);
-  console.log("📁 Serving from: " + path.join(__dirname, "public"));
 });
