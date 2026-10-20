@@ -10,9 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* =========================================================
-   TOKENS
-========================================================= */
 :root{
   --bg:#060910;--bg2:#0b1220;--panel:#0f1a2c;--panel2:#152035;--panel3:#1b2a42;
   --line:rgba(96,165,250,.11);--line2:rgba(96,165,250,.22);
@@ -42,9 +39,6 @@ img{display:block;max-width:100%}
 .container{width:min(1140px,calc(100% - 32px));margin:auto;position:relative;z-index:1}
 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-/* =========================================================
-   NAV
-========================================================= */
 .nav{position:sticky;top:0;z-index:50;
   background:rgba(6,9,16,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   border-bottom:1px solid var(--line)}
@@ -75,24 +69,13 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;
   background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted2);transition:.18s}
 .icon-btn:hover{background:rgba(255,255,255,.09);border-color:var(--line2);color:var(--text)}
-
-/* =========================================================
-   GRADIENT TEXT
-========================================================= */
 .g{background:var(--grad3);background-clip:text;-webkit-background-clip:text;color:transparent}
-
-/* =========================================================
-   EYEBROW
-========================================================= */
 .eyebrow{display:inline-flex;align-items:center;gap:7px;
   background:rgba(37,99,235,.1);border:1px solid rgba(96,165,250,.2);
   color:var(--cyan2);padding:5px 13px;border-radius:99px;
   font-size:11px;font-weight:800}
 .edot{width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 0 4px rgba(6,182,212,.2)}
 
-/* =========================================================
-   HERO
-========================================================= */
 .hero{padding:80px 0 68px;position:relative}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
 .hero h1{font-size:clamp(36px,5vw,62px);line-height:1.22;letter-spacing:-1.5px;margin:20px 0 18px;font-weight:900}
@@ -105,7 +88,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .avatars span:nth-child(2){background:linear-gradient(135deg,#0e7490,#155e75)}
 .avatars span:nth-child(3){background:linear-gradient(135deg,#7c3aed,#4c1d95)}
 
-/* hero art */
 .hero-art{position:relative;min-height:440px;display:grid;place-items:center}
 .orb{position:absolute;width:330px;height:330px;border-radius:50%;
   background:linear-gradient(135deg,rgba(37,99,235,.16),rgba(6,182,212,.07));
@@ -147,9 +129,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .tag-two{bottom:38px;right:-8px;animation-delay:-2.3s}
 .float-tag small{display:block;font-size:10px;color:var(--muted);font-weight:600}
 
-/* =========================================================
-   STATS
-========================================================= */
 .stats{padding:0 0 64px}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .stat{padding:22px;border:1px solid var(--line);border-radius:17px;
@@ -159,16 +138,12 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .stat b{font-size:25px;font-weight:900;color:var(--cyan2)}
 .stat span{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
 
-/* =========================================================
-   SECTIONS
-========================================================= */
 .section{padding:70px 0}
 .section-head{text-align:center;max-width:700px;margin:0 auto 38px}
 .section-head .eyebrow{margin-bottom:13px}
 .section-head h2{font-size:clamp(27px,3.5vw,42px);line-height:1.4;margin:0 0 12px;font-weight:900}
 .section-head p{color:var(--muted2);line-height:1.95;font-size:14px;margin:0}
 
-/* quote */
 .quote-card{max-width:920px;margin:auto;padding:clamp(24px,4vw,46px);
   border-radius:24px;
   background:linear-gradient(140deg,var(--panel2),var(--panel));
@@ -181,7 +156,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .quote-card p{color:var(--muted2);line-height:2.1;font-size:15px;margin:0;position:relative;z-index:1}
 .quote-card strong{color:var(--cyan2)}
 
-/* price */
 .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .price-card{position:relative;padding:26px 22px;
   border:1px solid var(--line);
@@ -206,7 +180,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .price-card .btn{width:100%}
 .note{margin:18px auto 0;text-align:center;color:var(--muted);font-size:11px;line-height:1.8}
 
-/* features */
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .feature{padding:24px;border:1px solid var(--line);border-radius:18px;
   background:rgba(255,255,255,.025);transition:.25s}
@@ -216,7 +189,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .feature h3{margin:0 0 8px;font-size:15px;font-weight:900}
 .feature p{margin:0;color:var(--muted);font-size:12px;line-height:2}
 
-/* trial */
 .trial{padding:0 0 78px}
 .trial-box{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;
   gap:24px;align-items:center;padding:clamp(24px,4vw,44px);
@@ -240,7 +212,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .admin-card b{font-size:13px;display:block}
 .admin-card small{font-size:10px;color:var(--muted);display:block;margin-top:3px}
 
-/* faq */
 .faq{max-width:800px;margin:auto;display:grid;gap:9px}
 .faq details{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:0 17px;transition:border-color .2s}
 .faq details[open]{border-color:rgba(96,165,250,.2)}
@@ -251,27 +222,21 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .faq details[open] summary::after{content:"−"}
 .faq details p{color:var(--muted2);font-size:12px;line-height:2;margin:0;padding:0 0 16px}
 
-/* footer */
 .footer{border-top:1px solid var(--line);padding:26px 0 34px;color:var(--muted);font-size:11px}
 .footer-in{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 .footer b{color:var(--text)}
 
-/* toast */
 .toast{position:fixed;z-index:200;bottom:24px;left:50%;
   transform:translate(-50%,150%);padding:12px 18px;border-radius:12px;
   background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);
   font-size:12px;font-weight:800;transition:transform .3s;max-width:90vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}
 
-/* reveal */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .62s ease,transform .62s cubic-bezier(.2,.8,.2,1)}
 .reveal.visible{opacity:1;transform:none}
 .reveal:nth-child(2){transition-delay:.07s}
 .reveal:nth-child(3){transition-delay:.13s}
 
-/* =========================================================
-   AUTH SCREEN — OVERLAY
-========================================================= */
 #auth-screen{
   display:none;position:fixed;inset:0;z-index:9999;overflow:auto;
   background:rgba(6,9,16,.98);color:var(--text);font-family:var(--font);
@@ -341,7 +306,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .auth-foot{text-align:center;color:var(--muted);font-size:10px;margin-top:18px}
 .auth-foot a{color:var(--cyan2)}
 
-/* responsive */
 @media(max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:22px}
   .hero-copy{text-align:center}.hero-copy .eyebrow{margin-inline:auto}
@@ -377,7 +341,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 </head>
 <body data-theme="dark">
 
-<!-- NAV -->
 <header class="nav">
 <div class="container navin">
   <a class="brand" href="#home">
@@ -400,7 +363,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 </div>
 </header>
 
-<!-- HERO -->
 <main id="home">
 <section class="hero"><div class="container hero-grid">
   <div class="hero-copy">
@@ -437,14 +399,12 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
   </div>
 </div></section>
 
-<!-- STATS -->
 <section class="stats"><div class="container stats-grid reveal">
   <div class="stat"><b>150 جنيه</b><span>الاشتراك الشهري</span></div>
   <div class="stat"><b>شهري فقط</b><span>بدون عقود أو سنوات</span></div>
   <div class="stat"><b>دعم فوري</b><span>تيليجرام مباشر</span></div>
 </div></section>
 
-<!-- ABOUT -->
 <section class="section" id="about"><div class="container">
   <div class="section-head reveal">
     <div class="eyebrow"><span class="edot"></span> حكاية ثانوية club</div>
@@ -458,7 +418,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
   </div>
 </div></section>
 
-<!-- PLANS -->
 <section class="section" id="plans"><div class="container">
   <div class="section-head reveal">
     <div class="eyebrow"><span class="edot"></span> الاشتراك الشهري</div>
@@ -484,7 +443,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
   <p class="note">اشتراك شهري فقط · 150 جنيهًا · يتجدد بإرادتك</p>
 </div></section>
 
-<!-- FEATURES -->
 <section class="section"><div class="container">
   <div class="section-head reveal">
     <div class="eyebrow"><span class="edot"></span> ليه ثانوية club؟</div>
@@ -501,7 +459,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
   </div>
 </div></section>
 
-<!-- TRIAL -->
 <section class="trial" id="trial"><div class="container">
   <div class="trial-box reveal">
     <div class="trial-copy">
@@ -528,7 +485,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
   </div>
 </div></section>
 
-<!-- FAQ -->
 <section class="section" id="faq"><div class="container">
   <div class="section-head reveal">
     <div class="eyebrow"><span class="edot"></span> أسئلة شائعة</div>
@@ -544,7 +500,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 </div></section>
 </main>
 
-<!-- FOOTER -->
 <footer class="footer"><div class="container footer-in">
   <div><b>ثانوية club</b> — خلّي مذاكرتك في مكان واحد.</div>
   <div>الأسعار بالجنيه المصري · © <span id="year"></span> ثانوية club</div>
@@ -553,9 +508,6 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 
 <div class="toast" id="toast" role="status"></div>
 
-<!-- =========================================================
-   AUTH SCREEN
-========================================================= -->
 <div id="auth-screen" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
 <div class="auth-wrap">
   <header class="auth-top">
@@ -609,8 +561,8 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 document.getElementById('theme-toggle').addEventListener('click',function(){
   document.body.setAttribute('data-theme',document.body.getAttribute('data-theme')==='light'?'dark':'light');
 });
-/* Year */
 var y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
+
 /* Reveal */
 var items=document.querySelectorAll('.reveal');
 if('IntersectionObserver' in window){
@@ -619,6 +571,7 @@ if('IntersectionObserver' in window){
   },{threshold:.07});
   items.forEach(function(el){io.observe(el)});
 }else{items.forEach(function(el){el.classList.add('visible')})}
+
 /* Auth open/close */
 function openAuth(){document.getElementById('auth-screen').classList.add('open');document.body.style.overflow='hidden';window.scrollTo(0,0)}
 document.querySelectorAll('[data-open-login],[data-login-link]').forEach(function(el){
@@ -634,11 +587,8 @@ document.querySelectorAll('[data-home-link]').forEach(function(el){
     document.body.style.overflow='';
   });
 });
-/* ─────────────────────────────────────
-   LOGIN — BYPASS MODE
-   أي كود 7 أرقام يدخل مباشرةً
-   بدون سيرفر لحد ما الداش بور هيتجهز
-───────────────────────────────────── */
+
+/* Login عبر السيرفر مع fallback محلي */
 var form=document.getElementById('code-form');
 var code=document.getElementById('code');
 var statusBox=document.getElementById('status');
@@ -660,6 +610,15 @@ function savePersistent(k,v){
   try{window.localStorage.setItem(k,String(v));return true}catch(_){return false}
 }
 
+function doLocalLogin(val){
+  var token='bypass_'+val+'_'+Date.now();
+  savePersistent('cstk_tok',token);
+  savePersistent('cstk_code',val);
+  savePersistent('cstk_me',JSON.stringify({name:'طالب',code:val}));
+  showSt('success','تمام! جاري فتح المواد...');
+  setTimeout(function(){window.location.href='subjects.html'},500);
+}
+
 form.addEventListener('submit',function(e){
   e.preventDefault();
   if(busy)return;
@@ -667,14 +626,30 @@ form.addEventListener('submit',function(e){
   if(!/^\d{7}$/.test(val)){showSt('error','اكتب كود صحيح مكوّن من 7 أرقام.');code.focus();return}
   busy=true;submitBtn.disabled=true;
   showSt('loading','جاري التحقق من الكود');
-  /* BYPASS: save code as token and redirect */
-  setTimeout(function(){
-    savePersistent('cstk_tok','bypass_'+val+'_'+Date.now());
+
+  fetch('/api/auth/login',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({code:val})
+  })
+  .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})})
+  .then(function(out){
+    if(!out.ok || (out.d && out.d.success===false)){
+      throw new Error((out.d&&(out.d.message||out.d.error))||'كود غير صحيح');
+    }
+    var data=(out.d&&out.d.data)||out.d||{};
+    var token=data.token||('bypass_'+val+'_'+Date.now());
+    savePersistent('cstk_tok',token);
     savePersistent('cstk_code',val);
-    savePersistent('cstk_me',JSON.stringify({name:'طالب',code:val}));
+    savePersistent('cstk_me',JSON.stringify({name:data.name||'طالب',code:val}));
     showSt('success','تمام! جاري فتح المواد...');
     setTimeout(function(){window.location.href='subjects.html'},500);
-  },600);
+  })
+  .catch(function(err){
+    console.warn('login via server failed, fallback:',err.message);
+    doLocalLogin(val);
+  })
+  .then(function(){busy=false;submitBtn.disabled=false});
 });
 })();
 </script>
