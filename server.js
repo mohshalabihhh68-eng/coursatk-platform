@@ -6,7 +6,6 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ==================== التوكن ==================== */
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
@@ -15,10 +14,9 @@ const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
 
 app.use(cors());
-app.use(express.json({ limit: "2mb" }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ==================== Headers ==================== */
 function headers() {
   return {
     Authorization: "Bearer " + STUDENT_TOKEN,
@@ -43,7 +41,6 @@ function browserHeaders(extra) {
   );
 }
 
-/* ==================== Base64 helpers ==================== */
 function b64urlEncode(value) {
   var buf = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
   return buf
@@ -59,7 +56,6 @@ function b64urlDecode(value) {
   return Buffer.from(s, "base64").toString("utf8");
 }
 
-/* ==================== Path helpers ==================== */
 function joinRel(base, rel) {
   var q = "";
   var relPath = String(rel);
@@ -85,7 +81,6 @@ function joinRel(base, rel) {
   return stack.join("/") + q;
 }
 
-/* ==================== Fetch with redirects ==================== */
 async function fetchFollow(url, hdrs, left) {
   if (left == null) left = 5;
   var res = await fetch(url, { headers: hdrs, redirect: "manual" });
@@ -104,7 +99,6 @@ async function fetchFollow(url, hdrs, left) {
   return res;
 }
 
-/* ==================== Pipe ==================== */
 function pipeUpstream(res, upstream, buf) {
   var ct = upstream.headers.get("content-type") || "application/octet-stream";
   res.set("Content-Type", ct);
@@ -130,137 +124,52 @@ async function proxyJson(url, opts) {
   }
 }
 
-/* ==================== Auth middleware (بسيط) ==================== */
-// أي طلب بيعدي — السيرفر بيستخدم STUDENT_TOKEN دايماً
-function authMiddleware(req, res, next) {
-  next();
-}
+// ==================== Routes ====================
 
-/* ==================== Login ==================== */
-// أي كود 7 أرقام بيقبل — وضع تجريبي لحد ما لوحة التحكم تتعمل
-app.post("/api/auth/login", function (req, res) {
-  try {
-    const code = String((req.body && req.body.code) || "").trim();
-    if (!/^\d{7}$/.test(code)) {
-      return res.status(400).json({
-        success: false,
-        error: "invalid_code",
-        message: "الكود لازم يكون 7 أرقام",
-      });
-    }
-    const token = "bypass_" + code + "_" + Date.now();
-    return res.json({
-      success: true,
-      data: {
-        token: token,
-        code: code,
-        name: "طالب",
-        plan: "اشتراك شهري",
-      },
-    });
-  } catch (e) {
-    return res.status(500).json({ success: false, error: e.message });
-  }
+app.get("/api/years", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/years");
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Years ==================== */
-app.get("/api/years", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(API + "/api/v1/user/years");
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/subjects/:id", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Subjects ==================== */
-app.get("/api/subjects/:id", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/subjects/:id/teachers", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
+  res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:id/teachers", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(
-      API + "/api/v1/user/subjects/" + req.params.id + "/teachers"
-    );
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/teachers/:id/chapters", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Teachers ==================== */
-app.get("/api/teachers/:id/chapters", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(
-      API + "/api/v1/user/teachers/" + req.params.id + "/chapters"
-    );
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/chapters/:id/lectures", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Chapters ==================== */
-app.get("/api/chapters/:id/lectures", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(
-      API + "/api/v1/user/chapters/" + req.params.id + "/lectures"
-    );
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/lectures/:id/content", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Lectures ==================== */
-app.get("/api/lectures/:id/content", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(
-      API + "/api/v1/user/lectures/" + req.params.id + "/content"
-    );
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.get("/api/profile", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/profile");
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Profile ==================== */
-app.get("/api/profile", authMiddleware, async function (req, res) {
-  try {
-    const r = await proxyJson(API + "/api/v1/user/profile");
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
+app.post("/api/video/:id/play", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST",
+    headers: { "Content-Length": "0" },
+    body: "",
+  });
+  res.status(r.status).json(r.body);
 });
 
-/* ==================== Video play ==================== */
-async function handlePlay(req, res) {
-  try {
-    const r = await proxyJson(
-      API + "/api/v1/video/" + req.params.id + "/stream-weave/play",
-      {
-        method: "POST",
-        headers: { "Content-Length": "0", "Content-Type": "application/json" },
-        body: "",
-      }
-    );
-    res.status(r.status).json(r.body);
-  } catch (e) {
-    res.status(502).json({ success: false, error: e.message });
-  }
-}
-
-app.post("/api/video/:id/play", authMiddleware, handlePlay);
-app.post("/api/play/:id", authMiddleware, handlePlay);
-
-/* ==================== CDN Proxy ==================== */
 app.get("/api/cdn", async function (req, res) {
   try {
     var target = req.query.url || "";
@@ -277,14 +186,11 @@ app.get("/api/cdn", async function (req, res) {
   }
 });
 
-/* ==================== Stream Proxy ==================== */
 app.get("/api/stream", async function (req, res) {
   try {
     var swPath = (req.query.path || "").replace(/^\/+/, "");
     var token = req.query.t;
-    if (!token || !swPath) {
-      return res.status(400).json({ error: "missing path or token" });
-    }
+    if (!token || !swPath) return res.status(400).json({ error: "missing path or token" });
 
     var url = SW + "/api/v1/" + swPath;
     var hdrs = browserHeaders({ Authorization: "Bearer " + token });
@@ -299,10 +205,7 @@ app.get("/api/stream", async function (req, res) {
 
     if (isM3u8) {
       var text = await upstream.text();
-      var base =
-        swPath.indexOf("/") !== -1
-          ? swPath.substring(0, swPath.lastIndexOf("/") + 1)
-          : "";
+      var base = swPath.indexOf("/") !== -1 ? swPath.substring(0, swPath.lastIndexOf("/") + 1) : "";
 
       text = text
         .split("\n")
@@ -350,14 +253,11 @@ app.get("/api/stream", async function (req, res) {
   }
 });
 
-/* ==================== Heartbeat ==================== */
 app.post("/api/heartbeat", async function (req, res) {
   try {
     var url = req.body && req.body.url;
     var token = req.body && req.body.token;
-    if (!url || !token) {
-      return res.status(400).json({ error: "url+token required" });
-    }
+    if (!url || !token) return res.status(400).json({ error: "url+token required" });
     var upstream = await fetch(url, {
       method: "POST",
       headers: browserHeaders({
@@ -373,12 +273,19 @@ app.post("/api/heartbeat", async function (req, res) {
   }
 });
 
-/* ==================== SPA fallback ==================== */
+// مسار مباشر لصفحة المواد (قبل الـ fallback)
+app.get("/subjects.html", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "subjects.html"));
+});
+
+app.get("/profile.html", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "profile.html"));
+});
+
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, function () {
   console.log("✅ Running on port " + PORT);
-  console.log("🔑 Token: " + STUDENT_TOKEN.slice(0, 20) + "...");
 });
