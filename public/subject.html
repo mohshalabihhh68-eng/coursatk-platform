@@ -9,9 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/styles.css"/>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17"></script>
 <style>
-/* subjects-only extras */
 .ctrl-row svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .ctrl-btn svg.f{fill:currentColor;stroke:none}
 .topbar-actions{display:flex;align-items:center;gap:8px}
@@ -19,7 +18,6 @@
 </head>
 <body data-theme="dark">
 
-<!-- TOPBAR -->
 <header class="topbar">
   <div class="container topbar-inner">
     <a class="brand" href="#" onclick="event.preventDefault();goHome()">
@@ -40,7 +38,6 @@
   </div>
 </header>
 
-<!-- APP -->
 <main id="app">
   <div class="loading-screen">
     <div class="spinner-ring"></div>
@@ -48,7 +45,6 @@
   </div>
 </main>
 
-<!-- PLAYER MODAL -->
 <div id="player-modal" class="modal hidden">
   <div class="modal-box">
     <div class="modal-header">
@@ -69,22 +65,17 @@
       <video id="video" playsinline></video>
       <div class="click-layer" id="click-layer"></div>
 
-      <!-- Status -->
       <div id="player-status" class="player-status">
         <div class="spinner-ring"></div>
         <span>جاري التشغيل...</span>
       </div>
 
-      <!-- Seek indicator -->
       <div id="seek-indicator" class="seek-indicator hidden">+10s</div>
 
-      <!-- Controls -->
       <div class="controls-bar" id="controls-bar">
-        <!-- Progress -->
         <div class="prog-wrap" id="prog-bar" onclick="seekVideo(event)">
           <div class="prog-rail"><div class="prog-filled" id="prog-filled"></div></div>
         </div>
-        <!-- Row -->
         <div class="ctrl-row">
           <div class="ctrl-left">
             <button class="ctrl-btn" onclick="togglePlay()">
