@@ -26,7 +26,6 @@
     .login-box h1 {
       font-size: 1.6rem;
       margin-bottom: 8px;
-      text-align: center;
       background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -117,15 +116,7 @@
       <h1>ثانوية World</h1>
       <p>اكتب كود الاشتراك للدخول</p>
       <form id="login-form">
-        <input
-          id="code-input"
-          type="text"
-          inputmode="numeric"
-          maxlength="7"
-          placeholder="0000000"
-          autocomplete="one-time-code"
-          required
-        />
+        <input id="code-input" type="text" inputmode="numeric" maxlength="7" placeholder="0000000" autocomplete="one-time-code" required />
         <button type="submit" id="login-btn">دخول</button>
         <div class="login-status" id="login-status"></div>
       </form>
@@ -136,9 +127,8 @@
   <script>
     (function () {
       try {
-        var existing = localStorage.getItem("cstk_tok");
-        if (existing) {
-          window.location.href = "subjects.html";
+        if (localStorage.getItem("cstk_tok")) {
+          window.location.href = "/subjects.html";
           return;
         }
       } catch (e) {}
@@ -172,7 +162,7 @@
           localStorage.setItem("cstk_tok", token);
           localStorage.setItem("cstk_code", code);
           localStorage.setItem("cstk_me", JSON.stringify({ name: "طالب", code: code }));
-        } catch (e) {
+        } catch (err) {
           show("error", "المتصفح مش بيسمح بتخزين الجلسة");
           btn.disabled = false;
           return;
@@ -180,7 +170,7 @@
 
         show("success", "تمام! جاري فتح المواد...");
         setTimeout(function () {
-          window.location.href = "subjects.html";
+          window.location.href = "/subjects.html";
         }, 400);
       });
     })();
