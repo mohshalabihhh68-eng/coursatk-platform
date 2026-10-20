@@ -113,6 +113,7 @@ function setView(view, extra) {
 var appEl = document.getElementById("app");
 
 async function render() {
+  if (!appEl) return;
   appEl.innerHTML = '<div class="loading">جاري التحميل...</div>';
   try {
     if (state.view === "years") await renderYears();
