@@ -6,7 +6,7 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ التوكن الجديد اللي أنت بعته
+// ⚠️ حط التوكن الجديد بتاعك هنا
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDczNjMsInJvbGUiOiJzdHVkZW50IiwidXVpZCI6IjYwYTU0MzZiMDY2MzU4NmI1MDQwOTBhZTM3ZThmOWM5In0.Jz2LWCWeYW6O6Y3h_MntJJi8mcauFhRjcInC37Ns5wI";
@@ -15,12 +15,6 @@ const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
 
 app.use(cors());
-// ✅ السماح للـ iframe بالعمل
-app.use((req, res, next) => {
-  res.setHeader("X-Frame-Options", "ALLOWALL");
-  res.setHeader("Content-Security-Policy", "frame-ancestors *");
-  next();
-});
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -50,7 +44,11 @@ function browserHeaders(extra) {
 
 function b64urlEncode(value) {
   var buf = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
-  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return buf
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 function b64urlDecode(value) {
@@ -68,7 +66,11 @@ function joinRel(base, rel) {
     relPath = relPath.slice(0, qi);
   }
   var stack = String(base || "").split("/");
-  if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) {
+  if (
+    stack.length &&
+    stack[stack.length - 1] !== "" &&
+    /\.[a-z0-9]+$/i.test(stack[stack.length - 1])
+  ) {
     stack.pop();
   }
   if (stack.length && stack[stack.length - 1] === "") stack.pop();
@@ -124,43 +126,42 @@ async function proxyJson(url, opts) {
 }
 
 // ==================== Routes ====================
-
-app.get("/api/years", async (req, res) => {
+app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:id", async (req, res) => {
+app.get("/api/subjects/:id", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:id/teachers", async (req, res) => {
+app.get("/api/subjects/:id/teachers", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/teachers/:id/chapters", async (req, res) => {
+app.get("/api/teachers/:id/chapters", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/chapters/:id/lectures", async (req, res) => {
+app.get("/api/chapters/:id/lectures", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/lectures/:id/content", async (req, res) => {
+app.get("/api/lectures/:id/content", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/profile", async (req, res) => {
+app.get("/api/profile", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/profile");
   res.status(r.status).json(r.body);
 });
 
-app.post("/api/video/:id/play", async (req, res) => {
+app.post("/api/video/:id/play", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
     method: "POST",
     headers: { "Content-Length": "0" },
@@ -169,7 +170,7 @@ app.post("/api/video/:id/play", async (req, res) => {
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/cdn", async (req, res) => {
+app.get("/api/cdn", async function (req, res) {
   try {
     var target = req.query.url || "";
     if (req.query.u) target = b64urlDecode(String(req.query.u));
@@ -185,7 +186,7 @@ app.get("/api/cdn", async (req, res) => {
   }
 });
 
-app.get("/api/stream", async (req, res) => {
+app.get("/api/stream", async function (req, res) {
   try {
     var swPath = (req.query.path || "").replace(/^\/+/, "");
     var token = req.query.t;
@@ -197,26 +198,46 @@ app.get("/api/stream", async (req, res) => {
     var upstream = await fetchFollow(url, hdrs);
 
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
-    var isM3u8 = ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1 || swPath.indexOf(".m3u8") !== -1;
+    var isM3u8 =
+      ct.indexOf("mpegurl") !== -1 ||
+      ct.indexOf("m3u8") !== -1 ||
+      swPath.indexOf(".m3u8") !== -1;
 
     if (isM3u8) {
       var text = await upstream.text();
       var base = swPath.indexOf("/") !== -1 ? swPath.substring(0, swPath.lastIndexOf("/") + 1) : "";
-      text = text.split("\n").map(function (line) {
+
+      text = text
+        .split("\n")
+        .map(function (line) {
           var s = line.trim();
           if (!s) return line;
           if (s.charAt(0) === "#") {
             return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
-              if (uri.indexOf("http") === 0) return 'URI="/api/cdn?u=' + b64urlEncode(uri) + '"';
+              if (uri.indexOf("http") === 0) {
+                return 'URI="/api/cdn?u=' + b64urlEncode(uri) + '"';
+              }
               var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
               clean = clean.replace(/^api\/v1\//, "");
               if (clean.indexOf("videos/") !== 0) clean = joinRel(base, clean);
-              return 'URI="/api/stream?path=' + encodeURIComponent(clean) + "&t=" + encodeURIComponent(token) + '"';
+              return (
+                'URI="/api/stream?path=' +
+                encodeURIComponent(clean) +
+                "&t=" +
+                encodeURIComponent(token) +
+                '"'
+              );
             });
           }
           if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
-          return "/api/stream?path=" + encodeURIComponent(joinRel(base, s)) + "&t=" + encodeURIComponent(token);
-        }).join("\n");
+          return (
+            "/api/stream?path=" +
+            encodeURIComponent(joinRel(base, s)) +
+            "&t=" +
+            encodeURIComponent(token)
+          );
+        })
+        .join("\n");
 
       res.set("Content-Type", "application/vnd.apple.mpegurl");
       res.set("Access-Control-Allow-Origin", "*");
@@ -232,14 +253,17 @@ app.get("/api/stream", async (req, res) => {
   }
 });
 
-app.post("/api/heartbeat", async (req, res) => {
+app.post("/api/heartbeat", async function (req, res) {
   try {
     var url = req.body && req.body.url;
     var token = req.body && req.body.token;
     if (!url || !token) return res.status(400).json({ error: "url+token required" });
     var upstream = await fetch(url, {
       method: "POST",
-      headers: browserHeaders({ Authorization: "Bearer " + token, "Content-Type": "application/json" }),
+      headers: browserHeaders({
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      }),
       body: "{}",
     });
     var text = await upstream.text();
@@ -249,10 +273,11 @@ app.post("/api/heartbeat", async (req, res) => {
   }
 });
 
-app.get("*", (req, res) => {
+// الـ catch all
+app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, function () {
   console.log("Running on port " + PORT);
 });
