@@ -1,212 +1,512 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>حسابي | كورساتك</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<title>ملفي الشخصي | ثانوية Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-.profile-container { max-width: 900px; margin: 40px auto; padding: 20px; }
-.profile-header {
-  background: linear-gradient(135deg, var(--panel), var(--bg));
-  border: 1px solid var(--line); border-radius: 24px;
-  padding: 30px; text-align: center; margin-bottom: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+/* ==================== Tokens ==================== */
+:root{
+  --bg:#070b14;--bg2:#0c1422;--panel:#111d2e;--panel2:#172438;--panel3:#1c2d45;
+  --line:rgba(100,140,200,.13);--line2:rgba(100,140,200,.24);
+  --text:#e8f0ff;--muted:#6e8aaa;--muted2:#a3bcda;
+  --blue:#3b82f6;--blue2:#60a5fa;--cyan:#38bdf8;--cyan2:#7dd3fc;
+  --green:#34d399;--red:#f87171;--amber:#fbbf24;
+  --grad:linear-gradient(135deg,#3b82f6,#1e40af);
+  --grad2:linear-gradient(135deg,#38bdf8,#3b82f6);
+  --grad3:linear-gradient(90deg,#38bdf8,#3b82f6 55%,#818cf8);
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --font:'Cairo',system-ui,sans-serif
 }
-.profile-avatar {
-  width: 100px; height: 100px; margin: 0 auto 16px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange), var(--orange3));
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 2.5rem; font-weight: 900;
-  box-shadow: 0 10px 30px rgba(255,107,26,.4);
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;background:var(--bg)}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:var(--font);direction:rtl;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background:
+    radial-gradient(900px 500px at 92% -6%,#1c3d7a45,transparent 65%),
+    radial-gradient(700px 450px at -8% 82%,#164e6340,transparent 60%),
+    var(--bg)
 }
-.profile-name { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
-.profile-code { color: var(--orange2); font-weight: 800; font-size: 1rem; letter-spacing: 2px; margin-bottom: 20px; }
-.profile-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 16px; border-radius: 20px;
-  background: rgba(16,185,129,.15); color: var(--mint);
-  font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(16,185,129,.3);
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;z-index:0;
+  background-image:radial-gradient(rgba(96,165,250,.6) .6px,transparent .6px);
+  background-size:24px 24px;
+  mask-image:linear-gradient(to bottom,black,transparent 70%)
 }
-.profile-badge.warn { background: rgba(251,191,36,.15); color: #fcd34d; border-color: rgba(251,191,36,.3); }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 20px; padding: 24px; text-align: center;
-  transition: .3s;
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ==================== Top bar ==================== */
+.top{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);
+  background:rgba(7,11,20,.82);backdrop-filter:blur(20px);position:relative;z-index:1}
+.topin{max-width:1060px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.brand-logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+  background:var(--grad);box-shadow:0 8px 24px rgba(37,99,235,.4);flex-shrink:0;
+  position:relative;overflow:hidden;font-size:0}
+.brand-logo::after{content:"";position:absolute;inset:-70%;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
+  transform:translateX(-70%);animation:shine 6s ease-in-out infinite}
+@keyframes shine{0%,65%,100%{transform:translateX(-70%)}80%{transform:translateX(70%)}}
+.brand-logo svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-weight:900;font-size:15px}
+.brand-name small{display:block;font-size:10px;color:var(--muted);font-weight:600}
+.spacer{flex:1}
+.btn{border:1px solid var(--line2);border-radius:13px;padding:9px 14px;
+  background:rgba(255,255,255,.05);color:var(--text);
+  font-size:12px;font-weight:800;transition:.2s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.4);background:rgba(255,255,255,.09)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.btn.primary:hover{box-shadow:0 12px 30px rgba(37,99,235,.45)}
+.btn.danger{color:var(--red)}
+.btn.danger:hover{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.07)}
+
+/* ==================== Wrap ==================== */
+.wrap{max-width:1060px;margin:auto;padding:26px 18px 60px;position:relative;z-index:1}
+
+/* ==================== Heading ==================== */
+.heading{margin-bottom:22px;animation:fadeUp .4s ease}
+.eyebrow{display:inline-flex;gap:7px;align-items:center;
+  color:var(--cyan2);border:1px solid rgba(59,130,246,.25);background:rgba(59,130,246,.1);
+  border-radius:30px;padding:5px 12px;font-size:11px;font-weight:800}
+.heading h1{font-size:clamp(22px,5vw,32px);line-height:1.3;margin:12px 0 5px;font-weight:900}
+.heading p{margin:0;color:var(--muted2);font-size:13px}
+
+/* ==================== Hero card ==================== */
+.hero-card{
+  position:relative;overflow:hidden;
+  border:1px solid rgba(59,130,246,.22);border-radius:26px;
+  padding:25px;background:linear-gradient(115deg,#142b4b,var(--panel) 55%,#10243b);
+  box-shadow:var(--shadow);animation:fadeUp .45s ease;isolation:isolate
 }
-.stat-card:hover { border-color: var(--orange); transform: translateY(-4px); }
-.stat-icon { font-size: 2rem; margin-bottom: 10px; }
-.stat-value { font-size: 1.8rem; font-weight: 900; color: var(--orange2); }
-.stat-label { color: var(--muted); font-size: 0.85rem; margin-top: 4px; font-weight: 700; }
-.info-card {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 20px; padding: 24px;
+.hero-card::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:linear-gradient(110deg,transparent 15%,rgba(96,165,250,.06) 45%,transparent 70%);
+  transform:translateX(-100%);animation:heroSweep 10s ease-in-out infinite;pointer-events:none
 }
-.info-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 0; border-bottom: 1px solid var(--line);
+@keyframes heroSweep{0%,55%,100%{transform:translateX(-100%)}75%{transform:translateX(100%)}}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
+.avatar{
+  width:80px;height:80px;flex-shrink:0;display:grid;place-items:center;
+  border-radius:24px;background:var(--grad);
+  border:1px solid rgba(255,255,255,.3);box-shadow:0 12px 35px rgba(37,99,235,.45);
+  font-size:32px;font-weight:900;position:relative
 }
-.info-row:last-child { border-bottom: 0; }
-.info-row .label { color: var(--muted); font-size: 0.9rem; font-weight: 700; }
-.info-row .value { font-weight: 800; color: var(--text); }
-.action-buttons { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
-.action-btn {
-  flex: 1; min-width: 150px; padding: 14px 20px; border-radius: 14px;
-  border: 1px solid var(--line); background: var(--panel);
-  color: var(--text); font-weight: 800; cursor: pointer;
-  transition: .2s; font-family: inherit; font-size: 0.95rem;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+.avatar::after{
+  content:"";position:absolute;inset:-5px;border:1px solid rgba(147,197,253,.4);
+  border-radius:29px;animation:avatarPulse 3s ease-in-out infinite;pointer-events:none
 }
-.action-btn:hover { border-color: var(--orange); color: var(--orange2); }
-.action-btn.danger { color: #ff8a80; }
-.action-btn.danger:hover { border-color: #ff8a80; background: rgba(239,68,68,.1); }
-.loading-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+@keyframes avatarPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.06);opacity:.1}}
+.name{font-size:21px;font-weight:900;overflow-wrap:anywhere}
+.subline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:30px;
+  background:rgba(52,211,153,.12);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);font-weight:800;font-size:11px}
+.pill.warn{color:#fcd34d;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3)}
+.pill.off{color:var(--red);background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3)}
+.hero-tag{margin-right:auto;align-self:flex-start;border:1px solid var(--line);
+  background:rgba(255,255,255,.06);border-radius:13px;padding:9px 12px;
+  color:var(--muted2);font-size:11px;font-weight:800;white-space:nowrap}
+
+/* ==================== Stats ==================== */
+.stats-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 24px}
+.stat{border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(160deg,var(--panel2),var(--panel));
+  padding:16px;animation:fadeUp .5s ease both}
+.stat .ico{font-size:18px}
+.stat strong{display:block;font-size:24px;font-weight:900;margin-top:6px;line-height:1.25}
+.stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+
+/* ==================== Section title ==================== */
+.sec-title{font-size:15px;font-weight:900;margin:26px 0 12px;display:flex;align-items:center;gap:9px}
+.sec-title::before{content:"";width:4px;height:20px;border-radius:4px;background:var(--grad3)}
+
+/* ==================== Details grid ==================== */
+.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.detail{min-width:0;display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line);border-radius:16px;padding:14px;
+  background:rgba(17,29,46,.85);transition:.2s}
+.detail:hover{border-color:rgba(96,165,250,.3);transform:translateY(-2px)}
+.di{width:42px;height:42px;display:grid;place-items:center;flex-shrink:0;
+  border-radius:13px;background:rgba(59,130,246,.12);font-size:19px}
+.dlabel{font-size:11px;color:var(--muted);font-weight:700}
+.dvalue{font-size:14px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}
+.dvalue.small{font-size:12px}
+.dbody{min-width:0;flex:1}
+.copy-btn{border:1px solid rgba(59,130,246,.3);border-radius:10px;
+  background:rgba(59,130,246,.1);color:var(--cyan2);
+  font-size:11px;font-weight:800;padding:7px 9px;flex-shrink:0;transition:.15s;cursor:pointer}
+.copy-btn:hover{background:rgba(59,130,246,.2)}
+
+/* ==================== Subscription card ==================== */
+.sub-card{border:1px solid rgba(59,130,246,.22);
+  background:linear-gradient(135deg,var(--panel2),var(--panel));
+  border-radius:22px;padding:20px}
+.sub-head{display:flex;align-items:center;gap:12px}
+.sub-icon{width:46px;height:46px;display:grid;place-items:center;
+  border-radius:14px;background:rgba(59,130,246,.12);font-size:22px}
+.sub-head h3{margin:0;font-size:15px;font-weight:900}
+.sub-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
+
+/* Countdown */
+.countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:17px}
+.time-box{border:1px solid var(--line);background:rgba(7,11,20,.8);
+  border-radius:14px;text-align:center;padding:12px 5px}
+.time-box b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.time-box span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+
+/* Progress bar */
+.prog-meta{display:flex;justify-content:space-between;gap:10px;
+  color:var(--muted);font-size:11px;margin:15px 0 7px}
+.prog-bar{height:8px;background:rgba(255,255,255,.1);border-radius:20px;overflow:hidden}
+.prog-bar i{height:100%;display:block;width:0;background:var(--grad3);border-radius:20px;transition:width .6s}
+
+/* Actions */
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.notice{border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.07);
+  border-radius:14px;padding:13px 15px;color:#fde68a;font-size:12px;line-height:1.85;margin-top:14px}
+
+/* ==================== Loading / Error ==================== */
+.loading,.error-view{max-width:440px;margin:12vh auto;text-align:center;padding:28px;
+  border:1px solid var(--line);border-radius:22px;background:var(--panel)}
+.loader{width:38px;height:38px;border:3px solid rgba(255,255,255,.1);
+  border-top-color:var(--blue);border-radius:50%;
+  animation:spin .85s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-view p{color:var(--muted);font-size:13px;line-height:1.8}
+
+/* ==================== Toast ==================== */
+#toast{position:fixed;z-index:99;bottom:22px;left:50%;
+  transform:translate(-50%,150%);padding:11px 17px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);
+  font-size:12px;font-weight:800;transition:transform .3s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+
+/* ==================== Animations ==================== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ==================== Responsive ==================== */
+@media(max-width:620px){
+  .wrap{padding:18px 13px 44px}
+  .hero-card{padding:18px}
+  .hero-inner{align-items:flex-start;gap:13px}
+  .avatar{width:64px;height:64px;border-radius:19px;font-size:26px}
+  .name{font-size:17px}
+  .hero-tag{display:none}
+  .stats-row{gap:8px}
+  .stat{padding:12px 9px;border-radius:14px}
+  .stat strong{font-size:21px}
+  .details{grid-template-columns:1fr}
+  .detail{padding:12px}
+  .countdown{gap:6px}
+  .time-box{padding:9px 3px}
+  .time-box b{font-size:20px}
+  .topin{padding:10px 13px}
+  .btn{padding:8px 11px}
+  .brand-name{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 
-<header class="nav">
-  <div class="container navin">
-    <a class="brand" href="subjects.html">
-      <span class="logo">🎓</span>
-      <span>كورساتك<small>منصة تعليمية</small></span>
-    </a>
-    <div class="navactions">
-      <button class="btn btn-soft" onclick="location.href='subjects.html'">📚 المواد</button>
+<!-- ==================== Top bar ==================== -->
+<div class="top" style="position:sticky;top:0;z-index:10">
+  <div class="topin">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/></svg>
     </div>
+    <div class="brand-name">ثانوية club <small>ملفك الشخصي</small></div>
+    <div class="spacer"></div>
+    <button class="btn" id="backBtn">
+      <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      رجوع
+    </button>
   </div>
-</header>
+</div>
 
-<main class="profile-container" id="app">
-  <div class="loading-state">
-    <div class="spinner" style="width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;"></div>
-    جاري تحميل بيانات حسابك...
+<!-- ==================== Main ==================== -->
+<main class="wrap" id="main">
+  <div class="loading">
+    <div class="loader"></div>
+    <b>بنحمّل بياناتك...</b>
+    <p style="color:var(--muted);font-size:12px;margin-top:8px">مش هنخرجك من الحساب لو حصل خطأ مؤقت</p>
   </div>
 </main>
 
+<div id="toast" role="status"></div>
+
 <script>
-async function loadProfile() {
-  const app = document.getElementById('app');
-  try {
-    const res = await fetch('/api/profile');
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch(e) { data = text; }
-    if (!res.ok || (data.success === false)) {
-      throw new Error(data.message || data.error || 'فشل تحميل البيانات');
+(function(){
+'use strict';
+const TOKEN_KEY='cstk_tok';
+const API='https://coursattk-production.up.railway.app';
+
+/* ── utils ── */
+function $(id){return document.getElementById(id)}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2800)}
+function token(){try{return localStorage.getItem(TOKEN_KEY)||sessionStorage.getItem(TOKEN_KEY)}catch(_){return null}}
+
+/* SVG icons */
+function icon(name){
+  const m={
+    sparkles:'<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>',
+    shield:'<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>',
+    graduation:'<path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/>',
+    ticket:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M22 12H2M12 6v12"/>',
+    lock:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    school:'<path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5M12 21v-4"/>',
+    calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    devices:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+    clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    check:'<path d="m5 12 4 4L19 6"/>',
+    play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+    refresh:'<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>',
+    logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+    wifi:'<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>'
+  };
+  var d=m[name]||'<circle cx="12" cy="12" r="6"/>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">'+d+'</svg>';
+}
+
+function detail(ico,lbl,val,small){
+  return '<div class="detail"><div class="di">'+icon(ico)+'</div><div class="dbody"><div class="dlabel">'+lbl+'</div><div class="dvalue'+(small?' small':'')+'">'+val+'</div></div></div>';
+}
+
+function sectionLabel(s){
+  var m={'science':'علمي علوم','math':'علمي رياضة','literary':'أدبي','commercial':'تجاري','industrial':'صناعي'};
+  return m[s]||s||'—';
+}
+
+/* ── timer ── */
+var timer;
+function timerStart(){
+  var endDate=null;
+  try{
+    var me=JSON.parse(localStorage.getItem('cstk_me')||'{}');
+    var d=me.subscription_expires_at||me.expires_at||me.end_date||me.expiry_date;
+    if(d) endDate=new Date(d);
+  }catch(_){}
+  function tick(){
+    if(!endDate){$('days')&&($('days').textContent='—');return}
+    var diff=endDate-Date.now();
+    if(diff<0) diff=0;
+    var s=Math.floor(diff/1000);
+    $('days')&&($('days').textContent=String(Math.floor(s/86400)).padStart(2,'0'));
+    $('hours')&&($('hours').textContent=String(Math.floor((s%86400)/3600)).padStart(2,'0'));
+    $('mins')&&($('mins').textContent=String(Math.floor((s%3600)/60)).padStart(2,'0'));
+    $('secs')&&($('secs').textContent=String(s%60).padStart(2,'0'));
+    var days=diff/86400000;
+    var pct=100;
+    if(days<=30) pct=Math.max(0,Math.min(100,(days/30)*100));
+    var bar=$('subProgress');
+    if(bar) bar.style.width=pct+'%';
+    var pt=$('progressText');
+    if(pt){
+      if(diff<=0) pt.textContent='انتهت مدة الاشتراك';
+      else if(days<=3) pt.textContent='يتبقى أقل من 3 أيام!';
+      else if(days<=7) pt.textContent='يتبقى أقل من أسبوع';
+      else pt.textContent=Math.floor(days)+' يوم متبقي';
     }
-    const profile = data.data !== undefined ? data.data : data;
-    renderProfile(profile);
-  } catch (e) {
-    app.innerHTML = `<div class="loading-state">
-      <div style="font-size:2rem; margin-bottom:12px;">⚠️</div>
-      <b>خطأ في تحميل البروفايل</b><br>
-      <span style="font-size:0.9rem; color:var(--muted);">${e.message}</span>
-      <div style="margin-top:20px;">
-        <button class="action-btn" onclick="loadProfile()">إعادة المحاولة</button>
-      </div>
-    </div>`;
   }
+  tick();
+  clearInterval(timer);
+  timer=setInterval(tick,1000);
 }
 
-function renderProfile(p) {
-  const app = document.getElementById('app');
-  const name = p.name || p.fullName || p.studentName || 'طالب';
-  const code = p.code || p.subscriptionCode || '—';
-  const section = p.section || p.gradeName || 'عام';
-  const expiry = p.expiresAt ? new Date(p.expiresAt).toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'}) : 'غير محدد';
-  
-  // حساب الأيام المتبقية
-  let daysLeft = '—';
-  let statusClass = '';
-  let statusText = 'نشط';
-  if (p.expiresAt) {
-    const diff = new Date(p.expiresAt).getTime() - Date.now();
-    const days = Math.ceil(diff / (1000*60*60*24));
-    if (days > 7) { daysLeft = days + ' يوم'; statusText = 'نشط'; }
-    else if (days > 0) { daysLeft = days + ' يوم'; statusText = 'ينتهي قريباً'; statusClass = 'warn'; }
-    else { daysLeft = 'منتهي'; statusText = 'منتهي'; statusClass = 'warn'; }
-  }
-  
-  // إحصائيات المشاهدة
-  let watchedCount = 0;
-  let inProgressCount = 0;
-  let totalMinutes = 0;
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key || !key.startsWith('cstk_w_')) continue;
-      try {
-        const w = JSON.parse(localStorage.getItem(key) || 'null');
-        if (!w) continue;
-        if (w.watched || w.percent >= 90) watchedCount++;
-        else if (w.currentTime > 0) inProgressCount++;
-        totalMinutes += Math.floor((w.currentTime || 0) / 60);
-      } catch(e) {}
+/* ── render ── */
+function render(me){
+  clearInterval(timer);
+  var name=me.name||me.full_name||me.username||'طالب';
+  var plan=me.plan||me.subscription_type||me.subscription_plan||'اشتراك شهري';
+  var devices=me.max_devices||me.allowed_devices||1;
+  var year=me.year||me.grade||me.school_year||'—';
+  var created=me.created_at||me.createdAt||'—';
+  var expiry=me.subscription_expires_at||me.expires_at||me.end_date||'—';
+  var code=me.code||me.subscription_code||me.access_code||'—';
+  var now=Date.now();
+  var st={cls:'',label:'نشط',left:null};
+  var endDate=null;
+  if(expiry&&expiry!=='—'){
+    var d=new Date(expiry);
+    if(!isNaN(d)){
+      endDate=d; var left=d-now; st.left=left;
+      if(left<=0){st.cls='off';st.label='منتهي الاشتراك'}
+      else if(left<=7*86400000){st.cls='warn';st.label='قارب الانتهاء'}
+      else{st.cls='';st.label='نشط'}
     }
-  } catch(e) {}
-  
-  app.innerHTML = `
-    <div class="profile-header">
-      <div class="profile-avatar">${escape(name).charAt(0)}</div>
-      <div class="profile-name">${escape(name)}</div>
-      <div class="profile-code">كود: ${escape(code)}</div>
-      <span class="profile-badge ${statusClass}">● ${statusText}</span>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-value">${watchedCount}</div>
-        <div class="stat-label">فيديو مكتمل</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-value">${inProgressCount}</div>
-        <div class="stat-label">فيديو قيد المشاهدة</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏱</div>
-        <div class="stat-value">${totalMinutes}</div>
-        <div class="stat-label">دقيقة مشاهدة</div>
-      </div>
-    </div>
-    
-    <div class="info-card">
-      <h3 style="margin-bottom:16px; font-size:1.1rem;">📋 بيانات الحساب</h3>
-      <div class="info-row"><span class="label">الاسم</span><span class="value">${escape(name)}</span></div>
-      <div class="info-row"><span class="label">الكود</span><span class="value">${escape(code)}</span></div>
-      <div class="info-row"><span class="label">الشعبة</span><span class="value">${escape(section)}</span></div>
-      <div class="info-row"><span class="label">تاريخ الانتهاء</span><span class="value">${escape(expiry)}</span></div>
-      <div class="info-row"><span class="label">الأيام المتبقية</span><span class="value">${daysLeft}</span></div>
-    </div>
-    
-    <div class="action-buttons">
-      <button class="action-btn" onclick="location.href='subjects.html'">📚 رجوع للمواد</button>
-      <button class="action-btn danger" onclick="doLogout()">🚪 تسجيل الخروج</button>
-    </div>
-  `;
+  }
+  function fmt(v){
+    if(!v||v==='—') return '—';
+    var d=new Date(v); if(isNaN(d)) return v;
+    return d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  }
+  var codeHtml=esc(code);
+  var w={done:0,active:0,minutes:0};
+  try{
+    var p=JSON.parse(localStorage.getItem('cstk_progress')||'{}');
+    Object.values(p).forEach(function(v){
+      if(v&&v.pct>=90) w.done++;
+      else if(v&&v.pct>0) w.active++;
+      if(v&&v.t) w.minutes+=Math.floor(v.t/60);
+    });
+  }catch(_){}
+
+  $('main').innerHTML=
+    '<div class="heading">'+
+      '<span class="eyebrow">'+icon('sparkles')+' لوحة الطالب الشخصية</span>'+
+      '<h1>أهلاً بيك، '+esc(name.split(' ')[0])+'</h1>'+
+      '<p>كل تفاصيل حسابك واشتراكك وتقدّمك الدراسي في مكان واحد.</p>'+
+    '</div>'+
+
+    '<section class="hero-card">'+
+      '<div class="hero-inner">'+
+        '<div class="avatar">'+esc((name.trim().charAt(0)||'ط').toUpperCase())+'</div>'+
+        '<div style="min-width:0;flex:1">'+
+          '<div class="name">'+esc(name)+'</div>'+
+          '<div class="subline">'+
+            '<span class="pill '+st.cls+'">'+icon('shield')+' '+esc(st.label)+'</span>'+
+            '<span style="color:var(--muted);display:flex;align-items:center;gap:5px">'+icon('graduation')+' '+esc(sectionLabel(me.section))+'</span>'+
+          '</div>'+
+          '<div class="subline" style="margin-top:4px">'+
+            '<span style="color:var(--muted);display:flex;align-items:center;gap:5px">'+icon('ticket')+' '+esc(plan)+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="hero-tag">'+icon('sparkles')+' حسابك الدراسي</div>'+
+      '</div>'+
+    '</section>'+
+
+    '<div class="stats-row">'+
+      '<div class="stat"><div class="ico">'+icon('check')+'</div><strong>'+w.done+'</strong><span>فيديو مكتمل</span></div>'+
+      '<div class="stat"><div class="ico">'+icon('play')+'</div><strong>'+w.active+'</strong><span>فيديو بدأت فيه</span></div>'+
+      '<div class="stat"><div class="ico">'+icon('clock')+'</div><strong>'+w.minutes+'</strong><span>دقيقة مشاهدة</span></div>'+
+    '</div>'+
+
+    '<div class="sec-title">بيانات الحساب</div>'+
+    '<section class="details">'+
+      '<div class="detail"><div class="di">'+icon('lock')+'</div>'+
+        '<div class="dbody"><div class="dlabel">كود الاشتراك</div><div class="dvalue small">'+codeHtml+'</div></div>'+
+        '<button class="copy-btn" id="copyCode">'+icon('copy')+' نسخ</button>'+
+      '</div>'+
+      detail('book','الشعبة',esc(sectionLabel(me.section)))+
+      detail('school','الصف الدراسي',esc(String(year)))+
+      detail('calendar','تاريخ انتهاء الاشتراك',esc(fmt(expiry)),true)+
+      detail('devices','الأجهزة المسموحة',esc(String(devices))+' جهاز')+
+      detail('calendar','تاريخ إنشاء الحساب',esc(fmt(created)),true)+
+      detail('ticket','نوع الاشتراك',esc(plan),true)+
+    '</section>'+
+
+    '<div class="sec-title">عداد الاشتراك</div>'+
+    '<section class="sub-card">'+
+      '<div class="sub-head">'+
+        '<div class="sub-icon">'+icon('clock')+'</div>'+
+        '<div><h3>الوقت المتبقي في اشتراكك</h3><p>العداد بيتحدّث تلقائيًا كل ثانية</p></div>'+
+      '</div>'+
+      '<div class="countdown">'+
+        '<div class="time-box"><b id="days">00</b><span>يوم</span></div>'+
+        '<div class="time-box"><b id="hours">00</b><span>ساعة</span></div>'+
+        '<div class="time-box"><b id="mins">00</b><span>دقيقة</span></div>'+
+        '<div class="time-box"><b id="secs">00</b><span>ثانية</span></div>'+
+      '</div>'+
+      '<div class="prog-meta"><span>حالة المدة</span><span id="progressText">متابعة مدة الاشتراك</span></div>'+
+      '<div class="prog-bar"><i id="subProgress"></i></div>'+
+    '</section>'+
+
+    (st.left!==null&&st.left>0&&st.left<=7*86400000
+      ?'<div class="notice">'+icon('clock')+' اشتراكك قرب ينتهي. جدّد الاشتراك في الوقت المناسب.</div>'
+      :st.left!==null&&st.left<=0
+        ?'<div class="notice">انتهت مدة الاشتراك حسب البيانات المتاحة. لو شايف إن ده خطأ، تواصل مع الإدارة.</div>'
+        :'')+
+
+    '<div class="actions">'+
+      '<button class="btn primary" id="goSubjects">'+icon('book')+' رجوع للمواد</button>'+
+      '<button class="btn" id="refreshProfile">'+icon('refresh')+' تحديث البيانات</button>'+
+      '<button class="btn danger" id="logout">'+icon('logout')+' تسجيل الخروج</button>'+
+    '</div>';
+
+  /* events */
+  $('goSubjects').onclick=function(){location.href='subjects.html'};
+  $('refreshProfile').onclick=load;
+  $('copyCode').onclick=function(){
+    if(code==='—'){toast('مفيش كود متاح للنسخ');return}
+    var done=function(){toast('تم نسخ كود الاشتراك')};
+    if(navigator.clipboard&&navigator.clipboard.writeText)
+      navigator.clipboard.writeText(String(code)).then(done).catch(function(){fallback(code,done)});
+    else fallback(code,done);
+  };
+  $('logout').onclick=function(){
+    if(!confirm('متأكد إنك عاوز تسجّل الخروج؟')) return;
+    try{localStorage.removeItem(TOKEN_KEY)}catch(e){}
+    try{sessionStorage.removeItem(TOKEN_KEY)}catch(e){}
+    location.replace('index.html');
+  };
+  timerStart();
 }
 
-function doLogout() {
-  if (!confirm('متأكد إنك عايز تسجّل الخروج؟')) return;
-  localStorage.removeItem('cstk_tok');
-  window.location.href = 'index.html';
+function fallback(text,cb){
+  var x=document.createElement('textarea');
+  x.value=text;x.style.position='fixed';x.style.opacity='0';
+  document.body.appendChild(x);x.select();
+  try{document.execCommand('copy');cb()}catch(e){toast('تعذر النسخ تلقائيًا')}
+  x.remove();
 }
 
-function escape(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function showError(msg,canRetry){
+  clearInterval(timer);
+  $('main').innerHTML=
+    '<div class="error-view">'+
+      '<div style="font-size:38px;margin-bottom:10px">'+(canRetry?icon('wifi'):icon('lock'))+'</div>'+
+      '<h2>'+(canRetry?'تعذر تحميل بيانات الحساب':'محتاج تسجّل دخولك')+'</h2>'+
+      '<p>'+esc(msg)+'</p>'+
+      '<div class="actions" style="justify-content:center;margin-top:16px">'+
+        (canRetry?'<button class="btn primary" id="retryBtn">'+icon('refresh')+' إعادة المحاولة</button>':'<button class="btn primary" id="loginBtn">'+icon('logout')+' تسجيل الدخول</button>')+
+        '<button class="btn" id="backBtn2">رجوع للمواد</button>'+
+      '</div>'+
+    '</div>';
+  if($('retryBtn')) $('retryBtn').onclick=load;
+  if($('loginBtn')) $('loginBtn').onclick=function(){location.href='index.html'};
+  if($('backBtn2')) $('backBtn2').onclick=function(){location.href='subjects.html'};
 }
 
-if (!localStorage.getItem('cstk_tok')) {
-  window.location.href = 'index.html';
-} else {
-  loadProfile();
+function load(){
+  var t=token();
+  if(!t){showError('مش لاقي جلسة دخول محفوظة. سجّل الدخول الأول.',false);return}
+  $('main').innerHTML=
+    '<div class="loading"><div class="loader"></div><b>بنحدّث بياناتك…</b>'+
+    '<p style="color:var(--muted);font-size:12px;margin-top:8px">مش هنخرجك من الحساب لو حصل خطأ اتصال مؤقت</p></div>';
+
+  fetch(API+'/api/auth/me',{method:'GET',headers:{Accept:'application/json',Authorization:'Bearer '+t},cache:'no-store'})
+    .then(function(r){
+      return r.json().catch(function(){return{}}).then(function(d){
+        if(r.status===401){
+          try{localStorage.removeItem(TOKEN_KEY)}catch(e){}
+          showError('السيرفر أكد إن الجلسة غير صالحة. سجّل الدخول من جديد.',false);
+          return null;
+        }
+        if(!r.ok) throw new Error(d.message||('خطأ من السيرفر ('+r.status+')'));
+        return d;
+      });
+    })
+    .then(function(d){
+      if(!d) return;
+      if(!d.data) throw new Error('السيرفر مرجعش بيانات الحساب بالشكل المتوقع');
+      render(d.data);
+    })
+    .catch(function(e){showError((e&&e.message)||'حصلت مشكلة اتصال. جرّب تاني.',true)});
 }
+
+$('backBtn').onclick=function(){location.href='subjects.html'};
+load();
+})();
 </script>
-
 </body>
 </html>
