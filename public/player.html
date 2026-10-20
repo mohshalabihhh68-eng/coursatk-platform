@@ -3,215 +3,85 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080d18">
 <title>مشغل المحاضرة | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15/dist/hls.min.js"></script>
 <style>
-:root{
-  --bg:#080d18;--panel:#111a2a;--panel2:#172338;--line:#26344b;
-  --text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;--blue2:#8ab4ff;--green:#34d399;
-}
+:root{--bg:#080d18;--panel:#111a2a;--line:#26344b;--text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;}
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:radial-gradient(900px 380px at 50% -180px,#173b76 0,transparent 70%),var(--bg);color:var(--text);font-family:Cairo,sans-serif;overflow-x:hidden}
-button{font:inherit;cursor:pointer;border:0;background:none}
-
-.top{position:sticky;top:0;z-index:100;background:#080d18ef;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff12}
-.topin{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
-.brand{font-weight:900;display:flex;align-items:center;gap:10px}
-.brand small{display:block;font-size:10px;color:var(--muted);font-weight:700}
-.grow{flex:1}
-.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px}
-.btn:hover{background:#ffffff12}
-
-.wrap{max-width:1180px;margin:auto;padding:16px 14px 60px}
-.crumb{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:12px}
-.player-card{background:linear-gradient(180deg,#131d30,#0f1726);border:1px solid #ffffff16;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px #0004}
-.screen{position:relative;background:#000;aspect-ratio:16/9;overflow:hidden}
-.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
-.titlebox{padding:16px 2px 0}
-.titlebox h1{font-size:clamp(18px,3vw,25px);margin:4px 0 10px;font-weight:900}
-.subline{color:var(--muted);font-size:12px;display:flex;gap:8px;flex-wrap:wrap}
-.subline span{background:#ffffff08;border:1px solid #ffffff0c;padding:4px 9px;border-radius:9px;font-weight:700}
-
-.loading{position:absolute;inset:0;z-index:15;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#000a;font-weight:800;font-size:13px;color:#fff}
-.loading.show{display:flex}
-.spin{width:38px;height:38px;border:3px solid #ffffff30;border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif;height:100vh;display:flex;flex-direction:column}
+.top{background:#080d18ef;border-bottom:1px solid #ffffff12;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:900}
+.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;cursor:pointer;margin-right:auto}
+.wrap{flex:1;position:relative;background:#000}
+iframe{width:100%;height:100%;border:none}
+.loading{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#fff;z-index:10}
+.spin{width:38px;height:38px;border:3px solid #ffffff30;border-top-color:#5b8cff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.error{display:none;position:absolute;inset:0;background:linear-gradient(#080d18f7,#0a1222fa);z-index:16;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:14px;color:#fff}
-.error.show{display:flex}
-.error b{font-size:15px}
-.error p{color:var(--muted);font-size:12px;margin:0}
-.error button{border:1px solid #ffffff20;background:var(--blue);color:#fff;border-radius:10px;padding:8px 16px;font-weight:800;margin-top:10px}
+.error{position:absolute;inset:0;background:#080d18;display:none;align-items:center;justify-content:center;flex-direction:column;color:#ff5252;padding:20px;text-align:center;z-index:20}
 </style>
 </head>
 <body>
-  <header class="top"><div class="topin">
-    <div class="brand"><div class="logo" style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#60a5fa,#1d4ed8);display:grid;place-items:center">▶</div><div>ثانوية club<small>مشغل المحاضرات</small></div></div>
-    <div class="grow"></div>
-    <button class="btn" id="backBtn">رجوع للمحتوى</button>
-  </div></header>
-
-  <main class="wrap">
-    <div class="crumb" id="crumb">جاري تحميل المحاضرة...</div>
-    <div class="layout">
-      <section class="main">
-        <article class="player-card">
-          <div class="screen" id="screen">
-            <video id="video" playsinline controls oncontextmenu="return false"></video>
-            <div class="loading show" id="loading">
-              <div class="spin"></div>
-              <span id="loadText">جاري التحميل...</span>
-            </div>
-            <div class="error" id="error">
-              <b>تعذر تشغيل الفيديو</b>
-              <p id="errText">حدث خطأ غير متوقع</p>
-              <button id="retryBtn">إعادة المحاولة</button>
-            </div>
-          </div>
-        </article>
-        <div class="titlebox">
-          <div class="eyebrow" style="font-size:11px;color:var(--blue2);font-weight:900">محتوى المحاضرة</div>
-          <h1 id="videoTitle">جاري التجهيز...</h1>
-          <div class="subline" id="subline"></div>
-        </div>
-      </section>
+  <header class="top">
+    <div class="brand">ثانوية club</div>
+    <button class="btn" onclick="history.back()">رجوع للمحتوى</button>
+  </header>
+  
+  <div class="wrap" id="player-wrap">
+    <div class="loading" id="loading">
+      <div class="spin"></div>
+      <span>جاري تحميل الفيديو...</span>
     </div>
-  </main>
+    <div class="error" id="error">
+      <div id="err-text">حدث خطأ</div>
+    </div>
+  </div>
 
 <script>
-(function(){
-'use strict';
-
-// ==========================================
-// 1. الإعدادات والدوال المساعدة
-// ==========================================
-const API_BASE = '';
-const TOKEN_KEY = 'cstk_tok';
-const token = localStorage.getItem(TOKEN_KEY);
-if (!token) { window.location.replace('index.html'); return; }
-
-const qs = new URLSearchParams(location.search);
-const lectureId = qs.get('lectureId');
-const videoId = qs.get('videoId');
-
-const $ = id => document.getElementById(id);
-const video = $('video');
-let hls = null;
-
-const showLoad = (txt) => { $('loadText').textContent = txt || 'جاري التحميل...'; $('loading').classList.add('show'); };
-const hideLoad = () => $('loading').classList.remove('show');
-const showErr = (msg) => { $('errText').textContent = msg; $('error').classList.add('show'); hideLoad(); };
-const hideErr = () => $('error').classList.remove('show');
-
-// ==========================================
-// 2. دالة تشغيل الفيديو (المنطق الأصلي بتاعك)
-// ==========================================
-async function startPlayback() {
-  if (!lectureId || !videoId) { showErr('رابط المشغل ناقص.'); return; }
-  hideErr();
-  showLoad('جاري طلب جلسة التشغيل...');
-
-  try {
-    // طلب الجلسة من سيرفرك
-    const res = await fetch(`${API_BASE}/api/video/${videoId}/play`, { method: 'POST' });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || 'فشل جلب بيانات الفيديو');
-
-    const session = data.data;
-    const streamToken = session.token;
-    const swVideoId = session.video_id;
-    if (!streamToken || !swVideoId) throw new Error('بيانات الجلسة ناقصة');
-
-    // تحميل أدوات فك التشفير
-    showLoad('جاري تحميل أدوات فك التشفير...');
-    if (!window.DecryptionUtils) {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('فشل تحميل أدوات التشفير'));
-        document.head.appendChild(s);
-      });
-    }
-    const crypto = window.DecryptionUtils;
-
-    // جلب الـ master
-    showLoad('جاري جلب قائمة التشغيل...');
-    const masterUrl = `${API_BASE}/api/stream?path=${encodeURIComponent('videos/' + swVideoId + '/stream/master.m3u8')}&t=${encodeURIComponent(streamToken)}`;
-    const masterText = await (await fetch(masterUrl)).text();
-    const variantRel = masterText.split('\n').map(l => l.trim()).find(l => l && l[0] !== '#');
-    if (!variantRel) throw new Error('لم يتم العثور على variant');
-
-    // جلب الـ variant
-    const variantPath = 'videos/' + swVideoId + '/stream/' + variantRel;
-    const variantUrl = `${API_BASE}/api/stream?path=${encodeURIComponent(variantPath)}&t=${encodeURIComponent(streamToken)}`;
-    const variantText = await (await fetch(variantUrl)).text();
-
-    // فك تشفير المفتاح
-    showLoad('جاري فك تشفير المفتاح...');
-    const keyLine = variantText.split('\n').find(l => l.includes('EXT-X-KEY'));
-    const keyPath = 'videos/' + swVideoId + '/key';
-    const keyUrl = `${API_BASE}/api/stream?path=${encodeURIComponent(keyPath)}&t=${encodeURIComponent(streamToken)}`;
-    const wrappedKey = new Uint8Array(await (await fetch(keyUrl)).arrayBuffer());
-    const keyResult = await crypto.decryptPlaybackKey(wrappedKey, swVideoId);
-    const aesKey = keyResult?.key;
-    if (!aesKey || aesKey.byteLength !== 16) throw new Error('المفتاح غير صالح');
-
-    // تجهيز الـ blob
-    const keyBlobUrl = URL.createObjectURL(new Blob([aesKey], { type: 'application/octet-stream' }));
-    
-    // تعديل النص عشان يعدي على سيرفرك
-    const basePath = variantPath.substring(0, variantPath.lastIndexOf('/') + 1);
-    let fixed = variantText.replace(/URI="[^"]+"/, `URI="${keyBlobUrl}"`);
-    fixed = fixed.split('\n').map(line => {
-      let l = line.trim();
-      if (!l) return line;
-      if (l[0] === '#') return l;
-      // لو السطر فيه رابط مقطع
-      return `${API_BASE}/api/stream?path=${encodeURIComponent(basePath + l)}&t=${encodeURIComponent(streamToken)}`;
-    }).join('\n');
-
-    const playlistBlob = new Blob([fixed], { type: 'application/vnd.apple.mpegurl' });
-    const playlistUrl = URL.createObjectURL(playlistBlob);
-
-    // تشغيل الفيديو
-    showLoad('جاري التشغيل...');
-    if (window.Hls && Hls.isSupported()) {
-      if (hls) hls.destroy();
-      hls = new Hls({ enableWorker: true, maxBufferLength: 30 });
-      hls.loadSource(playlistUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        hideLoad();
-        video.play().catch(() => {});
-      });
-      hls.on(Hls.Events.ERROR, (e, d) => {
-        if (d.fatal) showErr('فشل تشغيل الفيديو: ' + (d.details || 'خطأ في الشبكة'));
-      });
-    } else {
-      video.src = playlistUrl;
-      video.play().catch(() => {});
-      hideLoad();
-    }
-
-  } catch (e) {
-    console.error(e);
-    showErr(e.message || 'فشل تشغيل الفيديو');
+(async function(){
+  const API_BASE = '';
+  const TOKEN_KEY = 'cstk_tok';
+  const token = localStorage.getItem(TOKEN_KEY);
+  
+  if (!token) { window.location.replace('index.html'); return; }
+  
+  const qs = new URLSearchParams(location.search);
+  const lectureId = qs.get('lectureId');
+  const videoId = qs.get('videoId');
+  
+  if (!lectureId || !videoId) {
+    showErr('رابط المشغل ناقص.');
+    return;
   }
-}
-
-// ==========================================
-// 3. الأحداث والتهيئة
-// ==========================================
-$('backBtn').onclick = () => history.length > 1 ? history.back() : window.location.href = 'subjects.html';
-$('retryBtn').onclick = startPlayback;
-
-// تشغيل
-startPlayback();
-
+  
+  try {
+    // طلب البيانات من السيرفر
+    const res = await fetch(API_BASE + `/api/video/${videoId}/play`, { method: 'POST' });
+    const data = await res.json();
+    
+    if (!res.ok || !data.success) throw new Error(data.message || 'فشل جلب بيانات الفيديو');
+    
+    // الرابط الجاهز من الـ API
+    const streamUrl = data.data.stream_url;
+    if (!streamUrl) throw new Error('لم يتم العثور على رابط البث');
+    
+    // إخفاء التحميل وعرض الـ iframe
+    document.getElementById('loading').style.display = 'none';
+    const iframe = document.createElement('iframe');
+    iframe.src = streamUrl;
+    iframe.allow = "autoplay; fullscreen; encrypted-media";
+    iframe.allowFullscreen = true;
+    document.getElementById('player-wrap').appendChild(iframe);
+    
+  } catch (e) {
+    showErr(e.message);
+  }
+  
+  function showErr(msg) {
+    document.getElementById('loading').style.display = 'none';
+    const errDiv = document.getElementById('error');
+    errDiv.style.display = 'flex';
+    document.getElementById('err-text').textContent = msg;
+  }
 })();
 </script>
 </body>
