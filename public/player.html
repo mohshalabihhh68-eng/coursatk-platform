@@ -1,122 +1,105 @@
-// ==========================================
-// 1. دالة الـ Fetch الآمنة (عشان نمنع خطأ Unexpected token '<')
-// ==========================================
-async function apiFetch(url) {
-    try {
-        const response = await fetch(url);
-        const contentType = response.headers.get("content-type");
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشغل المحاضرة</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+    <style>
+        body { margin:0; background:#000; font-family: Arial, sans-serif; overflow: hidden; }
+        #video-container { position: relative; width: 100%; height: 100vh; }
+        #video { width: 100%; height: 100%; object-fit: contain; }
+        .error-box { color: #fff; text-align: center; padding: 50px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" autoplay playsinline controls></video>
+    </div>
 
-        // لو السيرفر رجع HTML بدل JSON
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text();
-            console.error(`❌ [API Error] المسار: ${url}`);
-            console.error(`❌ الرد المستلم:`, text.substring(0, 100) + "...");
-            throw new Error(`استلمت صفحة HTML بدل البيانات. تأكد من أن المسار ${url} يعمل في السيرفر.`);
+    <!-- الكود كله لازم يكون جوه السكريبت ده -->
+    <script>
+        const video = document.getElementById('video');
+        let hls;
+
+        // دالة تحميل أدوات فك التشفير
+        function loadSWPlayer() {
+            return new Promise((resolve, reject) => {
+                if (window.DecryptionUtils) return resolve(window.DecryptionUtils);
+                const script = document.createElement('script');
+                script.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
+                script.onload = () => {
+                    if (window.DecryptionUtils) resolve(window.DecryptionUtils);
+                    else reject(new Error("DecryptionUtils not found"));
+                };
+                script.onerror = () => reject(new Error("Failed to load player.js"));
+                document.head.appendChild(script);
+            });
         }
 
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.message || errData.error || `HTTP Error: ${response.status}`);
+        async function playVideo(lectureId, videoId) {
+            try {
+                // 1. طلب البيانات من السيرفر
+                const res = await fetch(`/api/video/${lectureId}/session`);
+                
+                // لو السيرفر رجع صفحة HTML بدل JSON (زي اللي حصل في الصورة)
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("السيرفر رجع صفحة HTML بدل البيانات. تأكد من رفع ملف server.js الجديد.");
+                }
+
+                if (!res.ok) throw new Error("فشل جلب بيانات الجلسة من السيرفر");
+
+                const session = await res.json();
+                const { token, stream_url, video_id } = session;
+
+                const urlObj = new URL(stream_url);
+                const path = urlObj.pathname.replace('/api/v1/', '');
+                const proxyUrl = `/api/stream?path=${encodeURIComponent(path)}&t=${token}`;
+
+                // 2. تحميل أدوات فك التشفير
+                const crypto = await loadSWPlayer();
+
+                // 3. تشغيل HLS
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        keyLoader: function(keyInfo, keyXhr, resp) {
+                            fetch(keyInfo.url)
+                                .then(r => r.arrayBuffer())
+                                .then(async buffer => {
+                                    const result = await crypto.decryptPlaybackKey(new Uint8Array(buffer), video_id);
+                                    if (result && result.key) {
+                                        resp.data = result.key.buffer; 
+                                        keyLoader(keyInfo, resp);
+                                    } else {
+                                        keyLoader(keyInfo, resp, new Error("فشل فك التشفير"));
+                                    }
+                                })
+                                .catch(err => keyLoader(keyInfo, resp, err));
+                        }
+                    });
+
+                    hls.loadSource(proxyUrl);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
+                } else {
+                    video.src = proxyUrl;
+                }
+            } catch (e) {
+                console.error(e);
+                document.body.innerHTML = `<div class="error-box">❌ خطأ: ${e.message}</div>`;
+            }
         }
 
-        return await response.json();
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        throw error; 
-    }
-}
-
-// ==========================================
-// 2. عناصر الواجهة (DOM)
-// ==========================================
-const container = document.getElementById('app-container') || document.body;
-const loadingSpinner = document.getElementById('loading');
-
-function showLoading(show) {
-    if (loadingSpinner) loadingSpinner.style.display = show ? 'block' : 'none';
-}
-
-function showError(message) {
-    container.innerHTML = `
-        <div style="text-align:center; padding: 50px; color: #fff; font-family: sans-serif;">
-            <div style="font-size: 50px; margin-bottom: 20px;">⚠️</div>
-            <h2 style="color: #f44336;">حدث خطأ</h2>
-            <p style="color: #aaa;">${message}</p>
-            <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #2196F3; color: #fff; border: none; border-radius: 5px; cursor: pointer;">
-                إعادة المحاولة
-            </button>
-        </div>
-    `;
-    showLoading(false);
-}
-
-// ==========================================
-// 3. منطق التطبيق (Routing & Rendering)
-// ==========================================
-
-// دالة لجلب السنوات الدراسية وعرضها
-async function loadYears() {
-    showLoading(true);
-    try {
-        const data = await apiFetch('/api/years');
-        // افترض إن الرد فيه مصفوفة اسمها data أو years
-        const years = data.data || data.years || data; 
-        
-        if (!Array.isArray(years)) {
-            throw new Error("البيانات المستلمة غير صحيحة");
-        }
-
-        // رسم الواجهة (مثال بسيط)
-        let html = '<h1>السنوات الدراسية</h1><div class="grid">';
-        years.forEach(year => {
-            html += `
-                <div class="card" onclick="window.location.href='/subjects.html?yearId=${year.id}'">
-                    <h3>${year.name || year.title}</h3>
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        showLoading(false);
-    }
-}
-
-// دالة لجلب المواد (بتتنادى من صفحة subjects.html)
-async function loadSubjects(yearId) {
-    showLoading(true);
-    try {
-        // لو مش موجود yearId، نجيبه من الرابط
-        if (!yearId) {
-            const params = new URLSearchParams(window.location.search);
-            yearId = params.get('yearId');
-        }
-
-        const data = await apiFetch(`/api/years`); // أو المسار اللي بيجيب المواد
-        // هنا تحط كود رسم المواد
-        console.log("Subjects Data:", data);
-        
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        showLoading(false);
-    }
-}
-
-// ==========================================
-// 4. تشغيل الصفحة بناءً على المسار الحالي
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
-
-    if (path === '/' || path === '/index.html') {
-        loadYears();
-    } else if (path === '/subjects.html') {
         const params = new URLSearchParams(window.location.search);
-        loadSubjects(params.get('yearId'));
-    } 
-    // ... (تقدر تضيف باقي الصفحات هنا زي teachers, chapters, إلخ)
-});
+        const lectureId = params.get('lecturedId') || params.get('lectureId');
+        const videoId = params.get('videold') || params.get('videoId');
+
+        if (lectureId && videoId) {
+            playVideo(lectureId, videoId);
+        } else {
+            document.body.innerHTML = '<div class="error-box">❌ مفيش بيانات في الرابط</div>';
+        }
+    </script>
+</body>
+</html>
