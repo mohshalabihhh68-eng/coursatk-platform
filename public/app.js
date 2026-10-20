@@ -252,14 +252,52 @@ function _observe(){
   document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 }
 
-/* ==================== PLAYER: توجيه لصفحة منفصلة ==================== */
-function playVideo(videoId,title){
-  const lectureId = state.lecture && state.lecture.id;
-  if(!lectureId){
-    alert('مفيش محاضرة محددة');
-    return;
-  }
-  window.location.href = 'player.html?lectureId=' + encodeURIComponent(lectureId) + '&videoId=' + encodeURIComponent(videoId);
+/* ==================== PLAYER: التشغيل بنافذة منبثقة ==================== */
+async function playVideo(videoId, title) {
+    // 1. إنشاء نافذة سوداء شفافة
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+    
+    // 2. زر الإغلاق
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✖ إغلاق';
+    closeBtn.style.cssText = 'position:absolute;top:20px;right:20px;z-index:100000;padding:10px 20px;background:#f44336;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;';
+    closeBtn.onclick = () => modal.remove();
+
+    // 3. رسالة تحميل
+    const loading = document.createElement('div');
+    loading.innerHTML = '<div style="color:#fff;font-size:20px;">⏳ جاري تحميل الفيديو...</div>';
+    
+    modal.appendChild(closeBtn);
+    modal.appendChild(loading);
+    document.body.appendChild(modal);
+
+    try {
+        // 4. طلب بيانات الفيديو من السيرفر
+        const res = await fetch(`/api/video/${videoId}/play`, { method: 'POST' });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || "فشل جلب بيانات الفيديو");
+        }
+
+        // 5. الرابط الجاهز من Stream-Weave
+        const streamUrl = data.data.stream_url;
+        
+        // 6. إزالة رسالة التحميل ووضع الـ iframe
+        loading.remove();
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = streamUrl;
+        iframe.style.cssText = 'width:90%;height:80vh;max-width:1200px;border:none;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);';
+        iframe.allow = "autoplay; fullscreen; encrypted-media";
+        iframe.allowFullscreen = true;
+        
+        modal.appendChild(iframe);
+
+    } catch (error) {
+        loading.innerHTML = `<div style="color:#ff5252;font-size:18px;text-align:center;padding:20px;">❌ خطأ: ${error.message}</div>`;
+    }
 }
 
 /* ==================== INIT ==================== */
