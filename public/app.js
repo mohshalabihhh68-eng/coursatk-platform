@@ -16,13 +16,13 @@ function ic(p,w){w=w||18;return`<svg viewBox="0 0 24 24" fill="none" stroke="cur
 /* ── api ── */
 async function api(path,opts){
   opts=opts||{};
-  /* attach saved token if present */
   const tok=(() => { try{return localStorage.getItem("cstk_tok")||sessionStorage.getItem("cstk_tok")||null}catch(_){return null} })();
   if(tok && !opts.noAuth){
     opts.headers=Object.assign({"Authorization":"Bearer "+tok}, opts.headers||{});
   }
   const res=await fetch(path,opts);
-  const data=await res.json();
+  let data;
+  try{data=await res.json()}catch(_){data={}}
   if(!res.ok||data.success===false) throw new Error(data.error||data.message||"HTTP "+res.status);
   return data.data!==undefined?data.data:data;
 }
@@ -58,13 +58,7 @@ async function render(){
 }
 
 /* ─────────────────────────────────────
-   PAGES — server routes from server.js
-   GET /api/years
-   GET /api/subjects/:id
-   GET /api/subjects/:id/teachers
-   GET /api/teachers/:id/chapters
-   GET /api/chapters/:id/lectures
-   GET /api/lectures/:id/content
+   PAGES
 ───────────────────────────────────── */
 async function renderYears(){
   const years=await api("/api/years");
@@ -272,10 +266,6 @@ function _observe(){
 
 /* ─────────────────────────────────────
    PLAYER — CRYPTO & DECRYPT
-   All routes: POST /api/video/:id/play
-               GET  /api/stream?path=&t=
-               GET  /api/cdn?u=
-               POST /api/heartbeat
 ───────────────────────────────────── */
 function findCrypto(){
   if(window.DecryptionUtils&&typeof window.DecryptionUtils.decryptPlaybackKey==="function")return window.DecryptionUtils;
@@ -488,7 +478,7 @@ function toggleMute(){videoEl.muted=!videoEl.muted;document.getElementById("vol-
 document.getElementById("volume-slider").addEventListener("input",e=>{videoEl.volume=e.target.value;videoEl.muted=+e.target.value===0});
 function toggleFullscreen(){!document.fullscreenElement?playerWrap.requestFullscreen().catch(()=>{}):document.exitFullscreen()}
 
-/* click layer — tap zones + long press */
+/* click layer */
 let clickTimer=null,pressTimer=null,isLongPress=false,speedBeforeHold=1;
 clickLayer.addEventListener("mousedown",handleDown);
 clickLayer.addEventListener("touchstart",handleDown,{passive:true});
