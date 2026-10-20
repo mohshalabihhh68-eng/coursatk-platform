@@ -10,10 +10,8 @@ const videoEl     = document.getElementById("video");
 const playerWrap  = document.getElementById("player-wrap");
 const clickLayer  = document.getElementById("click-layer");
 
-/* ── icon helper ── */
 function ic(p,w){w=w||18;return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${w}" height="${w}">${p}</svg>`}
 
-/* ── api ── */
 async function api(path,opts){
   opts=opts||{};
   const tok=(() => { try{return localStorage.getItem("cstk_tok")||sessionStorage.getItem("cstk_tok")||null}catch(_){return null} })();
@@ -32,9 +30,6 @@ function goHome(){
 }
 function setView(v,extra){ if(extra)Object.assign(state,extra); state.view=v; render(); window.scrollTo(0,0) }
 
-/* ─────────────────────────────────────
-   RENDER ROUTER
-───────────────────────────────────── */
 async function render(){
   appEl.innerHTML=`<div class="loading-screen">
     <div class="spinner-ring"></div>
@@ -257,270 +252,15 @@ function _observe(){
   document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 }
 
-/* ─────────────────────────────────────
-   CRYPTO & DECRYPT
-───────────────────────────────────── */
-function findCrypto(){
-  if(window.DecryptionUtils&&typeof window.DecryptionUtils.decryptPlaybackKey==="function")return window.DecryptionUtils;
-  for(const n of Object.getOwnPropertyNames(window)){
-    try{const o=window[n];if(o&&typeof o==="object"&&typeof o.decryptPlaybackKey==="function")return o}catch(_){}
+/* ==================== PLAYER: توجيه لصفحة منفصلة ==================== */
+function playVideo(videoId,title){
+  const lectureId = state.lecture && state.lecture.id;
+  if(!lectureId){
+    alert('مفيش محاضرة محددة');
+    return;
   }
-  return null;
-}
-function loadPlayerScript(){
-  return new Promise((resolve,reject)=>{
-    if(findCrypto())return resolve(findCrypto());
-    let s=document.querySelector('script[src*="player.stream-weave.com"]');
-    if(s){
-      let tries=0,t=setInterval(()=>{const c=findCrypto();if(c){clearInterval(t);resolve(c)}else if(++tries>40){clearInterval(t);reject(new Error("timeout"))}},150);
-      return;
-    }
-    s=document.createElement("script");
-    s.src="https://player.stream-weave.com/assets/player.js?v=1.1.1";
-    s.onload=()=>{let tries=0,t=setInterval(()=>{const c=findCrypto();if(c){clearInterval(t);resolve(c)}else if(++tries>40){clearInterval(t);reject(new Error("crypto not found"))}},150)};
-    s.onerror=()=>reject(new Error("failed to load player.js"));
-    document.head.appendChild(s);
-  });
-}
-const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
-const b64d=v=>{let s=String(v).replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return decodeURIComponent(escape(atob(s)))};
-function joinRel(base,rel){
-  let q="",rp=String(rel),qi=rp.indexOf("?");
-  if(qi!==-1){q=rp.slice(qi);rp=rp.slice(0,qi)}
-  const st=String(base||"").split("/");
-  if(st.length&&st[st.length-1]!==""&&/\.[a-z0-9]+$/i.test(st[st.length-1]))st.pop();
-  if(st.length&&st[st.length-1]==="")st.pop();
-  rp.split("/").forEach(p=>{if(!p||p===".")return;if(p==="..")st.pop();else st.push(p)});
-  return st.join("/")+q;
-}
-function resolveMedia(uri,varBase,token,varFileUrl){
-  if(/^(blob:|data:)/i.test(uri))return uri;
-  if(uri.indexOf("/api/stream")===0||uri.indexOf("/api/cdn")===0)return location.origin+uri;
-  if(/^https?:\/\//i.test(uri))return location.origin+"/api/cdn?u="+b64e(uri);
-  if(varFileUrl){try{return location.origin+"/api/cdn?u="+b64e(new URL(uri,varFileUrl).href)}catch(_){}}
-  return location.origin+"/api/stream?path="+encodeURIComponent(joinRel(varBase||"",uri))+"&t="+encodeURIComponent(token);
-}
-function rewritePlaylist(text,token,keyBlobUrl,varBase,varFileUrl){
-  return text.split("\n").map(line=>{
-    const s=line.trim();if(!s)return line;
-    if(s.charAt(0)==="#"){
-      if(s.indexOf("#EXT-X-KEY:")===0&&keyBlobUrl)return s.replace(/URI="[^"]+"/, `URI="${keyBlobUrl}"`);
-      return s.replace(/URI="([^"]+)"/g,(_m,uri)=>`URI="${resolveMedia(uri,varBase,token,varFileUrl)}"`);
-    }
-    return resolveMedia(s,varBase,token,varFileUrl);
-  }).join("\n");
+  window.location.href = 'player.html?lectureId=' + encodeURIComponent(lectureId) + '&videoId=' + encodeURIComponent(videoId);
 }
 
-async function playVideo(videoId,title){
-  document.getElementById("player-title").textContent=title;
-  document.getElementById("player-modal").classList.remove("hidden");
-  document.body.style.overflow="hidden";
-  const st=document.getElementById("player-status");
-  st.querySelector("span").textContent="جاري فتح الجلسة...";
-  st.classList.remove("hidden");
-  stopPlayback();
-  try{
-    const session=await api("/api/video/"+videoId+"/play",{method:"POST"});
-    const streamToken=session.token, swVideoId=session.video_id, hbUrl=session.heartbeat_url;
-    if(!streamToken||!swVideoId)throw new Error("جلسة ناقصة");
-
-    st.querySelector("span").textContent="جاري تحضير التشغيل...";
-    if(!cryptoUtils)cryptoUtils=await loadPlayerScript();
-
-    const masterUrl="/api/stream?path="+encodeURIComponent("videos/"+swVideoId+"/stream/master.m3u8")+"&t="+encodeURIComponent(streamToken);
-    const masterRes=await fetch(masterUrl);
-    if(!masterRes.ok)throw new Error("master.m3u8 → HTTP "+masterRes.status);
-    const masterText=await masterRes.text();
-    const variantRel=masterText.split("\n").map(l=>l.trim()).find(l=>l&&l.charAt(0)!=="#");
-    if(!variantRel)throw new Error("لا يوجد variant في الـ master");
-
-    let variantUrl, varBase="videos/"+swVideoId+"/stream/", varFileUrl=null;
-    if(variantRel.indexOf("/api/stream")===0||variantRel.indexOf("/api/cdn")===0){
-      variantUrl=variantRel;
-      try{const u=new URL(variantRel,location.origin);if(u.pathname.indexOf("/api/stream")===0&&u.searchParams.get("path"))varBase=u.searchParams.get("path");if(u.pathname.indexOf("/api/cdn")===0&&u.searchParams.get("u"))varFileUrl=b64d(u.searchParams.get("u"))}catch(_){}
-    }else if(variantRel.indexOf("http")===0){
-      varFileUrl=variantRel;variantUrl="/api/cdn?u="+b64e(variantRel);
-    }else{
-      varBase="videos/"+swVideoId+"/stream/"+variantRel;
-      variantUrl="/api/stream?path="+encodeURIComponent(varBase)+"&t="+encodeURIComponent(streamToken);
-    }
-
-    const variantRes=await fetch(variantUrl);
-    if(!variantRes.ok)throw new Error("variant → HTTP "+variantRes.status);
-    const variantText=await variantRes.text();
-
-    st.querySelector("span").textContent="فك التشفير...";
-    const keyLine=variantText.split("\n").find(l=>l.indexOf("EXT-X-KEY")!==-1);
-    let keyPath="videos/"+swVideoId+"/key",ivHex=null;
-    if(keyLine){
-      const kum=keyLine.match(/URI="([^"]+)"/),ivm=keyLine.match(/IV=0x([0-9a-fA-F]+)/i);
-      if(ivm)ivHex=ivm[1];
-      if(kum){
-        const uri=kum[1];
-        if(uri.indexOf("/api/stream")===0||uri.indexOf(location.origin+"/api/stream")===0){
-          try{const u=new URL(uri,location.origin);const pth=u.searchParams.get("path");if(pth)keyPath=pth}catch(_){}
-        }else if(uri.indexOf("http")!==0&&uri.indexOf("/api/cdn")!==0)keyPath=uri.replace(/^\//,"").replace(/^api\/v1\//,"");
-      }
-    }
-    const keyUrl="/api/stream?path="+encodeURIComponent(keyPath)+"&t="+encodeURIComponent(streamToken);
-    const keyRes=await fetch(keyUrl);
-    if(!keyRes.ok)throw new Error("key → HTTP "+keyRes.status);
-    const wrappedKey=new Uint8Array(await keyRes.arrayBuffer());
-    const keyResult=await cryptoUtils.decryptPlaybackKey(wrappedKey,swVideoId);
-    const aesKey=keyResult&&keyResult.key;
-    if(!aesKey||aesKey.byteLength!==16)throw new Error("مفتاح التشفير غير صالح");
-
-    const keyBytes=aesKey instanceof ArrayBuffer?aesKey:aesKey.buffer.slice(aesKey.byteOffset,aesKey.byteOffset+aesKey.byteLength);
-    currentKeyBlobUrl=URL.createObjectURL(new Blob([keyBytes],{type:"application/octet-stream"}));
-
-    let fixedVariant=rewritePlaylist(variantText,streamToken,currentKeyBlobUrl,varBase,varFileUrl);
-    if(fixedVariant.indexOf("#EXTM3U")!==0)fixedVariant="#EXTM3U\n"+fixedVariant.replace(/^#EXTM3U\s*/m,"");
-    if(fixedVariant.indexOf("EXT-X-KEY")===-1){
-      const ivPart=ivHex?",IV=0x"+ivHex:"";
-      fixedVariant=`#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="${currentKeyBlobUrl}"${ivPart}\n`+fixedVariant.replace(/^#EXTM3U\s*/m,"");
-    }
-    currentPlaylistBlobUrl=URL.createObjectURL(new Blob([fixedVariant],{type:"application/vnd.apple.mpegurl"}));
-
-    st.querySelector("span").textContent="جاري التشغيل...";
-
-    hbTimer=setInterval(()=>{
-      fetch("/api/heartbeat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:hbUrl,token:streamToken})}).catch(()=>{});
-    },25000);
-
-    if(window.Hls&&Hls.isSupported()){
-      hls=new Hls({enableWorker:false,maxBufferLength:30,maxMaxBufferLength:60});
-      hls.loadSource(currentPlaylistBlobUrl);
-      hls.attachMedia(videoEl);
-      hls.on(Hls.Events.MANIFEST_PARSED,(_,data)=>{
-        st.classList.add("hidden");
-        const qMenu=document.getElementById("quality-menu");
-        let qHtml=`<button onclick="setQuality(-1,this)" class="active">تلقائي</button>`;
-        data.levels.forEach((lv,i)=>{if(lv.height>0)qHtml+=`<button onclick="setQuality(${i},this)">${lv.height}p</button>`});
-        qMenu.innerHTML=qHtml;
-        videoEl.play().catch(()=>{});
-      });
-      hls.on(Hls.Events.ERROR,(_,d)=>{if(!d.fatal)return;st.querySelector("span").textContent="خطأ HLS: "+d.type;st.classList.remove("hidden")});
-    }else{
-      videoEl.src=currentPlaylistBlobUrl;
-      videoEl.play();
-      st.classList.add("hidden");
-    }
-  }catch(e){
-    st.querySelector("span").textContent="فشل: "+e.message;
-    st.classList.remove("hidden");
-  }
-}
-
-/* ─────────────────────────────────────
-   PLAYER UI
-───────────────────────────────────── */
-function toggleDropdown(id){
-  document.querySelectorAll(".dropdown-panel").forEach(el=>{if(el.id!==id)el.classList.add("hidden")});
-  document.getElementById(id).classList.toggle("hidden");
-}
-document.addEventListener("click",e=>{if(!e.target.closest(".dropdown"))document.querySelectorAll(".dropdown-panel").forEach(el=>el.classList.add("hidden"))});
-
-function togglePlay(){videoEl.paused?videoEl.play():videoEl.pause()}
-videoEl.addEventListener("play",()=>{
-  document.getElementById("play-icon").classList.add("hidden");
-  document.getElementById("pause-icon").classList.remove("hidden");
-  playerWrap.classList.remove("paused");
-});
-videoEl.addEventListener("pause",()=>{
-  document.getElementById("play-icon").classList.remove("hidden");
-  document.getElementById("pause-icon").classList.add("hidden");
-  playerWrap.classList.add("paused");
-  playerWrap.classList.remove("hide-cursor");
-});
-
-function setSpeed(speed,btn){
-  videoEl.playbackRate=speed;
-  document.getElementById("speed-btn").textContent=speed===1?"1x":speed+"x";
-  document.querySelectorAll("#speed-menu button").forEach(b=>b.classList.remove("active"));
-  if(btn)btn.classList.add("active");
-  document.getElementById("speed-menu").classList.add("hidden");
-}
-function setQuality(idx,btn){
-  if(!hls)return;
-  hls.currentLevel=idx;
-  document.getElementById("quality-btn").textContent=idx===-1?"تلقائي":hls.levels[idx].height+"p";
-  document.querySelectorAll("#quality-menu button").forEach(b=>b.classList.remove("active"));
-  if(btn)btn.classList.add("active");
-  document.getElementById("quality-menu").classList.add("hidden");
-}
-
-const fmtT=s=>{if(isNaN(s))return"00:00";return String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math.floor(s%60)).padStart(2,"0")};
-videoEl.addEventListener("timeupdate",()=>{
-  if(!videoEl.duration)return;
-  document.getElementById("prog-filled").style.width=(videoEl.currentTime/videoEl.duration*100)+"%";
-  document.getElementById("time-disp").textContent=fmtT(videoEl.currentTime)+" / "+fmtT(videoEl.duration);
-});
-videoEl.addEventListener("loadedmetadata",()=>{document.getElementById("time-disp").textContent="00:00 / "+fmtT(videoEl.duration)});
-
-function seekVideo(e){
-  const bar=document.getElementById("prog-bar");
-  const rect=bar.getBoundingClientRect();
-  let pct=(e.clientX-rect.left)/rect.width;
-  if(document.dir==="rtl")pct=1-pct;
-  if(videoEl.duration)videoEl.currentTime=pct*videoEl.duration;
-}
-function toggleMute(){videoEl.muted=!videoEl.muted;document.getElementById("vol-icon").style.opacity=videoEl.muted?.5:1}
-document.getElementById("volume-slider").addEventListener("input",e=>{videoEl.volume=e.target.value;videoEl.muted=+e.target.value===0});
-function toggleFullscreen(){!document.fullscreenElement?playerWrap.requestFullscreen().catch(()=>{}):document.exitFullscreen()}
-
-let clickTimer=null,pressTimer=null,isLongPress=false,speedBeforeHold=1;
-clickLayer.addEventListener("mousedown",handleDown);
-clickLayer.addEventListener("touchstart",handleDown,{passive:true});
-clickLayer.addEventListener("mouseup",handleUp);
-clickLayer.addEventListener("touchend",handleUp);
-clickLayer.addEventListener("mouseleave",handleUp);
-function handleDown(e){
-  isLongPress=false; if(videoEl.paused)return;
-  const cx=e.touches?e.touches[0].clientX:e.clientX;
-  pressTimer=setTimeout(()=>{isLongPress=true;speedBeforeHold=videoEl.playbackRate;videoEl.playbackRate=2;clearTimeout(clickTimer)},400);
-  clickTimer=setTimeout(()=>{if(!isLongPress)handleTap(cx)},250);
-}
-function handleUp(){
-  clearTimeout(pressTimer);clearTimeout(clickTimer);
-  if(isLongPress){videoEl.playbackRate=speedBeforeHold;isLongPress=false}
-}
-function handleTap(cx){
-  const rect=playerWrap.getBoundingClientRect(),rx=(cx-rect.left)/rect.width;
-  if(rx<.35)skipTime(-10);else if(rx>.65)skipTime(10);else togglePlay();
-}
-function skipTime(sec){videoEl.currentTime+=sec;showSeekInd(sec>0?"+10s":"-10s")}
-function showSeekInd(txt){
-  const el=document.getElementById("seek-indicator");
-  el.textContent=txt;el.classList.remove("hidden");
-  el.style.animation="none";el.offsetHeight;el.style.animation=null;
-  setTimeout(()=>el.classList.add("hidden"),700);
-}
-let cursorTimer;
-playerWrap.addEventListener("mousemove",()=>{
-  playerWrap.classList.remove("hide-cursor");clearTimeout(cursorTimer);
-  if(!videoEl.paused)cursorTimer=setTimeout(()=>playerWrap.classList.add("hide-cursor"),2500);
-});
-
-function stopPlayback(){
-  if(hbTimer){clearInterval(hbTimer);hbTimer=null}
-  if(hls){hls.destroy();hls=null}
-  if(currentKeyBlobUrl){URL.revokeObjectURL(currentKeyBlobUrl);currentKeyBlobUrl=null}
-  if(currentPlaylistBlobUrl){URL.revokeObjectURL(currentPlaylistBlobUrl);currentPlaylistBlobUrl=null}
-  videoEl.playbackRate=1;
-  videoEl.removeAttribute("src");videoEl.load();
-}
-function closePlayer(){
-  stopPlayback();
-  document.getElementById("player-modal").classList.add("hidden");
-  document.body.style.overflow="";
-  document.querySelectorAll(".dropdown-panel").forEach(el=>el.classList.add("hidden"));
-  document.getElementById("seek-indicator").classList.add("hidden");
-}
-
-document.getElementById("theme-toggle").addEventListener("click",()=>{
-  const next=document.body.getAttribute("data-theme")==="light"?"dark":"light";
-  document.body.setAttribute("data-theme",next);
-});
-
-loadPlayerScript().then(c=>cryptoUtils=c).catch(()=>{});
+/* ==================== INIT ==================== */
 render();
