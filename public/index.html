@@ -2,649 +2,79 @@
 <html lang="ar-EG" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#060910">
-<title>ثانوية club — كل محاضراتك في مكان واحد</title>
-<meta name="description" content="ثانوية club — محتوى المدرسين والشعب في مكان واحد، اشتراك شهري 150 جنيه.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اختبار - ثانوية club</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#060910;--bg2:#0b1220;--panel:#0f1a2c;--panel2:#152035;--panel3:#1b2a42;
-  --line:rgba(96,165,250,.11);--line2:rgba(96,165,250,.22);
-  --text:#deeaff;--muted:#5a7491;--muted2:#8aaec8;
-  --blue:#3b82f6;--blue2:#60a5fa;--cyan:#22d3ee;--cyan2:#67e8f9;
-  --green:#34d399;--red:#f87171;
-  --grad:linear-gradient(135deg,#2563eb,#1d4ed8);
-  --grad2:linear-gradient(135deg,#06b6d4,#2563eb);
-  --grad3:linear-gradient(90deg,#06b6d4,#3b82f6 50%,#818cf8);
-  --shadow:0 24px 64px rgba(0,0,0,.6);
-  --font:'Cairo',system-ui,sans-serif
-}
-[data-theme="light"]{
-  --bg:#f0f5fc;--panel:#ffffff;--panel2:#f4f8fd;--panel3:#eaf0f9;
-  --line:rgba(59,130,246,.15);--line2:rgba(59,130,246,.28);
-  --text:#0d1929;--muted:#4e6a85;--muted2:#2d4a66
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth;scroll-padding-top:72px}
-body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;direction:rtl;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 950px 650px at 88% -8%,rgba(37,99,235,.2),transparent),
-             radial-gradient(ellipse 700px 500px at -5% 80%,rgba(6,182,212,.1),transparent)}
-a{color:inherit;text-decoration:none}
-button,input{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-img{display:block;max-width:100%}
-.container{width:min(1140px,calc(100% - 32px));margin:auto;position:relative;z-index:1}
-svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-
-.nav{position:sticky;top:0;z-index:50;
-  background:rgba(6,9,16,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  border-bottom:1px solid var(--line)}
-[data-theme="light"] .nav{background:rgba(240,245,252,.9)}
-.navin{height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{display:flex;align-items:center;gap:11px;font-size:16px;font-weight:900}
-.brand-logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
-  background:var(--grad);box-shadow:0 8px 28px rgba(37,99,235,.45);
-  position:relative;overflow:hidden;flex-shrink:0}
-.brand-logo::after{content:"";position:absolute;inset:-60%;
-  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
-  transform:translateX(-100%);animation:shine 7s ease-in-out infinite}
-@keyframes shine{0%,65%,100%{transform:translateX(-100%)}82%{transform:translateX(100%)}}
-.brand-logo svg{width:22px;height:22px;stroke:#fff}
-.brand small{display:block;font-size:10px;color:var(--muted);font-weight:600;margin-top:1px}
-.navlinks{display:flex;gap:24px;font-size:13px;font-weight:700;color:var(--muted2)}
-.navlinks a{transition:color .15s}.navlinks a:hover{color:var(--cyan2)}
-.navacts{display:flex;align-items:center;gap:9px}
-.btn{border:1px solid var(--line2);border-radius:12px;padding:10px 16px;font-weight:800;font-size:13px;
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.05);color:var(--text);
-  transition:transform .18s,box-shadow .18s,border-color .18s,background .18s;white-space:nowrap;cursor:pointer}
-.btn:hover{transform:translateY(-2px);border-color:rgba(96,165,250,.35);background:rgba(255,255,255,.09)}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 8px 28px rgba(37,99,235,.4)}
-.btn-primary:hover{box-shadow:0 14px 38px rgba(37,99,235,.55);background:linear-gradient(135deg,#3b82f6,#1e40af);border-color:transparent}
-.btn-lg{padding:13px 22px;font-size:14px;border-radius:14px}
-.icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;
-  background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted2);transition:.18s}
-.icon-btn:hover{background:rgba(255,255,255,.09);border-color:var(--line2);color:var(--text)}
-.g{background:var(--grad3);background-clip:text;-webkit-background-clip:text;color:transparent}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;
-  background:rgba(37,99,235,.1);border:1px solid rgba(96,165,250,.2);
-  color:var(--cyan2);padding:5px 13px;border-radius:99px;
-  font-size:11px;font-weight:800}
-.edot{width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 0 4px rgba(6,182,212,.2)}
-
-.hero{padding:80px 0 68px;position:relative}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
-.hero h1{font-size:clamp(36px,5vw,62px);line-height:1.22;letter-spacing:-1.5px;margin:20px 0 18px;font-weight:900}
-.hero p{font-size:16px;color:var(--muted2);line-height:2.1;max-width:560px;margin:0}
-.hero-acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-.trust{display:flex;align-items:center;gap:13px;margin-top:24px;color:var(--muted);font-size:12px;font-weight:700}
-.avatars{display:flex;direction:ltr}
-.avatars span{width:28px;height:28px;margin-left:-7px;border:2px solid var(--bg);border-radius:50%;
-  display:grid;place-items:center;background:var(--grad);font-size:10px;color:#fff}
-.avatars span:nth-child(2){background:linear-gradient(135deg,#0e7490,#155e75)}
-.avatars span:nth-child(3){background:linear-gradient(135deg,#7c3aed,#4c1d95)}
-
-.hero-art{position:relative;min-height:440px;display:grid;place-items:center}
-.orb{position:absolute;width:330px;height:330px;border-radius:50%;
-  background:linear-gradient(135deg,rgba(37,99,235,.16),rgba(6,182,212,.07));
-  border:1px solid rgba(96,165,250,.13);filter:blur(1px);animation:float 6s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.dashboard{position:relative;width:min(100%,435px);padding:22px;
-  border-radius:22px;border:1px solid rgba(96,165,250,.16);
-  background:linear-gradient(150deg,rgba(15,26,44,.96),rgba(11,18,32,.96));
-  box-shadow:0 32px 100px rgba(0,0,0,.65);transform:rotate(-2deg);animation:rise .85s ease both}
-@keyframes rise{from{opacity:0;transform:translateY(22px) rotate(-2deg)}to{opacity:1;transform:translateY(0) rotate(-2deg)}}
-.dash-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:15px;border-bottom:1px solid var(--line)}
-.dash-title{font-size:14px;font-weight:900}
-.dash-sub{font-size:10px;color:var(--muted);margin-top:3px}
-.live-pill{font-size:10px;padding:5px 10px;background:rgba(6,182,212,.12);color:var(--cyan2);border-radius:99px;font-weight:900;border:1px solid rgba(6,182,212,.2)}
-.dash-welcome{margin:15px 0 13px;padding:14px;border-radius:14px;
-  background:linear-gradient(120deg,rgba(37,99,235,.28),rgba(6,182,212,.06));
-  border:1px solid rgba(59,130,246,.18)}
-.dash-welcome small{color:var(--cyan2);font-size:11px;font-weight:800}
-.dash-welcome b{display:block;font-size:17px;margin-top:4px}
-.mini-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.mini-card{padding:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:12px}
-.mini-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
-  background:rgba(59,130,246,.14);color:var(--cyan2);margin-bottom:8px}
-.mini-card:nth-child(2) .mini-icon{background:rgba(6,182,212,.12);color:var(--cyan)}
-.mini-card:nth-child(3) .mini-icon{background:rgba(129,140,248,.12);color:#a5b4fc}
-.mini-card:nth-child(4) .mini-icon{background:rgba(52,211,153,.12);color:var(--green)}
-.mini-card b{font-size:12px;display:block}
-.mini-card small{font-size:10px;color:var(--muted)}
-.dash-bottom{margin-top:10px;padding:10px 13px;border-radius:11px;
-  background:rgba(6,9,16,.85);display:flex;align-items:center;justify-content:space-between;font-size:11px}
-.dash-bottom strong{color:var(--cyan2)}
-.float-tag{position:absolute;z-index:2;display:flex;align-items:center;gap:9px;
-  padding:11px 14px;border-radius:13px;
-  background:rgba(15,26,44,.95);border:1px solid rgba(96,165,250,.2);
-  box-shadow:0 12px 40px rgba(0,0,0,.5);font-size:12px;font-weight:900;
-  animation:float 5s ease-in-out infinite;backdrop-filter:blur(8px)}
-.float-tag svg{color:var(--cyan)}
-.tag-one{top:42px;left:-10px}
-.tag-two{bottom:38px;right:-8px;animation-delay:-2.3s}
-.float-tag small{display:block;font-size:10px;color:var(--muted);font-weight:600}
-
-.stats{padding:0 0 64px}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.stat{padding:22px;border:1px solid var(--line);border-radius:17px;
-  background:rgba(255,255,255,.025);text-align:center;
-  transition:border-color .2s,transform .2s}
-.stat:hover{border-color:var(--line2);transform:translateY(-3px)}
-.stat b{font-size:25px;font-weight:900;color:var(--cyan2)}
-.stat span{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
-
-.section{padding:70px 0}
-.section-head{text-align:center;max-width:700px;margin:0 auto 38px}
-.section-head .eyebrow{margin-bottom:13px}
-.section-head h2{font-size:clamp(27px,3.5vw,42px);line-height:1.4;margin:0 0 12px;font-weight:900}
-.section-head p{color:var(--muted2);line-height:1.95;font-size:14px;margin:0}
-
-.quote-card{max-width:920px;margin:auto;padding:clamp(24px,4vw,46px);
-  border-radius:24px;
-  background:linear-gradient(140deg,var(--panel2),var(--panel));
-  border:1px solid rgba(59,130,246,.18);box-shadow:var(--shadow);position:relative;overflow:hidden}
-.quote-card::after{content:"✦";position:absolute;right:-20px;bottom:-40px;font-size:160px;
-  color:rgba(255,255,255,.03);pointer-events:none;line-height:1}
-.quote-mark{width:46px;height:46px;border-radius:13px;background:rgba(59,130,246,.12);color:var(--cyan2);
-  display:grid;place-items:center;margin-bottom:17px}
-.quote-card h3{font-size:clamp(20px,3vw,29px);line-height:1.65;margin:0 0 13px;font-weight:900;position:relative;z-index:1}
-.quote-card p{color:var(--muted2);line-height:2.1;font-size:15px;margin:0;position:relative;z-index:1}
-.quote-card strong{color:var(--cyan2)}
-
-.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.price-card{position:relative;padding:26px 22px;
-  border:1px solid var(--line);
-  background:linear-gradient(160deg,var(--panel2),var(--panel));
-  border-radius:20px;transition:transform .25s,border-color .25s,box-shadow .25s;overflow:hidden}
-.price-card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.35);box-shadow:0 18px 50px rgba(0,0,0,.5)}
-.price-card.featured{border-color:rgba(59,130,246,.32);
-  background:linear-gradient(155deg,#142d52,#0f1a2c);
-  box-shadow:0 16px 50px rgba(20,70,163,.2)}
-.popular{position:absolute;top:15px;left:15px;background:rgba(59,130,246,.15);color:var(--cyan2);
-  padding:4px 10px;border-radius:99px;font-size:10px;font-weight:900;border:1px solid rgba(96,165,250,.2)}
-.price-icon{width:46px;height:46px;display:grid;place-items:center;
-  border-radius:13px;background:rgba(59,130,246,.12);color:var(--cyan2);margin-bottom:16px}
-.price-card h3{font-size:18px;margin:0;font-weight:900}
-.price-card .desc{color:var(--muted);font-size:12px;min-height:40px;line-height:1.8;margin:6px 0 16px}
-.price{font-size:36px;line-height:1.3;font-weight:900;letter-spacing:-1px}
-.price small{font-size:12px;color:var(--muted);letter-spacing:0}
-.price-note{font-size:11px;color:var(--muted);margin-top:3px}
-.price-card ul{padding:0;list-style:none;margin:20px 0;display:grid;gap:11px}
-.price-card li{display:flex;align-items:center;gap:9px;color:var(--muted2);font-size:12px;font-weight:700}
-.price-card li svg{color:var(--green);width:15px;height:15px}
-.price-card .btn{width:100%}
-.note{margin:18px auto 0;text-align:center;color:var(--muted);font-size:11px;line-height:1.8}
-
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.feature{padding:24px;border:1px solid var(--line);border-radius:18px;
-  background:rgba(255,255,255,.025);transition:.25s}
-.feature:hover{transform:translateY(-5px);background:rgba(255,255,255,.05);border-color:rgba(96,165,250,.22)}
-.feature-icon{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
-  color:var(--cyan2);background:rgba(59,130,246,.1);margin-bottom:16px}
-.feature h3{margin:0 0 8px;font-size:15px;font-weight:900}
-.feature p{margin:0;color:var(--muted);font-size:12px;line-height:2}
-
-.trial{padding:0 0 78px}
-.trial-box{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;
-  gap:24px;align-items:center;padding:clamp(24px,4vw,44px);
-  border-radius:24px;border:1px solid rgba(6,182,212,.2);
-  background:linear-gradient(125deg,#0f3060,#0c1e38 58%,#0e2650)}
-.trial-box::after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;
-  border:1px solid rgba(6,182,212,.1);left:12%;top:-140px;
-  box-shadow:0 0 0 30px rgba(6,182,212,.03),0 0 0 65px rgba(6,182,212,.015)}
-.trial-copy,.trial-cta{position:relative;z-index:1}
-.trial-copy h2{margin:0 0 8px;font-size:clamp(22px,3vw,33px);font-weight:900}
-.trial-copy p{margin:0;color:rgba(163,188,218,.9);line-height:2;font-size:13px;max-width:680px}
-.trial-cta .btn{white-space:nowrap;background:var(--grad2);border-color:transparent;color:#fff;
-  box-shadow:0 10px 26px rgba(6,182,212,.22)}
-.admins-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px;margin-top:22px}
-.admin-card{padding:18px;border:1px dashed rgba(96,165,250,.18);border-radius:15px;
-  background:rgba(255,255,255,.025);display:flex;align-items:center;gap:12px;
-  transition:transform .2s,border-color .2s,background .2s}
-.admin-card:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.07)}
-.admin-avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
-  background:rgba(37,99,235,.15);color:var(--cyan2)}
-.admin-card b{font-size:13px;display:block}
-.admin-card small{font-size:10px;color:var(--muted);display:block;margin-top:3px}
-
-.faq{max-width:800px;margin:auto;display:grid;gap:9px}
-.faq details{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:0 17px;transition:border-color .2s}
-.faq details[open]{border-color:rgba(96,165,250,.2)}
-.faq summary{cursor:pointer;list-style:none;padding:16px 0;font-size:13px;font-weight:900;
-  display:flex;align-items:center;justify-content:space-between;gap:12px}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";font-size:20px;color:var(--cyan2);transition:transform .2s}
-.faq details[open] summary::after{content:"−"}
-.faq details p{color:var(--muted2);font-size:12px;line-height:2;margin:0;padding:0 0 16px}
-
-.footer{border-top:1px solid var(--line);padding:26px 0 34px;color:var(--muted);font-size:11px}
-.footer-in{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-.footer b{color:var(--text)}
-
-.toast{position:fixed;z-index:200;bottom:24px;left:50%;
-  transform:translate(-50%,150%);padding:12px 18px;border-radius:12px;
-  background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);
-  font-size:12px;font-weight:800;transition:transform .3s;max-width:90vw;text-align:center}
-.toast.show{transform:translate(-50%,0)}
-
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .62s ease,transform .62s cubic-bezier(.2,.8,.2,1)}
-.reveal.visible{opacity:1;transform:none}
-.reveal:nth-child(2){transition-delay:.07s}
-.reveal:nth-child(3){transition-delay:.13s}
-
-#auth-screen{
-  display:none;position:fixed;inset:0;z-index:9999;overflow:auto;
-  background:rgba(6,9,16,.98);color:var(--text);font-family:var(--font);
-  padding:24px;align-items:center;justify-content:center;min-height:100vh
-}
-#auth-screen.open{display:flex}
-.auth-wrap{width:min(100%,1040px)}
-.auth-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:24px}
-.auth-brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:16px}
-.auth-back{font-size:12px;color:var(--muted2);padding:9px 14px;border:1px solid var(--line);
-  border-radius:11px;background:rgba(255,255,255,.04);transition:.18s;cursor:pointer}
-.auth-back:hover{border-color:rgba(96,165,250,.4);transform:translateY(-1px);background:rgba(255,255,255,.08)}
-.auth-layout{display:grid;grid-template-columns:1fr .9fr;gap:18px;align-items:stretch}
-.auth-intro,.auth-panel{
-  border:1px solid var(--line);border-radius:24px;
-  background:linear-gradient(145deg,rgba(15,26,44,.97),rgba(11,18,32,.97));
-  box-shadow:var(--shadow)}
-.auth-intro{padding:clamp(26px,4vw,48px);position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:center;min-height:560px}
-.auth-intro::after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;
-  border:1px solid rgba(96,165,250,.1);left:-80px;bottom:-95px;
-  box-shadow:0 0 0 30px rgba(96,165,250,.04),0 0 0 65px rgba(96,165,250,.02)}
-.auth-intro h1{font-size:clamp(28px,3.8vw,48px);line-height:1.38;letter-spacing:-.7px;margin:22px 0 12px;font-weight:900}
-.auth-intro p{color:var(--muted2);line-height:2.1;font-size:14px;margin:0;max-width:480px}
-.benefits{display:grid;gap:11px;margin-top:26px}
-.benefit{display:flex;align-items:center;gap:11px;color:var(--muted2);font-size:12px;font-weight:800}
-.benefit-icon{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;
-  background:rgba(52,211,153,.12);color:var(--green);flex-shrink:0}
-.benefit-icon svg{width:14px;height:14px}
-.auth-panel{padding:clamp(24px,3.5vw,40px)}
-.panel-head{text-align:center;margin-bottom:24px}
-.panel-logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
-  background:var(--grad);box-shadow:0 8px 28px rgba(37,99,235,.45);margin:0 auto 14px;
-  position:relative;overflow:hidden}
-.panel-logo::after{content:"";position:absolute;inset:-60%;
-  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
-  transform:translateX(-100%);animation:shine 7s ease-in-out 1.5s infinite}
-.panel-logo svg{width:24px;height:24px;stroke:#fff}
-.panel-head h2{font-size:23px;margin:0;font-weight:900}
-.panel-head p{font-size:12px;line-height:1.9;color:var(--muted);margin:7px 0 0}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:12px;font-weight:900;color:var(--muted2);margin-bottom:8px}
-.field input{width:100%;padding:15px;
-  background:rgba(6,9,16,.9);border:1px solid var(--line);
-  border-radius:13px;color:var(--text);font-family:inherit;font-size:18px;outline:none;transition:.2s}
-.field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
-.field input.code-input{text-align:center;font-size:28px;letter-spacing:.3em;font-weight:900}
-.hint-txt{font-size:11px;color:var(--muted);line-height:1.8;margin-top:8px}
-.btn-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
-  border-radius:14px;padding:15px 17px;font-family:inherit;font-weight:900;font-size:14px;
-  background:var(--grad);color:#fff;border:0;cursor:pointer;
-  box-shadow:0 10px 30px rgba(37,99,235,.35);transition:transform .18s,box-shadow .18s}
-.btn-submit:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(37,99,235,.5)}
-.btn-submit:disabled{opacity:.6;cursor:wait;transform:none}
-.btn-submit svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.auth-status{display:none;margin-top:16px;padding:14px;border-radius:13px;
-  font-size:12px;line-height:1.9;font-weight:800;text-align:center}
-.auth-status.show{display:block}
-.auth-status.loading{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--cyan2)}
-.auth-status.error{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.28);color:var(--red)}
-.auth-status.success{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.28);color:var(--green)}
-.auth-spinner{display:inline-block;vertical-align:middle;width:14px;height:14px;
-  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
-  border-radius:50%;animation:spin .7s linear infinite;margin-left:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.legal-txt{font-size:10px;color:var(--muted);text-align:center;line-height:1.9;margin-top:16px}
-.auth-foot{text-align:center;color:var(--muted);font-size:10px;margin-top:18px}
-.auth-foot a{color:var(--cyan2)}
-
-@media(max-width:900px){
-  .hero-grid{grid-template-columns:1fr;gap:22px}
-  .hero-copy{text-align:center}.hero-copy .eyebrow{margin-inline:auto}
-  .hero-copy p{margin-inline:auto}.hero-acts,.trust{justify-content:center}
-  .hero-art{min-height:400px}.dashboard{width:min(100%,420px)}
-  .features{grid-template-columns:repeat(2,1fr)}.prices{gap:13px}
-}
-@media(max-width:760px){
-  #auth-screen{padding:16px}
-  .auth-layout{grid-template-columns:1fr}
-  .auth-intro{min-height:0;padding:22px;order:2}
-  .auth-intro h1{font-size:28px;margin:14px 0 8px}
-  .auth-intro p{font-size:12px}
-  .benefits{grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
-  .benefit{font-size:10px;align-items:flex-start}
-  .auth-panel{order:1;padding:22px 18px}
-}
-@media(max-width:650px){
-  .navlinks{display:none}.navin{height:62px}
-  .hero{padding:52px 0 40px}
-  .hero-art{min-height:355px}.orb{width:270px;height:270px}
-  .dashboard{padding:16px;border-radius:19px}
-  .stats-grid{gap:9px}.stat{padding:14px 8px}.stat b{font-size:21px}
-  .section{padding:50px 0}.prices{grid-template-columns:1fr}
-  .price-card.featured{order:-1}.features{grid-template-columns:1fr}
-  .trial-box{grid-template-columns:1fr;text-align:center}.trial-cta .btn{width:100%}
-  .footer-in{justify-content:center;text-align:center}
-  .navacts .btn:not(.btn-primary){display:none}
-}
-@media(max-width:390px){.benefits{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#060910;color:#deeaff;direction:rtl;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#0f1a2c;border:1px solid rgba(96,165,250,.22);border-radius:20px;padding:40px;max-width:400px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+h1{font-size:24px;margin-bottom:20px;text-align:center}
+h1 span{background:linear-gradient(90deg,#06b6d4,#3b82f6,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+label{display:block;font-size:13px;font-weight:800;margin-bottom:8px;color:#8aaec8}
+input{width:100%;padding:15px;background:#060910;border:1px solid rgba(96,165,250,.22);border-radius:13px;color:#deeaff;font-size:24px;text-align:center;letter-spacing:.3em;font-weight:900;outline:none;font-family:inherit}
+input:focus{border-color:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+button{width:100%;margin-top:16px;padding:15px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:0;border-radius:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;box-shadow:0 10px 30px rgba(37,99,235,.4)}
+button:hover{transform:translateY(-2px)}
+button:disabled{opacity:.6;cursor:wait}
+.msg{margin-top:16px;padding:14px;border-radius:13px;font-size:13px;font-weight:800;text-align:center;display:none}
+.msg.show{display:block}
+.msg.loading{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#67e8f9}
+.msg.error{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.28);color:#f87171}
+.msg.success{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.28);color:#34d399}
 </style>
 </head>
-<body data-theme="dark">
-
-<header class="nav">
-<div class="container navin">
-  <a class="brand" href="#home">
-    <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/></svg></div>
-    ثانوية <span class="g" style="margin-right:3px">club</span>
-    <small>مستقبلك في مكان واحد</small>
-  </a>
-  <nav class="navlinks">
-    <a href="#about">عن المنصة</a>
-    <a href="#plans">الاشتراك</a>
-    <a href="#trial">تجربة مجانية</a>
-    <a href="#faq">الأسئلة</a>
-  </nav>
-  <div class="navacts">
-    <button class="icon-btn" id="theme-toggle" title="تبديل الثيم">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-    </button>
-    <button class="btn btn-primary" type="button" data-open-login>تسجيل الدخول <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button>
-  </div>
-</div>
-</header>
-
-<main id="home">
-<section class="hero"><div class="container hero-grid">
-  <div class="hero-copy">
-    <div class="eyebrow"><span class="edot"></span> ثانوية club · الدراسة بشكل أسهل</div>
-    <h1>كل محاضراتك،<br><span class="g">بسعر على قدّك.</span></h1>
-    <p>اجمع محتوى مدرسينك والشعب في مكان واحد. اشتراك شهري واحد، تابع محاضراتك، وركّز في اللي يهمك: <strong style="color:var(--text)">مستقبلك.</strong></p>
-    <div class="hero-acts">
-      <button class="btn btn-primary btn-lg" type="button" data-open-login>ابدأ الآن <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-      <a class="btn btn-lg" href="#plans"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> اشتراك 150 جنيه</a>
-    </div>
-    <div class="trust">
-      <div class="avatars"><span>✓</span><span>✓</span><span>✓</span></div>
-      <span>سعر واضح · تجربة مجانية · دعم مباشر</span>
-    </div>
-  </div>
-  <div class="hero-art" aria-hidden="true">
-    <div class="orb"></div>
-    <div class="float-tag tag-one"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>كل حاجة منظمة<small>مواد ومحاضرات في مكان</small></span></div>
-    <div class="dashboard">
-      <div class="dash-top">
-        <div><div class="dash-title">مساحة مذاكرتك</div><div class="dash-sub">ثانوية club</div></div>
-        <span class="live-pill">● جاهز</span>
-      </div>
-      <div class="dash-welcome"><small>أهلاً بيك</small><b>ابدأ محاضرتك الجاية ✨</b></div>
-      <div class="mini-cards">
-        <div class="mini-card"><div class="mini-icon"><svg viewBox="0 0 24 24"><path d="m3 8 9-5 9 5-9 5-9-5Z"/><path d="M7 11v5c3 2 7 2 10 0v-5"/></svg></div><b>المواد</b><small>كل مادة في قسمها</small></div>
-        <div class="mini-card"><div class="mini-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg></div><b>المحاضرات</b><small>شاهد وقت ما تحب</small></div>
-        <div class="mini-card"><div class="mini-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></svg></div><b>تنظيم الوقت</b><small>كمّل من حيث وقفت</small></div>
-        <div class="mini-card"><div class="mini-icon"><svg viewBox="0 0 24 24"><path d="M12 2 15 9l7 1-5 4.9 1.2 7L12 18l-6.2 3.9L7 14.9 2 10l7-1 3-7Z"/></svg></div><b>اشتراك شهري</b><small>150 جنيه فقط</small></div>
-      </div>
-      <div class="dash-bottom"><span>خطوتك الجاية؟</span><strong>يلا نذاكر ←</strong></div>
-    </div>
-    <div class="float-tag tag-two"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg><span>سعر ثابت<small>150 جنيه / شهر</small></span></div>
-  </div>
-</div></section>
-
-<section class="stats"><div class="container stats-grid reveal">
-  <div class="stat"><b>150 جنيه</b><span>الاشتراك الشهري</span></div>
-  <div class="stat"><b>شهري فقط</b><span>بدون عقود أو سنوات</span></div>
-  <div class="stat"><b>دعم فوري</b><span>تيليجرام مباشر</span></div>
-</div></section>
-
-<section class="section" id="about"><div class="container">
-  <div class="section-head reveal">
-    <div class="eyebrow"><span class="edot"></span> حكاية ثانوية club</div>
-    <h2>اشتراك واحد بسعر واضح <span class="g">من غير تعقيد.</span></h2>
-    <p>فكرتنا بسيطة: الوصول للمحتوى الدراسي بسعر ثابت 150 جنيه شهريًا.</p>
-  </div>
-  <div class="quote-card reveal">
-    <div class="quote-mark"><svg viewBox="0 0 24 24"><path d="M4 19c4-2 6-6 6-12H4v7h4M14 19c4-2 6-6 6-12h-6v7h4"/></svg></div>
-    <h3>مذاكرتك في مكان واحد، باشتراك شهري واضح.</h3>
-    <p>بنسهّل عليك الوصول للمحتوى الدراسي من مكان واحد. الاشتراك الشهري بـ<strong>150 جنيه</strong>، وتجديده كل شهر حسب احتياجك.</p>
-  </div>
-</div></section>
-
-<section class="section" id="plans"><div class="container">
-  <div class="section-head reveal">
-    <div class="eyebrow"><span class="edot"></span> الاشتراك الشهري</div>
-    <h2>خطة واحدة <span class="g">من غير حيرة.</span></h2>
-    <p>150 جنيه للشهر، بدون اشتراك ترم أو سنة.</p>
-  </div>
-  <div class="prices" style="grid-template-columns:minmax(0,500px);justify-content:center">
-    <article class="price-card featured reveal">
-      <span class="popular">✦ الاشتراك المتاح</span>
-      <div class="price-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></div>
-      <h3>اشتراك شهري</h3>
-      <p class="desc">بتجدد براحتك كل شهر، بسعر ثابت ومضمون.</p>
-      <div class="price">150 <small>جنيه / شهر</small></div>
-      <div class="price-note">بدون باقات ترم أو سنة</div>
-      <ul>
-        <li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>شهر كامل وصول</li>
-        <li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>كل المحتوى المفعّل لحسابك</li>
-        <li><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>دعم مباشر من الإدارة</li>
-      </ul>
-      <button class="btn btn-primary" data-login-link type="button">عندي كود اشتراك <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button>
-    </article>
-  </div>
-  <p class="note">اشتراك شهري فقط · 150 جنيهًا · يتجدد بإرادتك</p>
-</div></section>
-
-<section class="section"><div class="container">
-  <div class="section-head reveal">
-    <div class="eyebrow"><span class="edot"></span> ليه ثانوية club؟</div>
-    <h2>تجربة مذاكرة <span class="g">أبسط وأرتب.</span></h2>
-    <p>كل حاجة ترتيب وتنظيم عشان توصل للمحتوى بسهولة.</p>
-  </div>
-  <div class="features">
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h7M7 16h5"/></svg></div><h3>كل مادة في مكانها</h3><p>مواد وفصول ومحاضرات منظمة بشكل واضح.</p></article>
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.89L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg></div><h3>فيديو مشفّر بجودة عالية</h3><p>محاضرات مؤمّنة، شغّال على أي جهاز.</p></article>
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>سعر ثابت وواضح</h3><p>150 جنيه شهريًا، ما فيش مفاجآت.</p></article>
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>دخول بكود الاشتراك</h3><p>7 أرقام وتدخل على المحاضرات في ثوانٍ.</p></article>
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><h3>ملفات PDF مع الفيديو</h3><p>كل محاضرة فيها فيديو + ملف + اختبارات.</p></article>
-    <article class="feature reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6A8.4 8.4 0 0 1 12 3h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></div><h3>دعم تيليجرام مباشر</h3><p>تواصل مع الأدمن في أي وقت.</p></article>
-  </div>
-</div></section>
-
-<section class="trial" id="trial"><div class="container">
-  <div class="trial-box reveal">
-    <div class="trial-copy">
-      <h2>مش متأكد؟ جرّب الأول 👀</h2>
-      <p>من حقك تطمّن قبل ما تشترك. في تجربة مجانية للموقع — جرّب، وبعدين قرّر.</p>
-    </div>
-    <div class="trial-cta"><a class="btn btn-lg" href="#admins">كلّم الأدمن <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
-  </div>
-  <div id="admins">
-    <div class="section-head reveal" style="margin-top:36px;margin-bottom:18px">
-      <h2 style="font-size:24px">الأدمنز <span class="g">المتاحين</span></h2>
-      <p>تواصل مباشرة عبر تيليجرام.</p>
-    </div>
-    <div class="admins-grid">
-      <a class="admin-card" href="https://t.me/E3Fayomy" target="_blank" rel="noopener noreferrer">
-        <div class="admin-avatar"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
-        <div><b>@E3Fayomy</b><small>تواصل على تيليجرام ↗</small></div>
-      </a>
-      <a class="admin-card" href="https://t.me/Mohmed3Abdo" target="_blank" rel="noopener noreferrer">
-        <div class="admin-avatar"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></div>
-        <div><b>@Mohmed3Abdo</b><small>تواصل على تيليجرام ↗</small></div>
-      </a>
-    </div>
-  </div>
-</div></section>
-
-<section class="section" id="faq"><div class="container">
-  <div class="section-head reveal">
-    <div class="eyebrow"><span class="edot"></span> أسئلة شائعة</div>
-    <h2>إيه اللي <span class="g">بيتسأل كتير.</span></h2>
-  </div>
-  <div class="faq reveal">
-    <details><summary>إزاي أسجّل الدخول؟</summary><p>اضغط "تسجيل الدخول" وأدخل كود الاشتراك المكوّن من 7 أرقام، وهتدخل فورًا للمواد.</p></details>
-    <details><summary>هل فيه تجربة مجانية؟</summary><p>أيوه، تواصل مع أحد الأدمنز على تيليجرام وهيرتّبوا معاك تجربة.</p></details>
-    <details><summary>الاشتراك بكام؟</summary><p>150 جنيهًا شهريًا فقط، بدون باقات ترم أو سنة.</p></details>
-    <details><summary>هل كل المواد بتظهر؟</summary><p>المواد المرتبطة بصلاحيات حسابك اللي بتظهر — الإدارة بتفعّل المحتوى المناسب لك.</p></details>
-    <details><summary>ممكن أفتح الموقع من موبايل؟</summary><p>أيوه، الموقع شغّال على كل الأجهزة: موبايل، تابلت، كمبيوتر.</p></details>
-  </div>
-</div></section>
-</main>
-
-<footer class="footer"><div class="container footer-in">
-  <div><b>ثانوية club</b> — خلّي مذاكرتك في مكان واحد.</div>
-  <div>الأسعار بالجنيه المصري · © <span id="year"></span> ثانوية club</div>
-  <a href="#home" style="color:var(--cyan2)">الرجوع لأعلى ↑</a>
-</div></footer>
-
-<div class="toast" id="toast" role="status"></div>
-
-<div id="auth-screen" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
-<div class="auth-wrap">
-  <header class="auth-top">
-    <div class="auth-brand">
-      <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v13A2.5 2.5 0 0 1 6.5 16H20M9 7h7M9 10h7"/></svg></div>
-      ثانوية <span class="g" style="margin-right:3px">club</span>
-    </div>
-    <button class="auth-back" data-home-link type="button">← الرجوع للرئيسية</button>
-  </header>
-  <div class="auth-layout">
-    <section class="auth-intro">
-      <span class="eyebrow"><span class="edot"></span> دخول آمن وسريع</span>
-      <h1>مستعد ترجع<br><span class="g">لمحاضراتك؟</span></h1>
-      <p>اكتب كودك وهتدخل في ثواني. الكود مكوّن من 7 أرقام — اكتبه وضغط دخول.</p>
-      <div class="benefits">
-        <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>دخول للمحتوى المفعّل ليك</div>
-        <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>كل المواد في مكان واحد</div>
-        <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>يشتغل على أي جهاز</div>
-        <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>دخول في ثواني</div>
-      </div>
-    </section>
-    <section class="auth-panel">
-      <div class="panel-head">
-        <div class="panel-logo"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></div>
-        <h2>أهلاً بيك في <span class="g">ثانوية club</span></h2>
-        <p>اكتب كود الاشتراك المكوّن من 7 أرقام.</p>
-      </div>
-      <form id="code-form">
-        <div class="field">
-          <label for="code">كود الدخول (7 أرقام)</label>
-          <input id="code" class="code-input" inputmode="numeric" autocomplete="one-time-code"
-                 maxlength="7" pattern="[0-9]{7}" placeholder="0000000" required>
-          <div class="hint-txt">اكتب الكود وضغط دخول — أي 7 أرقام صح تشتغل.</div>
-        </div>
-        <button class="btn-submit" id="submit-btn" type="submit">
-          دخول <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg>
-        </button>
-        <div class="auth-status" id="status" role="status" aria-live="polite"></div>
-      </form>
-      <div class="legal-txt">جلسة الدخول بتتحفظ على جهازك. ما تشاركش كودك مع حد.</div>
-    </section>
-  </div>
-  <div class="auth-foot">© ثانوية club · <a href="#" data-home-link>الرئيسية</a></div>
-</div>
+<body>
+<div class="box">
+  <h1>ثانوية <span>club</span></h1>
+  <form id="f">
+    <label for="code">كود الدخول (7 أرقام)</label>
+    <input id="code" type="text" inputmode="numeric" maxlength="7" placeholder="0000000" required autofocus>
+    <button type="submit" id="btn">دخول</button>
+    <div class="msg" id="msg"></div>
+  </form>
 </div>
 
 <script>
 (function(){
-'use strict';
-document.getElementById('theme-toggle').addEventListener('click',function(){
-  document.body.setAttribute('data-theme',document.body.getAttribute('data-theme')==='light'?'dark':'light');
-});
-var y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
-var items=document.querySelectorAll('.reveal');
-if('IntersectionObserver' in window){
-  var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
-  },{threshold:.07});
-  items.forEach(function(el){io.observe(el)});
-}else{items.forEach(function(el){el.classList.add('visible')})}
+  var form = document.getElementById('f');
+  var code = document.getElementById('code');
+  var msg = document.getElementById('msg');
+  var btn = document.getElementById('btn');
 
-function openAuth(){document.getElementById('auth-screen').classList.add('open');document.body.style.overflow='hidden';window.scrollTo(0,0)}
-document.querySelectorAll('[data-open-login],[data-login-link]').forEach(function(el){
-  el.addEventListener('click',function(){
-    try{if(localStorage.getItem('cstk_tok')){window.location.href='subjects.html';return}}catch(_){}
-    openAuth();
+  code.addEventListener('input', function(){
+    code.value = code.value.replace(/\D/g, '').slice(0, 7);
   });
-});
-document.querySelectorAll('[data-home-link]').forEach(function(el){
-  el.addEventListener('click',function(e){
+
+  function show(type, text){
+    msg.className = 'msg show ' + type;
+    msg.textContent = text;
+  }
+
+  form.addEventListener('submit', function(e){
     e.preventDefault();
-    document.getElementById('auth-screen').classList.remove('open');
-    document.body.style.overflow='';
-  });
-});
-
-var form=document.getElementById('code-form');
-var code=document.getElementById('code');
-var statusBox=document.getElementById('status');
-var submitBtn=document.getElementById('submit-btn');
-var busy=false;
-
-code.addEventListener('input',function(){
-  code.value=code.value.replace(/\D/g,'').slice(0,7);
-  if(statusBox.classList.contains('error')){statusBox.className='auth-status';statusBox.textContent=''}
-});
-
-function showSt(type,msg){
-  statusBox.className='auth-status show '+type;
-  if(type==='loading')statusBox.innerHTML=msg+'<span class="auth-spinner"></span>';
-  else statusBox.textContent=msg;
-}
-
-function save(k,v){try{localStorage.setItem(k,String(v))}catch(_){}}
-
-function doLogin(val){
-  var token='bypass_'+val+'_'+Date.now();
-  save('cstk_tok',token);
-  save('cstk_code',val);
-  save('cstk_me',JSON.stringify({name:'طالب',code:val}));
-  showSt('success','تمام! جاري فتح المواد...');
-  setTimeout(function(){window.location.href='subjects.html'},400);
-}
-
-form.addEventListener('submit',function(e){
-  e.preventDefault();
-  if(busy)return;
-  var val=code.value.trim();
-  if(!/^\d{7}$/.test(val)){showSt('error','اكتب كود صحيح مكوّن من 7 أرقام.');code.focus();return}
-  busy=true;submitBtn.disabled=true;
-  showSt('loading','جاري التحقق من الكود');
-
-  fetch('/api/auth/login',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({code:val})
-  })
-  .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})})
-  .then(function(out){
-    if(!out.ok || (out.d && out.d.success===false)){
-      throw new Error((out.d&&(out.d.message||out.d.error))||'كود غير صحيح');
+    var val = code.value.trim();
+    if (!/^\d{7}$/.test(val)) {
+      show('error', 'اكتب 7 أرقام');
+      return;
     }
-    var data=(out.d&&out.d.data)||out.d||{};
-    var token=data.token||('bypass_'+val+'_'+Date.now());
-    save('cstk_tok',token);
-    save('cstk_code',val);
-    save('cstk_me',JSON.stringify({name:data.name||'طالب',code:val}));
-    showSt('success','تمام! جاري فتح المواد...');
-    setTimeout(function(){window.location.href='subjects.html'},400);
-  })
-  .catch(function(err){
-    console.warn('login fallback:',err.message);
-    doLogin(val);
-  })
-  .then(function(){busy=false;submitBtn.disabled=false});
-});
+    btn.disabled = true;
+    show('loading', 'جاري التحقق...');
+
+    var token = 'bypass_' + val + '_' + Date.now();
+    try {
+      localStorage.setItem('cstk_tok', token);
+      localStorage.setItem('cstk_code', val);
+      localStorage.setItem('cstk_me', JSON.stringify({name: 'طالب', code: val}));
+    } catch(_) {}
+
+    show('success', 'تمام! جاري فتح المواد...');
+
+    setTimeout(function(){
+      window.location.href = 'subjects.html';
+    }, 500);
+  });
 })();
 </script>
 </body>
-  </html>
+</html>
