@@ -21,11 +21,15 @@
   </main>
 
   <div id="player-modal" class="modal hidden">
-    <div class="modal-box">
-      <button class="close-btn" onclick="closePlayer()">✕</button>
-      <h3 id="player-title"></h3>
-      <video id="video" controls playsinline></video>
-      <div id="player-status" class="status"></div>
+    <div class="player-container">
+      <div class="player-header">
+        <h3 id="player-title"></h3>
+        <button class="close-btn" onclick="closePlayer()">✕</button>
+      </div>
+      <div class="video-wrapper">
+        <video id="video" controls playsinline></video>
+        <div id="player-status" class="status"></div>
+      </div>
     </div>
   </div>
 
@@ -36,7 +40,7 @@
         tok = localStorage.getItem("cstk_tok") || sessionStorage.getItem("cstk_tok");
       } catch (e) {}
       if (!tok) {
-        window.location.href = "index.html";
+        window.location.href = "/index.html";
         return;
       }
       window.logout = function () {
@@ -45,7 +49,7 @@
           localStorage.removeItem("cstk_code");
           localStorage.removeItem("cstk_me");
         } catch (e) {}
-        window.location.href = "index.html";
+        window.location.href = "/index.html";
       };
     })();
   </script>
