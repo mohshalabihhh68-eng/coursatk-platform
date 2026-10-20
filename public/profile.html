@@ -39,7 +39,6 @@ img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 .g{background:var(--grad3);background-clip:text;-webkit-background-clip:text;color:transparent}
 
-/* ── topbar ── */
 .top{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);
   background:rgba(6,9,16,.85);backdrop-filter:blur(22px);position:relative;z-index:1}
 .topin{max-width:1060px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
@@ -65,10 +64,8 @@ a{color:inherit;text-decoration:none}
 .btn.danger{color:var(--red)}
 .btn.danger:hover{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.07)}
 
-/* ── wrap ── */
 .wrap{max-width:1060px;margin:auto;padding:26px 18px 64px;position:relative;z-index:1}
 
-/* ── heading ── */
 .heading{margin-bottom:22px;animation:fadeUp .4s ease}
 .eyebrow{display:inline-flex;gap:7px;align-items:center;
   color:var(--cyan2);border:1px solid rgba(96,165,250,.2);background:rgba(37,99,235,.1);
@@ -76,7 +73,6 @@ a{color:inherit;text-decoration:none}
 .heading h1{font-size:clamp(22px,5vw,32px);line-height:1.3;margin:12px 0 5px;font-weight:900}
 .heading p{margin:0;color:var(--muted2);font-size:13px}
 
-/* ── hero card ── */
 .hero-card{
   position:relative;overflow:hidden;
   border:1px solid rgba(59,130,246,.2);border-radius:24px;
@@ -108,7 +104,6 @@ a{color:inherit;text-decoration:none}
   border:1px solid var(--line);background:rgba(255,255,255,.05);
   border-radius:12px;padding:8px 12px;color:var(--muted2);font-size:11px;font-weight:800}
 
-/* ── stats ── */
 .stats-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 24px}
 .stat{border:1px solid var(--line);border-radius:16px;
   background:linear-gradient(160deg,var(--panel2),var(--panel));
@@ -118,11 +113,9 @@ a{color:inherit;text-decoration:none}
 .stat strong{display:block;font-size:24px;font-weight:900;line-height:1.2}
 .stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
 
-/* ── section title ── */
 .sec-title{font-size:15px;font-weight:900;margin:26px 0 12px;display:flex;align-items:center;gap:9px}
 .sec-title::before{content:"";width:4px;height:20px;border-radius:4px;background:var(--grad3)}
 
-/* ── details ── */
 .details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
 .detail{min-width:0;display:flex;align-items:center;gap:12px;
   border:1px solid var(--line);border-radius:15px;padding:14px;
@@ -130,6 +123,7 @@ a{color:inherit;text-decoration:none}
 .detail:hover{border-color:rgba(96,165,250,.25);transform:translateY(-2px)}
 .di{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;
   border-radius:12px;background:rgba(59,130,246,.1);font-size:18px}
+.di svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .dlabel{font-size:11px;color:var(--muted);font-weight:700}
 .dvalue{font-size:14px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}
 .dvalue.small{font-size:12px}
@@ -138,14 +132,15 @@ a{color:inherit;text-decoration:none}
   background:rgba(59,130,246,.09);color:var(--cyan2);
   font-size:11px;font-weight:800;padding:6px 9px;cursor:pointer;transition:.15s}
 .copy-btn:hover{background:rgba(59,130,246,.18)}
+.copy-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-left:3px}
 
-/* ── sub card ── */
 .sub-card{border:1px solid rgba(59,130,246,.18);
   background:linear-gradient(135deg,var(--panel2),var(--panel));
   border-radius:20px;padding:20px}
 .sub-head{display:flex;align-items:center;gap:12px}
 .sub-icon{width:46px;height:46px;display:grid;place-items:center;
   border-radius:13px;background:rgba(59,130,246,.12);font-size:22px}
+.sub-icon svg{width:22px;height:22px;stroke:var(--cyan2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sub-head h3{margin:0;font-size:15px;font-weight:900}
 .sub-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
 .countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:16px}
@@ -161,8 +156,8 @@ a{color:inherit;text-decoration:none}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
 .notice{border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.07);
   border-radius:13px;padding:13px 15px;color:#fde68a;font-size:12px;line-height:1.85;margin-top:14px}
+.notice svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-left:4px}
 
-/* ── loading/error ── */
 .loading,.error-view{max-width:440px;margin:12vh auto;text-align:center;padding:28px;
   border:1px solid var(--line);border-radius:20px;background:var(--panel)}
 .loader{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);
@@ -222,7 +217,7 @@ a{color:inherit;text-decoration:none}
 (function(){
 'use strict';
 const TOKEN_KEY='cstk_tok';
-const API='https://coursattk-production.up.railway.app';
+const API_BASE=''; // نسبي — السيرفر بيوفر /api
 
 function $(id){return document.getElementById(id)}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
@@ -247,7 +242,8 @@ var ICONS={
   refresh:ic('<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'),
   logout:ic('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'),
   wifi:ic('<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>'),
-  star:ic('<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>')
+  star:ic('<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>'),
+  alert:ic('<circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 17v.01"/>')
 };
 
 function detail(ico,lbl,val,small){
@@ -258,13 +254,9 @@ function sectionLabel(s){
 }
 
 var timer;
-function timerStart(){
-  var endDate=null;
-  try{
-    var me=JSON.parse(localStorage.getItem('cstk_me')||'{}');
-    var d=me.subscription_expires_at||me.expires_at||me.end_date||me.expiry_date;
-    if(d)endDate=new Date(d);
-  }catch(_){}
+function timerStart(expiresAt){
+  var endDate=expiresAt?new Date(expiresAt):null;
+  if(endDate&&isNaN(endDate))endDate=null;
   function tick(){
     if(!endDate){$('days')&&($('days').textContent='—');return}
     var diff=Math.max(0,endDate-Date.now()),s=Math.floor(diff/1000);
@@ -291,6 +283,23 @@ function fmt(v){
   return d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
 }
 
+function computeWatchStats(){
+  var done=0,active=0,minutes=0;
+  try{
+    for(var k in localStorage){
+      if(!k.startsWith('cstk_w_'))continue;
+      try{
+        var p=JSON.parse(localStorage.getItem(k)||'null');
+        if(!p)continue;
+        if(p.watched||p.percent>=90)done++;
+        else if(p.percent>0)active++;
+        if(p.currentTime)minutes+=Math.floor(p.currentTime/60);
+      }catch(_){}
+    }
+  }catch(_){}
+  return{done:done,active:active,minutes:minutes};
+}
+
 function render(me){
   clearInterval(timer);
   var name=me.name||me.full_name||me.username||'طالب';
@@ -300,21 +309,24 @@ function render(me){
   var created=me.created_at||me.createdAt||'—';
   var expiry=me.subscription_expires_at||me.expires_at||me.end_date||'—';
   var code=me.code||me.subscription_code||me.access_code||'—';
-  /* check if bypass mode */
-  var tok=token()||'';
-  if(code==='—'&&tok.startsWith('bypass_')){
-    code=tok.replace('bypass_','').split('_')[0];
-    if(name==='طالب'){
-      try{var mc=JSON.parse(localStorage.getItem('cstk_me')||'{}');if(mc.code)code=mc.code}catch(_){}
-    }
+
+  /* استخراج الكود من توكن bypass لو مش موجود */
+  if(code==='—'){
+    var tok=token()||'';
+    if(tok.startsWith('bypass_'))code=tok.replace('bypass_','').split('_')[0];
   }
+
   var st={cls:'',label:'نشط',left:null};
   if(expiry&&expiry!=='—'){
     var end=new Date(expiry);
-    if(!isNaN(end)){var left=end-Date.now();st.left=left;if(left<=0){st.cls='off';st.label='منتهي'}else if(left<=7*86400000){st.cls='warn';st.label='قارب الانتهاء'}}
+    if(!isNaN(end)){
+      var left=end-Date.now();st.left=left;
+      if(left<=0){st.cls='off';st.label='منتهي'}
+      else if(left<=7*86400000){st.cls='warn';st.label='قارب الانتهاء'}
+    }
   }
-  var w={done:0,active:0,minutes:0};
-  try{var p=JSON.parse(localStorage.getItem('cstk_progress')||'{}');Object.values(p).forEach(function(v){if(v&&v.pct>=90)w.done++;else if(v&&v.pct>0)w.active++;if(v&&v.t)w.minutes+=Math.floor(v.t/60)})}catch(_){}
+
+  var w=computeWatchStats();
 
   $('main').innerHTML=
     '<div class="heading">'+
@@ -374,7 +386,7 @@ function render(me){
       '<div class="prog-bar"><i id="subProgress"></i></div>'+
     '</section>'+
 
-    (st.left!==null&&st.left>0&&st.left<=7*86400000?'<div class="notice">'+ICONS.clock+' اشتراكك قارب ينتهي — جدّد في الوقت المناسب.</div>':'')+
+    (st.left!==null&&st.left>0&&st.left<=7*86400000?'<div class="notice">'+ICONS.alert+' اشتراكك قارب ينتهي — جدّد في الوقت المناسب.</div>':'')+
     (st.left!==null&&st.left<=0?'<div class="notice">انتهت مدة الاشتراك. تواصل مع الإدارة.</div>':'')+
 
     '<div class="actions">'+
@@ -395,9 +407,11 @@ function render(me){
     if(!confirm('تسجيل الخروج؟'))return;
     try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
     try{sessionStorage.removeItem(TOKEN_KEY)}catch(_){}
+    try{localStorage.removeItem('cstk_code')}catch(_){}
+    try{localStorage.removeItem('cstk_me')}catch(_){}
     location.replace('index.html');
   };
-  timerStart();
+  timerStart(expiry!=='—'?expiry:null);
 }
 
 function fb(text,cb){
@@ -428,15 +442,17 @@ function load(){
   var t=token();
   if(!t){showError('مش لاقي جلسة دخول. سجّل الدخول أولاً.',false);return}
   $('main').innerHTML='<div class="loading"><div class="loader"></div><b>بنحمّل بياناتك...</b></div>';
-  /* If bypass token, build profile from localStorage */
+
+  // وضع bypass: نستخدم بيانات محلية
   if(t.startsWith('bypass_')){
     var code=t.replace('bypass_','').split('_')[0];
     var me={name:'طالب',code:code,plan:'اشتراك شهري (تجريبي)'};
     try{var s=JSON.parse(localStorage.getItem('cstk_me')||'{}');me=Object.assign(me,s);if(!me.code)me.code=code}catch(_){}
     render(me);return;
   }
-  /* Real API: GET /api/profile */
-  fetch(API+'/api/profile',{method:'GET',headers:{Accept:'application/json',Authorization:'Bearer '+t},cache:'no-store'})
+
+  // توكن حقيقي: نجيب من API
+  fetch(API_BASE+'/api/profile',{method:'GET',headers:{Accept:'application/json',Authorization:'Bearer '+t},cache:'no-store'})
     .then(function(r){
       return r.json().catch(function(){return{}}).then(function(d){
         if(r.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}showError('الجلسة انتهت. سجّل دخولك مجدداً.',false);return null}
