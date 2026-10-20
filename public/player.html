@@ -43,18 +43,14 @@ img{display:block;max-width:100%}
 .screen:fullscreen,.screen:-webkit-full-screen{aspect-ratio:auto;width:100%;height:100%;border-radius:0}
 .screen:not(.show-ui):not(.paused){cursor:none}
 .screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:1;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
-
 .ptap{position:absolute;inset:0;z-index:2;background:transparent;-webkit-touch-callout:none}
-
 .ptop,.pcenter,.pctrl{position:absolute;opacity:0;transition:opacity .22s;pointer-events:none}
 .screen.show-ui .ptop,.screen.show-ui .pcenter,.screen.show-ui .pctrl{opacity:1}
 .screen.show-ui .ptop>*,.screen.show-ui .pcenter>*,.screen.show-ui .pctrl>*{pointer-events:auto}
 .screen.holding .ptop,.screen.holding .pcenter,.screen.holding .pctrl{opacity:0!important}
-
 .ptop{top:0;left:0;right:0;z-index:7;display:flex;align-items:center;gap:10px;padding:10px 12px 30px;background:linear-gradient(#000b,transparent)}
 .ptitle{flex:1;min-width:0;color:#fff;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .plive{font-size:10px;font-weight:900;background:#3b82f633;color:#93c5fd;border-radius:99px;padding:4px 9px;flex:none}
-
 .ib{--ibs:40px;width:var(--ibs);height:var(--ibs);flex:none;border:0;border-radius:50%;background:#ffffff1f;color:#fff;display:grid;place-items:center;position:relative;transition:transform .15s,background .15s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .ib:hover{background:#ffffff2e}
 .ib:active{transform:scale(.92)}
@@ -62,7 +58,6 @@ img{display:block;max-width:100%}
 .ib svg,.bigplay svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
 .ib svg.f,.bigplay svg.f{fill:currentColor}
 .ib.active{background:var(--blue)}
-
 .pcenter{inset:0;z-index:6;display:flex;align-items:center;justify-content:center;gap:clamp(20px,7vw,60px);direction:ltr}
 .pcenter .ib.sk{--ibs:52px;background:#0007;box-shadow:0 6px 22px #0005}
 .pcenter .ib.sk svg{width:32px;height:32px;stroke-width:1.9}
@@ -73,9 +68,7 @@ img{display:block;max-width:100%}
   .pcenter .ib.sk{display:none}
   .screen:not(.paused) .bigplay{display:none}
 }
-
 .pctrl{left:0;right:0;bottom:0;z-index:7;padding:36px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:linear-gradient(transparent,#000d);direction:ltr}
-
 .seekwrap{position:relative;height:30px;cursor:pointer;display:flex;align-items:center;touch-action:none;outline:none}
 .rail{position:relative;width:100%;height:4px;border-radius:99px;background:#ffffff2e;transition:height .15s}
 .seekwrap:hover .rail,.seekwrap.drag .rail,.seekwrap:focus-visible .rail{height:7px}
@@ -87,7 +80,6 @@ img{display:block;max-width:100%}
 @media (pointer:coarse){#pknob{transform:scale(.85)}.seekwrap.drag #pknob{transform:scale(1.3)}}
 .ptip{position:absolute;bottom:30px;left:0;transform:translateX(-50%);background:#0b1220f5;border:1px solid #ffffff26;padding:4px 9px;border-radius:8px;font-size:11px;font-weight:800;color:#fff;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .12s;font-variant-numeric:tabular-nums}
 .seekwrap:hover .ptip,.seekwrap.drag .ptip{opacity:1}
-
 .prow{display:flex;align-items:center;gap:2px;flex-wrap:nowrap}
 .prow .ib{--ibs:38px;background:transparent}
 .prow .ib:hover{background:#ffffff1f}
@@ -97,13 +89,11 @@ img{display:block;max-width:100%}
 .pill{height:30px;min-width:44px;padding:0 11px;border-radius:99px;background:#ffffff1f;color:#fff;font-weight:900;font-size:12.5px;font-variant-numeric:tabular-nums;display:grid;place-items:center;flex:none;margin:0 4px;transition:background .15s,transform .15s}
 .pill:hover{background:#ffffff33}
 .pill:active{transform:scale(.94)}
-
 .vol{display:flex;align-items:center;flex:none}
 .vr{-webkit-appearance:none;appearance:none;width:0;opacity:0;height:4px;border-radius:99px;margin:0;padding:0;border:0;background:linear-gradient(to right,#fff var(--v,100%),#ffffff40 var(--v,100%));transition:width .2s,opacity .2s,margin .2s;cursor:pointer;outline:none}
 .vr::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;border:0}
 .vr::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:0}
 @media (hover:hover) and (pointer:fine){.vol:hover .vr,.vol:focus-within .vr{width:68px;opacity:1;margin:0 10px 0 4px}}
-
 .pmenu{position:absolute;right:12px;bottom:72px;z-index:20;width:250px;max-width:calc(100% - 24px);max-height:calc(100% - 92px);overflow:auto;background:#0d1424f8;border:1px solid #ffffff22;border-radius:16px;padding:8px;display:none;direction:rtl;color:#fff;box-shadow:0 20px 55px #0009;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);scrollbar-width:thin}
 .pmenu.open{display:block;animation:menuIn .18s cubic-bezier(.2,.8,.2,1)}
 @keyframes menuIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
@@ -123,20 +113,16 @@ img{display:block;max-width:100%}
 .opts button{border:1px solid #ffffff20;background:#ffffff0d;color:#fff;border-radius:10px;padding:8px 4px;font-size:12px;font-weight:800;transition:background .15s}
 .opts button:hover{background:#ffffff1c}
 .opts button.on{background:var(--blue);border-color:var(--blue)}
-
 .fx{position:absolute;top:50%;z-index:5;min-width:78px;text-align:center;background:#ffffff26;color:#fff;padding:12px 16px;border-radius:99px;font-weight:900;font-size:13px;opacity:0;pointer-events:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .fx.l{left:8%}
 .fx.r{right:8%}
 .fx.go{animation:fxa .6s ease}
 @keyframes fxa{0%{opacity:0;transform:translateY(-50%) scale(.75)}25%{opacity:1;transform:translateY(-50%) scale(1)}100%{opacity:0;transform:translateY(-50%) scale(1.1)}}
-
 .holdb{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:9;background:#000b;border:1px solid #ffffff2a;color:#fff;border-radius:99px;padding:6px 14px;font-weight:900;font-size:12.5px;display:none;align-items:center;gap:6px;pointer-events:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .holdb.show{display:inline-flex}
 .holdb svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-
 .toast{position:absolute;top:16%;left:50%;transform:translate(-50%,-10px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;background:#0b1220ee;border:1px solid #ffffff22;color:#fff;padding:7px 14px;border-radius:99px;z-index:25;font-size:12px;font-weight:800;box-shadow:0 8px 28px #0008;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-
 .loading{position:absolute;inset:0;z-index:15;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#000a;font-weight:800;font-size:13px;color:#fff}
 .loading.show{display:flex}
 .loading.buf{background:transparent;pointer-events:none}
@@ -157,7 +143,6 @@ img{display:block;max-width:100%}
 .ctrl.primary:hover{background:#4a7ff0}
 .ctrl:active{transform:scale(.96)}
 .ctrl:disabled{opacity:.4;pointer-events:none}
-
 .titlebox{padding:16px 2px 0;animation:fadeUp .45s both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 .eyebrow{font-size:11px;color:var(--blue2);font-weight:900;letter-spacing:.2px}
@@ -169,7 +154,6 @@ img{display:block;max-width:100%}
 .stat b{display:block;font-size:18px;font-weight:900}
 .stat span{font-size:10px;color:var(--muted);font-weight:800}
 .controls-under{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 0 0}
-
 .panel{background:linear-gradient(155deg,#15233aee,#0d1524f5);border:1px solid #8ab4ff20;border-radius:20px;overflow:hidden;box-shadow:0 22px 70px #0003;position:sticky;top:78px}
 .panel-head{padding:16px 16px 12px;background:linear-gradient(120deg,#1d3559aa,transparent);border-bottom:1px solid #ffffff0c}
 .panel-heading{display:flex;align-items:center;gap:10px}
@@ -206,7 +190,6 @@ img{display:block;max-width:100%}
 .mini i{display:block;height:100%;background:var(--blue2);border-radius:99px;transition:width .4s ease}
 .empty{padding:28px 18px;text-align:center;color:var(--muted);font-size:13px}
 .skeleton{padding:30px;text-align:center;color:var(--muted)}
-
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;gap:16px}
   .panel{position:relative;top:auto;order:2}
@@ -279,7 +262,6 @@ img{display:block;max-width:100%}
           <video id="video" playsinline webkit-playsinline preload="metadata" controlslist="nodownload noplaybackrate" oncontextmenu="return false"></video>
 
           <div class="ptap" id="ptap"></div>
-
           <div class="fx l" id="fxl"></div>
           <div class="fx r" id="fxr"></div>
           <div class="holdb" id="holdb"><svg viewBox="0 0 24 24"><path d="m5 6 6 6-6 6M13 6l6 6-6 6"/></svg><span>سرعة 2×</span></div>
@@ -412,7 +394,7 @@ let prefs=Object.assign({rate:1,autonext:true,volume:1,muted:false},readPref());
 function savePref(){try{localStorage.setItem(PREF_KEY,JSON.stringify(prefs))}catch(e){}}
 
 let videos=[],current=-1,hls=null,lastSaved=0,toastTimer=0,ready=false;
-let lectureTitle='المحاضرة',listFilter='all',listQuery='',pendingRestore=-1;
+let lectureTitle='المحاضرة',listFilter='all',listQuery='';
 
 let cryptoUtils=null,currentKeyBlobUrl=null,currentPlaylistBlobUrl=null,hbTimer=null;
 
@@ -479,7 +461,7 @@ async function api(path,opts={}){
   if(!r.ok){
     const er=new Error(d.message||`السيرفر رجّع خطأ (${r.status})`);
     er.status=r.status;
-    if(r.status===401||r.status===403){er.kind='auth';er.message='جلسة الدخول انتهت أو مفيش صلاحية لمشاهدة الفيديو ده.'}
+    if(r.status===401||r.status===403){er.kind='auth';er.message='جلسة الدخول انتهت أو مفيش صلاحية.'}
     throw er;
   }
   return d;
@@ -839,18 +821,20 @@ async function playIndex(i,autoplay){
   history.replaceState(null,'',`?lectureId=${encodeURIComponent(lectureId)}&videoId=${encodeURIComponent(item.id)}`);
   updateMediaSession();
   try{
-    // 1) جلسة التشغيل من الـ API
+    // 1) جلسة التشغيل من /api/video/:id/play
     const session=await api('/api/video/'+encodeURIComponent(item.id)+'/play',{method:'POST'});
     if(my!==playToken)return;
+    
+    // السيرفر بيرجع { token, video_id, heartbeat_url }
     const streamToken=session.token, swVideoId=session.video_id, hbUrl=session.heartbeat_url;
     if(!streamToken||!swVideoId)throw new Error('بيانات تشغيل الفيديو غير مكتملة');
 
-    // 2) تحميل مكتبة فك التشفير
+    // 2) تحميل crypto
     setLoading(true,'جاري تحضير التشغيل…');
     if(!cryptoUtils)cryptoUtils=await loadPlayerScript();
     if(my!==playToken)return;
 
-    // 3) جلب master playlist
+    // 3) master playlist
     const masterUrl='/api/stream?path='+encodeURIComponent('videos/'+swVideoId+'/stream/master.m3u8')+'&t='+encodeURIComponent(streamToken);
     const masterRes=await fetch(masterUrl);
     if(!masterRes.ok)throw new Error('master.m3u8 → HTTP '+masterRes.status);
@@ -858,7 +842,7 @@ async function playIndex(i,autoplay){
     const variantRel=masterText.split('\n').map(l=>l.trim()).find(l=>l&&l.charAt(0)!=='#');
     if(!variantRel)throw new Error('لا يوجد variant في الـ master');
 
-    // 4) جلب variant playlist
+    // 4) variant playlist
     let variantUrl,varBase='videos/'+swVideoId+'/stream/',varFileUrl=null;
     if(variantRel.indexOf('/api/stream')===0||variantRel.indexOf('/api/cdn')===0){
       variantUrl=variantRel;
@@ -875,7 +859,7 @@ async function playIndex(i,autoplay){
     const variantText=await variantRes.text();
     if(my!==playToken)return;
 
-    // 5) فك التشفير
+    // 5) فك المفتاح
     setLoading(true,'فك التشفير…');
     const keyLine=variantText.split('\n').find(l=>l.indexOf('EXT-X-KEY')!==-1);
     let keyPath='videos/'+swVideoId+'/key',ivHex=null;
@@ -902,7 +886,7 @@ async function playIndex(i,autoplay){
     const keyBytes=aesKey instanceof ArrayBuffer?aesKey:aesKey.buffer.slice(aesKey.byteOffset,aesKey.byteOffset+aesKey.byteLength);
     currentKeyBlobUrl=URL.createObjectURL(new Blob([keyBytes],{type:'application/octet-stream'}));
 
-    // 6) إعادة كتابة playlist
+    // 6) rewrite playlist
     let fixedVariant=rewritePlaylist(variantText,streamToken,currentKeyBlobUrl,varBase,varFileUrl);
     if(fixedVariant.indexOf('#EXTM3U')!==0)fixedVariant='#EXTM3U\n'+fixedVariant.replace(/^#EXTM3U\s*/m,'');
     if(fixedVariant.indexOf('EXT-X-KEY')===-1){
@@ -920,7 +904,7 @@ async function playIndex(i,autoplay){
       },25000);
     }
 
-    // 8) التشغيل
+    // 8) resume
     const saved=readProgress(item.id);
     const resumeAt=saved&&saved.currentTime>2&&!saved.watched?+saved.currentTime:0;
     applyRate();
@@ -950,10 +934,6 @@ async function playIndex(i,autoplay){
       hls.on(Hls.Events.FRAG_BUFFERED,()=>{hlsRetry.net=0});
       hls.on(Hls.Events.ERROR,(_e,d)=>{
         if(my!==playToken||!d||!d.fatal)return;
-        const code=d.response&&d.response.code;
-        if(code===401||code===403){
-          showError('جلسة الدخول انتهت أو مفيش صلاحية لمشاهدة الفيديو ده.','انتهت الجلسة','leave');return;
-        }
         if(d.type===Hls.ErrorTypes.NETWORK_ERROR){
           if(hlsRetry.net++<3){
             setLoading(true,'النت ضعيف… بحاول تاني',false);
@@ -996,12 +976,11 @@ async function init(){
     return;
   }
   if(!lectureId){
-    showError('رابط المشغل ناقصه رقم المحاضرة. افتح الفيديو من صفحة المواد.','رابط ناقص','leave');
+    showError('رابط المشغل ناقصه رقم المحاضرة.','رابط ناقص','leave');
     return;
   }
   try{
-    const r=await api('/api/lectures/'+encodeURIComponent(lectureId)+'/content');
-    const d=r.data||r;
+    const d=await api('/api/lectures/'+encodeURIComponent(lectureId)+'/content');
     videos=(d.videos||[]).map((v,i)=>({
       id:v.id,
       title:v.title||v.name||`فيديو ${i+1}`,
@@ -1110,10 +1089,6 @@ function onFsChange(){
   const on=!!fsEl();
   $('pfs').innerHTML=on?SVG_FS_OFF:SVG_FS_ON;
   $('pfs').setAttribute('aria-label',on?'خروج من ملء الشاشة':'ملء الشاشة');
-  try{
-    if(on&&matchMedia('(pointer:coarse)').matches&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});
-    else if(!on&&screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
-  }catch(e){}
   showUI();
 }
 ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,onFsChange));
@@ -1310,4 +1285,4 @@ init();
 })();
 </script>
 </body>
-                </html>
+</html>
