@@ -557,13 +557,10 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 <script>
 (function(){
 'use strict';
-/* Theme */
 document.getElementById('theme-toggle').addEventListener('click',function(){
   document.body.setAttribute('data-theme',document.body.getAttribute('data-theme')==='light'?'dark':'light');
 });
 var y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
-
-/* Reveal */
 var items=document.querySelectorAll('.reveal');
 if('IntersectionObserver' in window){
   var io=new IntersectionObserver(function(entries){
@@ -572,7 +569,6 @@ if('IntersectionObserver' in window){
   items.forEach(function(el){io.observe(el)});
 }else{items.forEach(function(el){el.classList.add('visible')})}
 
-/* Auth open/close */
 function openAuth(){document.getElementById('auth-screen').classList.add('open');document.body.style.overflow='hidden';window.scrollTo(0,0)}
 document.querySelectorAll('[data-open-login],[data-login-link]').forEach(function(el){
   el.addEventListener('click',function(){
@@ -588,7 +584,6 @@ document.querySelectorAll('[data-home-link]').forEach(function(el){
   });
 });
 
-/* Login عبر السيرفر مع fallback محلي */
 var form=document.getElementById('code-form');
 var code=document.getElementById('code');
 var statusBox=document.getElementById('status');
@@ -606,17 +601,15 @@ function showSt(type,msg){
   else statusBox.textContent=msg;
 }
 
-function savePersistent(k,v){
-  try{window.localStorage.setItem(k,String(v));return true}catch(_){return false}
-}
+function save(k,v){try{localStorage.setItem(k,String(v))}catch(_){}}
 
-function doLocalLogin(val){
+function doLogin(val){
   var token='bypass_'+val+'_'+Date.now();
-  savePersistent('cstk_tok',token);
-  savePersistent('cstk_code',val);
-  savePersistent('cstk_me',JSON.stringify({name:'طالب',code:val}));
+  save('cstk_tok',token);
+  save('cstk_code',val);
+  save('cstk_me',JSON.stringify({name:'طالب',code:val}));
   showSt('success','تمام! جاري فتح المواد...');
-  setTimeout(function(){window.location.href='subjects.html'},500);
+  setTimeout(function(){window.location.href='subjects.html'},400);
 }
 
 form.addEventListener('submit',function(e){
@@ -639,19 +632,19 @@ form.addEventListener('submit',function(e){
     }
     var data=(out.d&&out.d.data)||out.d||{};
     var token=data.token||('bypass_'+val+'_'+Date.now());
-    savePersistent('cstk_tok',token);
-    savePersistent('cstk_code',val);
-    savePersistent('cstk_me',JSON.stringify({name:data.name||'طالب',code:val}));
+    save('cstk_tok',token);
+    save('cstk_code',val);
+    save('cstk_me',JSON.stringify({name:data.name||'طالب',code:val}));
     showSt('success','تمام! جاري فتح المواد...');
-    setTimeout(function(){window.location.href='subjects.html'},500);
+    setTimeout(function(){window.location.href='subjects.html'},400);
   })
   .catch(function(err){
-    console.warn('login via server failed, fallback:',err.message);
-    doLocalLogin(val);
+    console.warn('login fallback:',err.message);
+    doLogin(val);
   })
   .then(function(){busy=false;submitBtn.disabled=false});
 });
 })();
 </script>
 </body>
-</html>
+  </html>
