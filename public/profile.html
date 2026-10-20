@@ -1,60 +1,459 @@
 <!doctype html>
 <html lang="ar-EG" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080d18"><title>ملفي الشخصي | ثانوية Club</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060910">
+<title>ملفي | ثانوية club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080d18;--panel:#111a2b;--panel2:#172238;--line:rgba(148,163,184,.15);--text:#f2f6ff;--muted:#94a3bd;--blue:#3b82f6;--cyan:#67e8f9;--green:#34d399;--amber:#fbbf24;--red:#fb7185}*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:var(--text);font-family:Cairo,system-ui,sans-serif;background:radial-gradient(900px 500px at 90% -5%,#1c3d7a55,transparent 65%),radial-gradient(700px 450px at -10% 80%,#164e6350,transparent 60%),var(--bg)}button{font:inherit;cursor:pointer}.top{position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:#080d18d9;backdrop-filter:blur(18px)}.topin{max-width:1050px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:12px}.logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 8px 24px #2563eb55;font-size:20px}.brand{font-weight:900}.brand small{display:block;font-size:10px;color:var(--muted);font-weight:600}.spacer{flex:1}.btn{border:1px solid var(--line);border-radius:13px;padding:9px 14px;background:#ffffff08;color:var(--text);font-size:12px;font-weight:800;transition:.2s}.btn:hover{transform:translateY(-1px);border-color:#60a5fa88;background:#ffffff0d}.btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:0;box-shadow:0 8px 22px #2563eb33}.btn.danger{color:#fda4af}.wrap{max-width:1050px;margin:auto;padding:26px 18px 60px}.heading{margin-bottom:22px;animation:up .4s ease}.eyebrow{display:inline-flex;gap:7px;align-items:center;color:#93c5fd;border:1px solid #3b82f644;background:#3b82f61a;border-radius:30px;padding:5px 11px;font-size:11px;font-weight:800}.heading h1{font-size:clamp(24px,5vw,34px);line-height:1.3;margin:12px 0 5px;font-weight:900}.heading p{margin:0;color:var(--muted);font-size:13px}.hero{position:relative;overflow:hidden;border:1px solid #5793ff35;border-radius:27px;padding:25px;background:linear-gradient(115deg,#142b4b,#111a2b 55%,#10243b);box-shadow:0 24px 70px #0004;animation:up .45s ease}.hero:after{content:"";position:absolute;width:250px;height:250px;left:-75px;top:-120px;border-radius:50%;background:#3b82f622;filter:blur(5px);pointer-events:none}.hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:18px}.avatar{width:82px;height:82px;flex-shrink:0;display:grid;place-items:center;border-radius:25px;background:linear-gradient(140deg,#60a5fa,#1d4ed8 70%);border:1px solid #ffffff40;box-shadow:0 12px 35px #2563eb55;font-size:32px;font-weight:900}.name{font-size:23px;font-weight:900;overflow-wrap:anywhere}.subline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:7px;color:var(--muted);font-size:12px}.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:30px;background:#34d3991a;color:#6ee7b7;border:1px solid #34d39935;font-weight:800;font-size:11px}.pill.warn{color:#fcd34d;background:#fbbf2415;border-color:#fbbf2435}.pill.off{color:#fda4af;background:#fb71851a;border-color:#fb718535}.hero-tag{margin-right:auto;align-self:flex-start;border:1px solid #ffffff16;background:#ffffff09;border-radius:14px;padding:9px 12px;color:#cbd5e1;font-size:11px;font-weight:800;white-space:nowrap}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 24px}.stat{border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg,#141e30,#0e1625);padding:17px;animation:up .5s ease both}.stat .ico{font-size:18px}.stat strong{display:block;font-size:25px;font-weight:900;margin-top:7px;line-height:1.25}.stat span{display:block;color:var(--muted);font-size:11px;margin-top:5px}.section-title{font-size:16px;font-weight:900;margin:25px 0 12px;display:flex;align-items:center;gap:9px}.section-title:before{content:"";width:4px;height:20px;border-radius:4px;background:linear-gradient(#60a5fa,#2563eb)}.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.detail{min-width:0;display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:17px;padding:15px;background:#111a2bc9;transition:.2s}.detail:hover{border-color:#60a5fa55;transform:translateY(-2px)}.detail .di{width:42px;height:42px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#3b82f61a;font-size:19px}.detail .label{font-size:11px;color:var(--muted);font-weight:700}.detail .value{font-size:14px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}.detail .value.small{font-size:12px}.detailbody{min-width:0;flex:1}.copy{border:1px solid #3b82f644;border-radius:10px;background:#3b82f61a;color:#93c5fd;font-size:11px;font-weight:800;padding:7px 9px;flex-shrink:0}.subscription{border:1px solid #3b82f635;background:linear-gradient(135deg,#132745,#111a2b);border-radius:23px;padding:20px}.sub-head{display:flex;align-items:center;gap:10px}.sub-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:14px;background:#3b82f622;font-size:22px}.sub-head h3{margin:0;font-size:15px}.sub-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}.countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:18px}.time{border:1px solid var(--line);background:#070d1988;border-radius:15px;text-align:center;padding:12px 5px}.time b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}.time span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.progress-wrap{margin-top:16px}.progress-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px;margin-bottom:8px}.progress{height:8px;background:#ffffff12;border-radius:20px;overflow:hidden}.progress i{height:100%;display:block;width:0;background:linear-gradient(90deg,#60a5fa,#34d399);border-radius:20px;transition:width .5s}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.notice{border:1px solid #fbbf2435;background:#fbbf240c;border-radius:15px;padding:13px 15px;color:#fde68a;font-size:12px;line-height:1.8;margin-top:16px}.loading,.error{max-width:460px;margin:12vh auto;text-align:center;padding:28px;border:1px solid var(--line);border-radius:22px;background:var(--panel)}.loader{width:38px;height:38px;border:3px solid #ffffff20;border-top-color:#60a5fa;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 15px}.error p{color:var(--muted);font-size:13px;line-height:1.8}@keyframes spin{to{transform:rotate(360deg)}}@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@media(max-width:620px){.wrap{padding:20px 13px 45px}.hero{padding:19px}.hero-inner{align-items:flex-start;gap:13px}.avatar{width:66px;height:66px;border-radius:20px;font-size:26px}.name{font-size:19px}.hero-tag{display:none}.stats{gap:8px}.stat{padding:12px 10px;border-radius:15px}.stat strong{font-size:22px}.stat span{font-size:10px}.details{grid-template-columns:1fr}.detail{padding:13px}.countdown{gap:6px}.time{padding:10px 3px}.time b{font-size:21px}.topin{padding:10px 13px}.btn{padding:8px 10px}.brand{font-size:14px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+:root{
+  --bg:#060910;--bg2:#0b1220;--panel:#0f1a2c;--panel2:#152035;--panel3:#1b2a42;
+  --line:rgba(96,165,250,.11);--line2:rgba(96,165,250,.22);
+  --text:#deeaff;--muted:#5a7491;--muted2:#8aaec8;
+  --blue:#3b82f6;--blue2:#60a5fa;--cyan:#22d3ee;--cyan2:#67e8f9;
+  --green:#34d399;--red:#f87171;--amber:#fbbf24;
+  --grad:linear-gradient(135deg,#2563eb,#1d4ed8);
+  --grad3:linear-gradient(90deg,#06b6d4,#3b82f6 50%,#818cf8);
+  --shadow:0 24px 64px rgba(0,0,0,.6);--font:'Cairo',system-ui,sans-serif
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;background:var(--bg)}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:var(--font);
+  direction:rtl;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background:
+    radial-gradient(900px 600px at 95% -6%,rgba(37,99,235,.18),transparent 65%),
+    radial-gradient(700px 500px at -6% 85%,rgba(6,182,212,.1),transparent 60%),
+    var(--bg)
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;z-index:0;
+  background-image:radial-gradient(rgba(96,165,250,.5) .55px,transparent .55px);
+  background-size:26px 26px;
+  mask-image:linear-gradient(to bottom,black,transparent 65%)
+}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.g{background:var(--grad3);background-clip:text;-webkit-background-clip:text;color:transparent}
 
-/* Profile Pro UI */
-:root{--glow:#3b82f6;--glass:rgba(17,26,43,.78)}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:radial-gradient(#8ab4ff 0.65px,transparent .65px);background-size:24px 24px;mask-image:linear-gradient(to bottom,black,transparent 75%);z-index:0}
-.top,.wrap,#toast{position:relative;z-index:1}.top{background:rgba(8,13,24,.78)}
-.logo{position:relative;overflow:hidden}.logo:after{content:"";position:absolute;inset:-70%;background:linear-gradient(115deg,transparent 35%,#ffffff55 50%,transparent 65%);transform:translateX(-70%);animation:shine 6s ease-in-out infinite}
-@keyframes shine{0%,65%,100%{transform:translateX(-70%)}80%{transform:translateX(70%)}}
-.hero{background:linear-gradient(120deg,rgba(20,43,75,.96),rgba(17,26,43,.96) 55%,rgba(16,36,59,.96));isolation:isolate}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 15%,#60a5fa09 45%,transparent 70%);transform:translateX(-100%);animation:heroSweep 10s ease-in-out infinite;pointer-events:none}@keyframes heroSweep{0%,55%,100%{transform:translateX(-100%)}75%{transform:translateX(100%)}}
-.avatar{position:relative}.avatar:after{content:"";position:absolute;inset:-5px;border:1px solid #93c5fd55;border-radius:29px;animation:avatarPulse 3s ease-in-out infinite;pointer-events:none}@keyframes avatarPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.06);opacity:.12}}
-.svg-icon{width:20px;height:20px;display:inline-block;vertical-align:middle;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.logo .svg-icon{width:23px;height:23px}.eyebrow .svg-icon{width:15px;height:15px}.stat .ico{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#3b82f629,#67e8f91a);border:1px solid #60a5fa20;color:#93c5fd}.stat .ico .svg-icon{width:22px;height:22px}.detail .di,.sub-icon{color:#93c5fd;border:1px solid #60a5fa20;background:linear-gradient(145deg,#3b82f625,#67e8f90b)}.detail .di .svg-icon,.sub-icon .svg-icon{width:21px;height:21px}.section-title{margin-top:30px}.section-title:before{box-shadow:0 0 15px #3b82f655}.stat{position:relative;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}.stat:after{content:"";position:absolute;inset:auto -25px -42px auto;width:100px;height:100px;border-radius:50%;background:#3b82f610;filter:blur(2px)}.stat:hover{transform:translateY(-4px);border-color:#60a5fa55;box-shadow:0 14px 30px #0003}.detail{background:linear-gradient(145deg,rgba(17,26,43,.92),rgba(12,20,34,.88));backdrop-filter:blur(8px)}.copy{transition:.2s}.copy:hover{background:#3b82f632;transform:translateY(-1px)}.subscription{position:relative;overflow:hidden;background:linear-gradient(125deg,#132745,#111a2b 70%)}.subscription:after{content:"";position:absolute;left:-45px;bottom:-80px;width:180px;height:180px;border-radius:50%;background:#3b82f614;filter:blur(4px);pointer-events:none}.progress{height:9px}.progress i{position:relative;overflow:hidden}.progress i:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff66,transparent);transform:translateX(-100%);animation:progressShine 2.5s linear infinite}@keyframes progressShine{to{transform:translateX(100%)}}
-.heading,.hero,.stat,.detail,.subscription,.actions{animation:up .48s cubic-bezier(.2,.75,.25,1) both}.stats .stat:nth-child(2){animation-delay:.07s}.stats .stat:nth-child(3){animation-delay:.14s}.details .detail:nth-child(2n){animation-delay:.04s}.details .detail:nth-child(3n){animation-delay:.08s}.actions .btn{transition:transform .2s,box-shadow .2s}.actions .btn:hover{box-shadow:0 8px 22px #0003}
-@media(max-width:620px){.hero-inner{align-items:center}.detail .di{width:40px;height:40px}.stat .ico{width:38px;height:38px}}
-@media(prefers-reduced-motion:reduce){.logo:after,.hero:before,.avatar:after,.progress i:after{animation:none!important}}
-</style></head>
+/* ── topbar ── */
+.top{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);
+  background:rgba(6,9,16,.85);backdrop-filter:blur(22px);position:relative;z-index:1}
+.topin{max-width:1060px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.brand-logo{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+  background:var(--grad);box-shadow:0 8px 28px rgba(37,99,235,.45);flex-shrink:0;
+  position:relative;overflow:hidden}
+.brand-logo::after{content:"";position:absolute;inset:-60%;
+  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
+  transform:translateX(-100%);animation:shine 7s ease-in-out infinite}
+@keyframes shine{0%,65%,100%{transform:translateX(-100%)}82%{transform:translateX(100%)}}
+.brand-logo svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-weight:900;font-size:15px;line-height:1.1}
+.brand-name small{display:block;font-size:10px;color:var(--muted);font-weight:600;margin-top:2px}
+.spacer{flex:1}
+.btn{border:1px solid var(--line2);border-radius:11px;padding:8px 14px;
+  background:rgba(255,255,255,.04);color:var(--text);
+  font-size:12px;font-weight:800;
+  transition:.18s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;cursor:pointer}
+.btn:hover{transform:translateY(-1px);border-color:rgba(96,165,250,.35);background:rgba(255,255,255,.08)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.btn.primary:hover{box-shadow:0 12px 32px rgba(37,99,235,.45)}
+.btn.danger{color:var(--red)}
+.btn.danger:hover{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.07)}
+
+/* ── wrap ── */
+.wrap{max-width:1060px;margin:auto;padding:26px 18px 64px;position:relative;z-index:1}
+
+/* ── heading ── */
+.heading{margin-bottom:22px;animation:fadeUp .4s ease}
+.eyebrow{display:inline-flex;gap:7px;align-items:center;
+  color:var(--cyan2);border:1px solid rgba(96,165,250,.2);background:rgba(37,99,235,.1);
+  border-radius:30px;padding:5px 12px;font-size:11px;font-weight:800}
+.heading h1{font-size:clamp(22px,5vw,32px);line-height:1.3;margin:12px 0 5px;font-weight:900}
+.heading p{margin:0;color:var(--muted2);font-size:13px}
+
+/* ── hero card ── */
+.hero-card{
+  position:relative;overflow:hidden;
+  border:1px solid rgba(59,130,246,.2);border-radius:24px;
+  padding:24px;
+  background:linear-gradient(120deg,rgba(20,45,80,.96),rgba(15,26,44,.97) 55%,rgba(16,36,59,.96));
+  box-shadow:var(--shadow);animation:fadeUp .45s ease;isolation:isolate
+}
+.hero-card::before{content:"";position:absolute;inset:0;z-index:0;
+  background:linear-gradient(110deg,transparent 15%,rgba(96,165,250,.05) 45%,transparent 70%);
+  transform:translateX(-100%);animation:sweep 12s ease-in-out infinite;pointer-events:none}
+@keyframes sweep{0%,55%,100%{transform:translateX(-100%)}75%{transform:translateX(100%)}}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
+.avatar{
+  width:80px;height:80px;flex-shrink:0;display:grid;place-items:center;
+  border-radius:22px;background:var(--grad);
+  border:1px solid rgba(255,255,255,.25);box-shadow:0 12px 36px rgba(37,99,235,.45);
+  font-size:32px;font-weight:900;position:relative
+}
+.avatar::after{content:"";position:absolute;inset:-5px;border:1px solid rgba(96,165,250,.35);
+  border-radius:27px;animation:pulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.06);opacity:.1}}
+.name{font-size:21px;font-weight:900;overflow-wrap:anywhere;line-height:1.25}
+.subline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:12px;color:var(--muted2)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;
+  background:rgba(52,211,153,.12);color:#6ee7b7;border:1px solid rgba(52,211,153,.28);font-weight:800;font-size:11px}
+.pill.warn{color:#fcd34d;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.28)}
+.pill.off{color:var(--red);background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.28)}
+.hero-tag{margin-right:auto;align-self:flex-start;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);
+  border-radius:12px;padding:8px 12px;color:var(--muted2);font-size:11px;font-weight:800}
+
+/* ── stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 24px}
+.stat{border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(160deg,var(--panel2),var(--panel));
+  padding:16px;animation:fadeUp .5s ease both;transition:border-color .2s,transform .2s}
+.stat:hover{border-color:var(--line2);transform:translateY(-2px)}
+.stat .ico{font-size:18px;margin-bottom:6px}
+.stat strong{display:block;font-size:24px;font-weight:900;line-height:1.2}
+.stat span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+
+/* ── section title ── */
+.sec-title{font-size:15px;font-weight:900;margin:26px 0 12px;display:flex;align-items:center;gap:9px}
+.sec-title::before{content:"";width:4px;height:20px;border-radius:4px;background:var(--grad3)}
+
+/* ── details ── */
+.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.detail{min-width:0;display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line);border-radius:15px;padding:14px;
+  background:rgba(15,26,44,.88);transition:.18s}
+.detail:hover{border-color:rgba(96,165,250,.25);transform:translateY(-2px)}
+.di{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;
+  border-radius:12px;background:rgba(59,130,246,.1);font-size:18px}
+.dlabel{font-size:11px;color:var(--muted);font-weight:700}
+.dvalue{font-size:14px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}
+.dvalue.small{font-size:12px}
+.dbody{min-width:0;flex:1}
+.copy-btn{border:1px solid rgba(59,130,246,.28);border-radius:9px;
+  background:rgba(59,130,246,.09);color:var(--cyan2);
+  font-size:11px;font-weight:800;padding:6px 9px;cursor:pointer;transition:.15s}
+.copy-btn:hover{background:rgba(59,130,246,.18)}
+
+/* ── sub card ── */
+.sub-card{border:1px solid rgba(59,130,246,.18);
+  background:linear-gradient(135deg,var(--panel2),var(--panel));
+  border-radius:20px;padding:20px}
+.sub-head{display:flex;align-items:center;gap:12px}
+.sub-icon{width:46px;height:46px;display:grid;place-items:center;
+  border-radius:13px;background:rgba(59,130,246,.12);font-size:22px}
+.sub-head h3{margin:0;font-size:15px;font-weight:900}
+.sub-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
+.countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:16px}
+.time-box{border:1px solid var(--line);background:rgba(6,9,16,.8);
+  border-radius:13px;text-align:center;padding:12px 4px;transition:border-color .2s}
+.time-box:hover{border-color:var(--line2)}
+.time-box b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--cyan2)}
+.time-box span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.prog-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px;margin:15px 0 7px}
+.prog-bar{height:7px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.prog-bar i{height:100%;display:block;width:0;
+  background:var(--grad3);border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.notice{border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.07);
+  border-radius:13px;padding:13px 15px;color:#fde68a;font-size:12px;line-height:1.85;margin-top:14px}
+
+/* ── loading/error ── */
+.loading,.error-view{max-width:440px;margin:12vh auto;text-align:center;padding:28px;
+  border:1px solid var(--line);border-radius:20px;background:var(--panel)}
+.loader{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);
+  border-top-color:var(--blue);border-radius:50%;
+  animation:spin .85s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-view p{color:var(--muted);font-size:13px;line-height:1.8}
+#toast{position:fixed;z-index:99;bottom:22px;left:50%;
+  transform:translate(-50%,150%);padding:11px 17px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);
+  font-size:12px;font-weight:800;transition:transform .3s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:620px){
+  .wrap{padding:18px 13px 44px}
+  .hero-card{padding:18px}
+  .hero-inner{align-items:flex-start;gap:13px}
+  .avatar{width:64px;height:64px;border-radius:19px;font-size:26px}
+  .name{font-size:17px}
+  .hero-tag{display:none}
+  .stats-row{gap:8px}
+  .stat{padding:12px 9px;border-radius:14px}
+  .stat strong{font-size:21px}
+  .details{grid-template-columns:1fr}
+  .countdown{gap:6px}
+  .time-box b{font-size:20px}
+  .topin{padding:10px 13px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
 <body>
-<header class="top"><div class="topin"><div class="logo"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c2.5 2 9.5 2 12 0v-5M22 10v6"/></svg></div><div class="brand">ثانوية Club<small>ملف الطالب الشخصي</small></div><div class="spacer"></div><button class="btn" id="backBtn"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> المواد</button></div></header>
-<main class="wrap" id="main"><div class="loading"><div class="loader"></div><b>بنجهّز ملفك الشخصي…</b><p style="color:var(--muted);font-size:12px">لحظة واحدة بنجيب بيانات الحساب والاشتراك</p></div></main>
-<div id="toast" style="position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:20;background:#172238;border:1px solid #ffffff20;border-radius:12px;padding:11px 17px;font-size:12px;font-weight:800;transition:.25s;box-shadow:0 12px 35px #0007"></div>
+
+<div class="top" style="position:sticky;top:0;z-index:20">
+  <div class="topin">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/></svg>
+    </div>
+    <div class="brand-name">ثانوية club <small>ملفك الشخصي</small></div>
+    <div class="spacer"></div>
+    <button class="btn" id="backBtn">
+      <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> رجوع
+    </button>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <div class="loading">
+    <div class="loader"></div>
+    <b>بنحمّل بياناتك...</b>
+    <p style="color:var(--muted);font-size:12px;margin-top:8px">لحظة واحدة...</p>
+  </div>
+</main>
+<div id="toast" role="status"></div>
+
 <script>
-(function(){'use strict';
-var API='https://coursattk-production.up.railway.app',TOKEN_KEY='cstk_tok',WATCH_PREFIX='cstk_w_',me=null,timer=null,toastTimer=null;
+(function(){
+'use strict';
+const TOKEN_KEY='cstk_tok';
+const API='https://coursattk-production.up.railway.app';
+
 function $(id){return document.getElementById(id)}
-function icon(name){var paths={graduation:'<path d="m2 10 10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c2.5 2 9.5 2 12 0v-5M22 10v6"/>',sparkles:'<path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 1.1 2.9L23 18l-2.9 1.1L19 22l-1.1-2.9L15 18l2.9-1.1L19 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',play:'<path d="m8 5 11 7-11 7V5Z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',lock:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"/><path d="M4 17a2.5 2.5 0 0 1 2.5-2.5H20"/>',school:'<path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v5c3 2 7 2 10 0v-5M21 9v7"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',devices:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 8h10"/>',ticket:'<path d="M3 8a2 2 0 0 0 0 4v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 1 0-4V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2Z"/><path d="M13 5v2M13 11v2M13 17v2"/>',refresh:'<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.5-3"/>',logout:'<path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>',wifi:'<path d="M5 9a11 11 0 0 1 14 0M8 12a6.5 6.5 0 0 1 8 0M11 15a2 2 0 0 1 2 0M12 19h.01"/>',shield:'<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>',arrow:'<path d="M19 12H5M12 19l-7-7 7-7"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/>'};return '<svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true">'+(paths[name]||paths.sparkles)+'</svg>'}
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function token(){try{return localStorage.getItem(TOKEN_KEY)}catch(e){return null}}
-function sectionLabel(v){return ({scientific_sciences:'علمي علوم',scientific_math:'علمي رياضة',literary:'أدبي'})[v]||v||'غير محددة'}
-function asDate(v){if(v==null||v==='')return null;var d=(typeof v==='number'||/^\d+$/.test(String(v)))?new Date(Number(v)):new Date(v);return isNaN(d.getTime())?null:d}
-function dateLabel(v){var d=asDate(v);return d?d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'}):'غير محدد'}
-function toast(s){var t=$('toast');t.textContent=s;t.style.opacity='1';t.style.transform='translate(-50%,0)';clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.style.opacity='0';t.style.transform='translate(-50%,20px)'},2300)}
-function watchStats(){var total=0,done=0,seconds=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||k.indexOf(WATCH_PREFIX)!==0)continue;var x;try{x=JSON.parse(localStorage.getItem(k)||'null')}catch(e){x=null}if(!x)continue;total++;if(x.watched||(+x.percent||0)>=90)done++;seconds+=Math.max(0,+x.currentTime||0)}}catch(e){}return {total:total,done:done,active:Math.max(0,total-done),minutes:Math.floor(seconds/60)}}
-function subType(m){var v=m.subscriptionType||m.planName||m.plan||m.subscriptionName||m.packageName||m.subscription||m.type; if(v&&typeof v==='string')return v;return m.isPremium?'مميز':'اشتراك طالب'}
-function status(m){var expiry=asDate(m.expiresAt),left=expiry?expiry.getTime()-Date.now():null;if(left===null)return {label:'الحالة غير محددة',cls:'warn',left:null};if(left<=0)return {label:'منتهي',cls:'off',left:left};if(left<=7*86400000)return {label:'ينتهي قريبًا',cls:'warn',left:left};return {label:'نشط',cls:'',left:left}}
-function timerStart(){clearInterval(timer);function tick(){if(!me)return;var s=status(me),n=Math.max(0,Math.floor((s.left||0)/1000)),d=Math.floor(n/86400);n%=86400;var h=Math.floor(n/3600);n%=3600;var m=Math.floor(n/60),ss=n%60;[['days',d],['hours',h],['mins',m],['secs',ss]].forEach(function(x){var el=$(x[0]);if(el)el.textContent=String(x[1]).padStart(2,'0')});var p=$('subProgress');if(p){var duration=Number(me.durationMs||me.subscriptionDurationMs||0);if(!duration&&me.createdAt&&me.expiresAt){var cd=asDate(me.createdAt),ed=asDate(me.expiresAt);if(cd&&ed)duration=ed.getTime()-cd.getTime();}var pct=duration>0?Math.max(0,Math.min(100,(s.left||0)/duration*100)):((s.left||0)>0?100:0);p.style.width=pct+'%';var t=$('progressText');if(t)t.textContent=duration>0?Math.round(pct)+'% من مدة الاشتراك المتبقية':'حسب تاريخ انتهاء الاشتراك'}}tick();timer=setInterval(tick,1000)}
-function detail(iconName,label,value,extra){return '<div class="detail"><div class="di">'+icon(iconName)+'</div><div class="detailbody"><div class="label">'+label+'</div><div class="value '+(extra?'small':'')+'">'+value+'</div></div></div>'}
-function render(m){me=m||{};var st=status(me),w=watchStats(),name=me.name||me.fullName||me.studentName||'الطالب',code=me.code||me.subscriptionCode||'—',year=me.yearName||me.gradeName||me.year||'—',devices=me.maxDevices||me.deviceLimit||1,plan=subType(me),expiry=dateLabel(me.expiresAt),created=dateLabel(me.createdAt),days=st.left===null?'—':Math.max(0,Math.ceil(st.left/86400000));
-var codeHtml=esc(code);
-$('main').innerHTML='<div class="heading"><span class="eyebrow">'+icon('sparkles')+' لوحة الطالب الشخصية</span><h1>أهلاً بيك، '+esc(name.split(' ')[0])+'</h1><p>كل تفاصيل حسابك واشتراكك وتقدّمك الدراسي في مكان واحد.</p></div>'+ 
-'<section class="hero"><div class="hero-inner"><div class="avatar">'+esc((name.trim().charAt(0)||'ط').toUpperCase())+'</div><div style="min-width:0;flex:1"><div class="name">'+esc(name)+'</div><div class="subline"><span class="pill '+st.cls+'">'+icon('shield')+' '+esc(st.label)+'</span><span>'+icon('graduation')+' '+esc(sectionLabel(me.section))+'</span></div><div class="subline"><span>'+icon('ticket')+' '+esc(plan)+'</span></div></div><div class="hero-tag">'+icon('sparkles')+' حسابك الدراسي</div></div></section>'+ 
-'<section class="stats"><div class="stat"><div class="ico">'+icon('check')+'</div><strong>'+w.done+'</strong><span>فيديو مكتمل</span></div><div class="stat"><div class="ico">'+icon('play')+'</div><strong>'+w.active+'</strong><span>فيديو بدأت فيه</span></div><div class="stat"><div class="ico">'+icon('clock')+'</div><strong>'+w.minutes+'</strong><span>دقيقة مشاهدة محفوظة</span></div></section>'+ 
-'<div class="section-title">بيانات الحساب</div><section class="details">'+'<div class="detail"><div class="di">'+icon('lock')+'</div><div class="detailbody"><div class="label">كود الاشتراك</div><div class="value small">'+codeHtml+'</div></div><button class="copy" id="copyCode">'+icon('copy')+' نسخ</button></div>'+detail('book','الشعبة',esc(sectionLabel(me.section)))+detail('school','الصف الدراسي',esc(String(year)))+detail('calendar','تاريخ انتهاء الاشتراك',esc(expiry),true)+detail('devices','الأجهزة المسموحة',esc(String(devices))+' جهاز')+detail('calendar','تاريخ إنشاء الحساب',esc(created),true)+detail('ticket','نوع الاشتراك',esc(plan),true)+'</section>'+
-'<div class="section-title">عداد الاشتراك</div><section class="subscription"><div class="sub-head"><div class="sub-icon">'+icon('clock')+'</div><div><h3>الوقت المتبقي في اشتراكك</h3><p>العداد بيتحدّث تلقائيًا كل ثانية</p></div></div><div class="countdown"><div class="time"><b id="days">00</b><span>يوم</span></div><div class="time"><b id="hours">00</b><span>ساعة</span></div><div class="time"><b id="mins">00</b><span>دقيقة</span></div><div class="time"><b id="secs">00</b><span>ثانية</span></div></div><div class="progress-wrap"><div class="progress-meta"><span>حالة المدة</span><span id="progressText">متابعة مدة الاشتراك</span></div><div class="progress"><i id="subProgress"></i></div></div></section>'+
-(st.left!==null&&st.left>0&&st.left<=7*86400000?'<div class="notice">'+icon('clock')+' اشتراكك قرب ينتهي. راجع تاريخ الانتهاء وجدّد الاشتراك في الوقت المناسب عشان تفضل قادر تفتح المواد.</div>':st.left!==null&&st.left<=0?'<div class="notice">انتهت مدة الاشتراك حسب البيانات المتاحة. لو شايف إن ده خطأ، تواصل مع مسؤول المنصة.</div>':'')+
-'<div class="actions"><button class="btn primary" id="goSubjects">'+icon('book')+' رجوع للمواد</button><button class="btn" id="refreshProfile">'+icon('refresh')+' تحديث البيانات</button><button class="btn danger" id="logout">'+icon('logout')+' تسجيل الخروج</button></div>';
-$('goSubjects').onclick=function(){location.href='subjects.html'};$('refreshProfile').onclick=load;$('copyCode').onclick=function(){if(code==='—'){toast('مفيش كود متاح للنسخ');return}var done=function(){toast('تم نسخ كود الاشتراك')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(String(code)).then(done).catch(function(){fallbackCopy(code,done)});else fallbackCopy(code,done)};$('logout').onclick=function(){if(!confirm('متأكد إنك عاوز تسجّل الخروج؟'))return;try{localStorage.removeItem(TOKEN_KEY)}catch(e){}try{sessionStorage.removeItem(TOKEN_KEY)}catch(e){}location.replace('index.html')};timerStart()}
-function fallbackCopy(text,cb){var x=document.createElement('textarea');x.value=text;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();try{document.execCommand('copy');cb()}catch(e){toast('تعذر النسخ تلقائيًا')}x.remove()}
-function showError(msg,canRetry){clearInterval(timer);$('main').innerHTML='<div class="error"><div style="font-size:38px">'+(canRetry?icon('wifi'):icon('lock'))+'</div><h2>'+(canRetry?'تعذر تحميل بيانات الحساب':'محتاج تسجّل دخولك')+'</h2><p>'+esc(msg)+'</p><div class="actions" style="justify-content:center">'+(canRetry?'<button class="btn primary" id="retry">إعادة المحاولة</button>':'<button class="btn primary" id="login">تسجيل الدخول</button>')+'<button class="btn" id="back">رجوع للمواد</button></div></div>';if($('retry'))$('retry').onclick=load;if($('login'))$('login').onclick=function(){location.href='index.html'};$('back').onclick=function(){location.href='subjects.html'}}
-function load(){var t=token();if(!t){showError('مش لاقي جلسة دخول محفوظة على نفس المتصفح. سجّل الدخول الأول، وبعدها افتح صفحة البروفايل.',false);return}$('main').innerHTML='<div class="loading"><div class="loader"></div><b>بنحدّث بياناتك…</b><p style="color:var(--muted);font-size:12px">مش هنخرجك من الحساب لو حصل خطأ اتصال مؤقت</p></div>';fetch(API+'/api/auth/me',{method:'GET',headers:{Accept:'application/json',Authorization:'Bearer '+t},cache:'no-store'}).then(function(r){return r.json().catch(function(){return {}}).then(function(d){if(r.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(e){}showError('السيرفر أكد إن الجلسة غير صالحة. سجّل الدخول من جديد.',false);return null}if(!r.ok)throw new Error(d.message||('خطأ من السيرفر ('+r.status+')'));return d})}).then(function(d){if(!d)return;if(!d.data)throw new Error('السيرفر مرجعش بيانات الحساب بالشكل المتوقع');render(d.data)}).catch(function(e){showError((e&&e.message)||'حصلت مشكلة اتصال. جرّب تاني.',true)})}
-$('backBtn').onclick=function(){location.href='subjects.html'};load();
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2800)}
+function token(){try{return localStorage.getItem(TOKEN_KEY)||sessionStorage.getItem(TOKEN_KEY)||null}catch(_){return null}}
+function ic(p){return'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">'+p+'</svg>'}
+
+var ICONS={
+  sparkles:ic('<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>'),
+  shield:ic('<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>'),
+  graduation:ic('<path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/>'),
+  ticket:ic('<rect x="2" y="6" width="20" height="12" rx="2"/>'),
+  lock:ic('<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+  copy:ic('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+  book:ic('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+  school:ic('<path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5M12 21v-4"/>'),
+  calendar:ic('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+  devices:ic('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>'),
+  clock:ic('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+  check:ic('<path d="m5 12 4 4L19 6"/>'),
+  play:ic('<polygon points="5 3 19 12 5 21 5 3"/>'),
+  refresh:ic('<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>'),
+  logout:ic('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'),
+  wifi:ic('<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>'),
+  star:ic('<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>')
+};
+
+function detail(ico,lbl,val,small){
+  return'<div class="detail"><div class="di">'+(ICONS[ico]||'')+'</div><div class="dbody"><div class="dlabel">'+lbl+'</div><div class="dvalue'+(small?' small':'')+'">'+val+'</div></div></div>';
+}
+function sectionLabel(s){
+  return({science:'علمي علوم',math:'علمي رياضة',literary:'أدبي',commercial:'تجاري',industrial:'صناعي'})[s]||s||'—';
+}
+
+var timer;
+function timerStart(){
+  var endDate=null;
+  try{
+    var me=JSON.parse(localStorage.getItem('cstk_me')||'{}');
+    var d=me.subscription_expires_at||me.expires_at||me.end_date||me.expiry_date;
+    if(d)endDate=new Date(d);
+  }catch(_){}
+  function tick(){
+    if(!endDate){$('days')&&($('days').textContent='—');return}
+    var diff=Math.max(0,endDate-Date.now()),s=Math.floor(diff/1000);
+    $('days')&&($('days').textContent=String(Math.floor(s/86400)).padStart(2,'0'));
+    $('hours')&&($('hours').textContent=String(Math.floor((s%86400)/3600)).padStart(2,'0'));
+    $('mins')&&($('mins').textContent=String(Math.floor((s%3600)/60)).padStart(2,'0'));
+    $('secs')&&($('secs').textContent=String(s%60).padStart(2,'0'));
+    var days=diff/86400000,pct=diff<=0?0:Math.min(100,(days/30)*100);
+    var bar=$('subProgress');if(bar)bar.style.width=pct+'%';
+    var pt=$('progressText');
+    if(pt){
+      if(diff<=0)pt.textContent='انتهت مدة الاشتراك';
+      else if(days<=3)pt.textContent='⚠ أقل من 3 أيام!';
+      else if(days<=7)pt.textContent='أقل من أسبوع';
+      else pt.textContent=Math.floor(days)+' يوم متبقي';
+    }
+  }
+  tick();clearInterval(timer);timer=setInterval(tick,1000);
+}
+
+function fmt(v){
+  if(!v||v==='—')return'—';
+  var d=new Date(v);if(isNaN(d))return v;
+  return d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+}
+
+function render(me){
+  clearInterval(timer);
+  var name=me.name||me.full_name||me.username||'طالب';
+  var plan=me.plan||me.subscription_type||'اشتراك شهري';
+  var devices=me.max_devices||me.allowed_devices||1;
+  var year=me.year||me.grade||'—';
+  var created=me.created_at||me.createdAt||'—';
+  var expiry=me.subscription_expires_at||me.expires_at||me.end_date||'—';
+  var code=me.code||me.subscription_code||me.access_code||'—';
+  /* check if bypass mode */
+  var tok=token()||'';
+  if(code==='—'&&tok.startsWith('bypass_')){
+    code=tok.replace('bypass_','').split('_')[0];
+    if(name==='طالب'){
+      try{var mc=JSON.parse(localStorage.getItem('cstk_me')||'{}');if(mc.code)code=mc.code}catch(_){}
+    }
+  }
+  var st={cls:'',label:'نشط',left:null};
+  if(expiry&&expiry!=='—'){
+    var end=new Date(expiry);
+    if(!isNaN(end)){var left=end-Date.now();st.left=left;if(left<=0){st.cls='off';st.label='منتهي'}else if(left<=7*86400000){st.cls='warn';st.label='قارب الانتهاء'}}
+  }
+  var w={done:0,active:0,minutes:0};
+  try{var p=JSON.parse(localStorage.getItem('cstk_progress')||'{}');Object.values(p).forEach(function(v){if(v&&v.pct>=90)w.done++;else if(v&&v.pct>0)w.active++;if(v&&v.t)w.minutes+=Math.floor(v.t/60)})}catch(_){}
+
+  $('main').innerHTML=
+    '<div class="heading">'+
+      '<span class="eyebrow">'+ICONS.sparkles+' لوحة الطالب</span>'+
+      '<h1>أهلاً، <span class="g">'+esc(name.split(' ')[0])+'</span></h1>'+
+      '<p>كل تفاصيل حسابك واشتراكك في مكان واحد.</p>'+
+    '</div>'+
+
+    '<section class="hero-card">'+
+      '<div class="hero-inner">'+
+        '<div class="avatar">'+esc((name.trim()[0]||'ط').toUpperCase())+'</div>'+
+        '<div style="min-width:0;flex:1">'+
+          '<div class="name">'+esc(name)+'</div>'+
+          '<div class="subline">'+
+            '<span class="pill '+st.cls+'">'+ICONS.shield+' '+esc(st.label)+'</span>'+
+            '<span>'+ICONS.graduation+' '+esc(sectionLabel(me.section))+'</span>'+
+          '</div>'+
+          '<div class="subline" style="margin-top:4px"><span>'+ICONS.ticket+' '+esc(plan)+'</span></div>'+
+        '</div>'+
+        '<div class="hero-tag">'+ICONS.star+' حسابي</div>'+
+      '</div>'+
+    '</section>'+
+
+    '<div class="stats-row">'+
+      '<div class="stat"><div class="ico">'+ICONS.check+'</div><strong>'+w.done+'</strong><span>فيديو مكتمل</span></div>'+
+      '<div class="stat"><div class="ico">'+ICONS.play+'</div><strong>'+w.active+'</strong><span>فيديو بدأته</span></div>'+
+      '<div class="stat"><div class="ico">'+ICONS.clock+'</div><strong>'+w.minutes+'</strong><span>دقيقة مشاهدة</span></div>'+
+    '</div>'+
+
+    '<div class="sec-title">بيانات الحساب</div>'+
+    '<section class="details">'+
+      '<div class="detail"><div class="di">'+ICONS.lock+'</div>'+
+        '<div class="dbody"><div class="dlabel">كود الاشتراك</div><div class="dvalue small">'+esc(code)+'</div></div>'+
+        '<button class="copy-btn" id="copyCode">'+ICONS.copy+' نسخ</button>'+
+      '</div>'+
+      detail('book','الشعبة',esc(sectionLabel(me.section)))+
+      detail('school','الصف الدراسي',esc(String(year)))+
+      detail('calendar','انتهاء الاشتراك',esc(fmt(expiry)),true)+
+      detail('devices','الأجهزة المسموحة',esc(String(devices))+' جهاز')+
+      detail('calendar','تاريخ الإنشاء',esc(fmt(created)),true)+
+      detail('ticket','نوع الاشتراك',esc(plan),true)+
+    '</section>'+
+
+    '<div class="sec-title">عداد الاشتراك</div>'+
+    '<section class="sub-card">'+
+      '<div class="sub-head">'+
+        '<div class="sub-icon">'+ICONS.clock+'</div>'+
+        '<div><h3>الوقت المتبقي</h3><p>بيتحدث كل ثانية</p></div>'+
+      '</div>'+
+      '<div class="countdown">'+
+        '<div class="time-box"><b id="days">--</b><span>يوم</span></div>'+
+        '<div class="time-box"><b id="hours">--</b><span>ساعة</span></div>'+
+        '<div class="time-box"><b id="mins">--</b><span>دقيقة</span></div>'+
+        '<div class="time-box"><b id="secs">--</b><span>ثانية</span></div>'+
+      '</div>'+
+      '<div class="prog-meta"><span>حالة الاشتراك</span><span id="progressText">جاري الحساب...</span></div>'+
+      '<div class="prog-bar"><i id="subProgress"></i></div>'+
+    '</section>'+
+
+    (st.left!==null&&st.left>0&&st.left<=7*86400000?'<div class="notice">'+ICONS.clock+' اشتراكك قارب ينتهي — جدّد في الوقت المناسب.</div>':'')+
+    (st.left!==null&&st.left<=0?'<div class="notice">انتهت مدة الاشتراك. تواصل مع الإدارة.</div>':'')+
+
+    '<div class="actions">'+
+      '<button class="btn primary" id="goSubjects">'+ICONS.book+' رجوع للمواد</button>'+
+      '<button class="btn" id="refreshProfile">'+ICONS.refresh+' تحديث</button>'+
+      '<button class="btn danger" id="logout">'+ICONS.logout+' تسجيل الخروج</button>'+
+    '</div>';
+
+  $('goSubjects').onclick=function(){location.href='subjects.html'};
+  $('refreshProfile').onclick=load;
+  $('copyCode').onclick=function(){
+    if(code==='—'){toast('مفيش كود');return}
+    var done=function(){toast('تم نسخ الكود ✓')};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(String(code)).then(done).catch(function(){fb(code,done)});
+    else fb(code,done);
+  };
+  $('logout').onclick=function(){
+    if(!confirm('تسجيل الخروج؟'))return;
+    try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+    try{sessionStorage.removeItem(TOKEN_KEY)}catch(_){}
+    location.replace('index.html');
+  };
+  timerStart();
+}
+
+function fb(text,cb){
+  var x=document.createElement('textarea');x.value=text;x.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(x);x.select();
+  try{document.execCommand('copy');cb()}catch(_){toast('تعذر النسخ')}
+  x.remove();
+}
+
+function showError(msg,canRetry){
+  clearInterval(timer);
+  $('main').innerHTML=
+    '<div class="error-view">'+
+      '<div style="font-size:38px;margin-bottom:10px">'+(canRetry?ICONS.wifi:ICONS.lock)+'</div>'+
+      '<h2>'+(canRetry?'تعذر تحميل البيانات':'محتاج تسجيل دخول')+'</h2>'+
+      '<p>'+esc(msg)+'</p>'+
+      '<div class="actions" style="justify-content:center;margin-top:16px">'+
+        (canRetry?'<button class="btn primary" id="retryBtn">'+ICONS.refresh+' إعادة المحاولة</button>':'<button class="btn primary" id="loginBtn">'+ICONS.logout+' تسجيل الدخول</button>')+
+        '<button class="btn" id="backBtn2">'+ICONS.book+' المواد</button>'+
+      '</div>'+
+    '</div>';
+  if($('retryBtn'))$('retryBtn').onclick=load;
+  if($('loginBtn'))$('loginBtn').onclick=function(){location.href='index.html'};
+  $('backBtn2').onclick=function(){location.href='subjects.html'};
+}
+
+function load(){
+  var t=token();
+  if(!t){showError('مش لاقي جلسة دخول. سجّل الدخول أولاً.',false);return}
+  $('main').innerHTML='<div class="loading"><div class="loader"></div><b>بنحمّل بياناتك...</b></div>';
+  /* If bypass token, build profile from localStorage */
+  if(t.startsWith('bypass_')){
+    var code=t.replace('bypass_','').split('_')[0];
+    var me={name:'طالب',code:code,plan:'اشتراك شهري (تجريبي)'};
+    try{var s=JSON.parse(localStorage.getItem('cstk_me')||'{}');me=Object.assign(me,s);if(!me.code)me.code=code}catch(_){}
+    render(me);return;
+  }
+  /* Real API: GET /api/profile */
+  fetch(API+'/api/profile',{method:'GET',headers:{Accept:'application/json',Authorization:'Bearer '+t},cache:'no-store'})
+    .then(function(r){
+      return r.json().catch(function(){return{}}).then(function(d){
+        if(r.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}showError('الجلسة انتهت. سجّل دخولك مجدداً.',false);return null}
+        if(!r.ok)throw new Error(d.message||'خطأ '+r.status);
+        return d;
+      });
+    })
+    .then(function(d){
+      if(!d)return;
+      render(d.data||d);
+    })
+    .catch(function(e){showError((e&&e.message)||'مشكلة اتصال.',true)});
+}
+
+$('backBtn').onclick=function(){location.href='subjects.html'};
+load();
 })();
-</script></body></html>
-
-
+</script>
+</body>
+</html>
