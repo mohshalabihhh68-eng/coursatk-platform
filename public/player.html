@@ -821,7 +821,7 @@ async function playIndex(i,autoplay){
   history.replaceState(null,'',`?lectureId=${encodeURIComponent(lectureId)}&videoId=${encodeURIComponent(item.id)}`);
   updateMediaSession();
   try{
-    // 1) جلسة التشغيل من /api/video/:id/play
+    // 1) جلسة التشغيل من الـ API بتاعك
     const session=await api('/api/video/'+encodeURIComponent(item.id)+'/play',{method:'POST'});
     if(my!==playToken)return;
     
@@ -829,12 +829,11 @@ async function playIndex(i,autoplay){
     const streamToken=session.token, swVideoId=session.video_id, hbUrl=session.heartbeat_url;
     if(!streamToken||!swVideoId)throw new Error('بيانات تشغيل الفيديو غير مكتملة');
 
-    // 2) تحميل crypto
     setLoading(true,'جاري تحضير التشغيل…');
     if(!cryptoUtils)cryptoUtils=await loadPlayerScript();
     if(my!==playToken)return;
 
-    // 3) master playlist
+    // 2) master playlist
     const masterUrl='/api/stream?path='+encodeURIComponent('videos/'+swVideoId+'/stream/master.m3u8')+'&t='+encodeURIComponent(streamToken);
     const masterRes=await fetch(masterUrl);
     if(!masterRes.ok)throw new Error('master.m3u8 → HTTP '+masterRes.status);
@@ -842,7 +841,7 @@ async function playIndex(i,autoplay){
     const variantRel=masterText.split('\n').map(l=>l.trim()).find(l=>l&&l.charAt(0)!=='#');
     if(!variantRel)throw new Error('لا يوجد variant في الـ master');
 
-    // 4) variant playlist
+    // 3) variant playlist
     let variantUrl,varBase='videos/'+swVideoId+'/stream/',varFileUrl=null;
     if(variantRel.indexOf('/api/stream')===0||variantRel.indexOf('/api/cdn')===0){
       variantUrl=variantRel;
@@ -859,7 +858,7 @@ async function playIndex(i,autoplay){
     const variantText=await variantRes.text();
     if(my!==playToken)return;
 
-    // 5) فك المفتاح
+    // 4) فك المفتاح
     setLoading(true,'فك التشفير…');
     const keyLine=variantText.split('\n').find(l=>l.indexOf('EXT-X-KEY')!==-1);
     let keyPath='videos/'+swVideoId+'/key',ivHex=null;
@@ -886,7 +885,7 @@ async function playIndex(i,autoplay){
     const keyBytes=aesKey instanceof ArrayBuffer?aesKey:aesKey.buffer.slice(aesKey.byteOffset,aesKey.byteOffset+aesKey.byteLength);
     currentKeyBlobUrl=URL.createObjectURL(new Blob([keyBytes],{type:'application/octet-stream'}));
 
-    // 6) rewrite playlist
+    // 5) rewrite playlist
     let fixedVariant=rewritePlaylist(variantText,streamToken,currentKeyBlobUrl,varBase,varFileUrl);
     if(fixedVariant.indexOf('#EXTM3U')!==0)fixedVariant='#EXTM3U\n'+fixedVariant.replace(/^#EXTM3U\s*/m,'');
     if(fixedVariant.indexOf('EXT-X-KEY')===-1){
@@ -897,14 +896,14 @@ async function playIndex(i,autoplay){
 
     setLoading(true,'جاري التشغيل…');
 
-    // 7) heartbeat
+    // 6) heartbeat
     if(hbUrl){
       hbTimer=setInterval(()=>{
         fetch('/api/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:hbUrl,token:streamToken})}).catch(()=>{});
       },25000);
     }
 
-    // 8) resume
+    // 7) resume
     const saved=readProgress(item.id);
     const resumeAt=saved&&saved.currentTime>2&&!saved.watched?+saved.currentTime:0;
     applyRate();
@@ -920,6 +919,7 @@ async function playIndex(i,autoplay){
       paintProgress();
     },{once:true});
 
+    // 8) تشغيل hls
     if(window.Hls&&Hls.isSupported()){
       hls=new Hls({
         enableWorker:true,maxBufferLength:30,maxMaxBufferLength:60,backBufferLength:15,
