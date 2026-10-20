@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشغل المحاضرة</title>
-    <link rel="stylesheet" href="/styles.css">
+    <!-- مكتبة HLS.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
     <style>
         body { margin:0; background:#000; font-family: Arial, sans-serif; overflow: hidden; }
@@ -16,62 +16,116 @@
 <body>
     <div id="video-container">
         <video id="video" autoplay playsinline controls></video>
-        <div class="controls">
-            <button onclick="togglePlay()" id="playBtn">⏸️</button>
-            <input type="range" id="progress" min="0" max="100" value="0" style="width:300px;">
-            <span id="time">00:00 / 00:00</span>
-        </div>
     </div>
 
     <script>
-        let video = document.getElementById('video');
+        const video = document.getElementById('video');
         let hls;
-        let currentKey = null;
-        let isPaused = false;
 
-        function playIndex(lectureId, videoId) {
-            const base = window.location.origin;
-            const proxyUrl = `\( {base}/api/video/ \){lectureId}/play?videoId=${videoId}`;
+        // دالة لتحميل سكريبت stream-weave اللي فيه أدوات فك التشفير
+        function loadSWPlayer() {
+            return new Promise((resolve, reject) => {
+                if (window.DecryptionUtils) return resolve(window.DecryptionUtils);
+                
+                const script = document.createElement('script');
+                script.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
+                script.onload = () => {
+                    if (window.DecryptionUtils) resolve(window.DecryptionUtils);
+                    else reject(new Error("DecryptionUtils not found in player.js"));
+                };
+                script.onerror = () => reject(new Error("Failed to load player.js"));
+                document.head.appendChild(script);
+            });
+        }
 
-            if (Hls.isSupported()) {
-                hls = new Hls({
-                    maxBufferSize: 10 * 1024 * 1024,
-                    debug: false,
-                    maxBufferHole: 1,
-                    autoStartLoad: false,
-                    startLevel: -1
-                });
-                hls.loadSource(proxyUrl);
-                hls.attachMedia(video);
+        async function playVideo(lectureId, videoId) {
+            try {
+                // 1. جلب بيانات الجلسة من السيرفر بتاعك
+                const sessionRes = await fetch(`/api/video/${lectureId}/session`);
+                if (!sessionRes.ok) throw new Error("فشل الاتصال بالسيرفر");
+                const session = await sessionRes.json();
+                
+                const { token, stream_url, video_id } = session;
 
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.play().catch(() => {});
-                    console.log('✅ HLS شغال مع الـ decryption');
-                });
+                // تجهيز رابط الـ Proxy الخاص بالسيرفر بتاعك
+                const urlObj = new URL(stream_url);
+                const path = urlObj.pathname.replace('/api/v1/', '');
+                const proxyUrl = `/api/stream?path=${encodeURIComponent(path)}&t=${token}`;
 
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS Error:', data);
-                });
-            } else {
-                video.src = proxyUrl;
-                video.play().catch(() => {});
+                // 2. تحميل أدوات فك التشفير
+                const crypto = await loadSWPlayer();
+
+                // 3. تشغيل HLS.js مع ميزة فك تشفير المفتاح
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        // هنا بنعترض طلب المفتاح ونفك تشفيره قبل ما HLS يستلمه
+                        keyLoader: function(keyInfo, keyXhr, resp) {
+                            // keyInfo.url هيكون رابط الـ Proxy بتاعنا
+                            fetch(keyInfo.url)
+                                .then(r => {
+                                    if (!r.ok) throw new Error("Key fetch failed: " + r.status);
+                                    return r.arrayBuffer();
+                                })
+                                .then(async buffer => {
+                                    // فك تشفير المفتاح باستخدام دالة stream-weave
+                                    const result = await crypto.decryptPlaybackKey(new Uint8Array(buffer), video_id);
+                                    
+                                    if (result && result.key) {
+                                        // نرجع المفتاح مفكوك لـ HLS.js (لازم يكون ArrayBuffer بحجم 16 بايت)
+                                        resp.data = result.key.buffer; 
+                                        keyLoader(keyInfo, resp); // Success callback
+                                        console.log('🔑 تم فك تشفير المفتاح بنجاح');
+                                    } else {
+                                        keyLoader(keyInfo, resp, new Error("فشل فك تشفير المفتاح"));
+                                    }
+                                })
+                                .catch(err => keyLoader(keyInfo, resp, err));
+                        }
+                    });
+
+                    hls.loadSource(proxyUrl);
+                    hls.attachMedia(video);
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(e => console.error("Auto-play prevented:", e));
+                        console.log('✅ الفيديو شغال');
+                    });
+
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS Error:', data);
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    hls.destroy();
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // دعم سفاري (ممكن يحتاج تعديل لو التشفير معقد)
+                    video.src = proxyUrl;
+                }
+            } catch (e) {
+                console.error("Playback Error:", e);
+                alert("خطأ في التشغيل: " + e.message);
             }
-
-            video.onended = () => { if (!isPaused) video.currentTime = 0; };
         }
 
-        function togglePlay() {
-            if (isPaused) { video.play(); isPaused = false; } else { video.pause(); isPaused = true; }
-        }
-
+        // استخراج الـ Parameters من الرابط
         const params = new URLSearchParams(window.location.search);
         const lectureId = params.get('lecturedId') || params.get('lectureId');
         const videoId = params.get('videold') || params.get('videoId');
 
         if (lectureId && videoId) {
-            playIndex(lectureId, videoId);
+            playVideo(lectureId, videoId);
         } else {
-            console.error('❌ مفيش lectureId أو videold');
+            console.error('❌ مفيش lectureId أو videoId في الرابط');
         }
     </script>
 </body>
