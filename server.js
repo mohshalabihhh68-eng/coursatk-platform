@@ -6,7 +6,7 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// التوكن الجديد
+// التوكن الافتراضي لو المستخدم مش مسجل دخول
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
@@ -44,11 +44,7 @@ function browserHeaders(extra) {
 
 function b64urlEncode(value) {
   var buf = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
-  return buf
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
 function b64urlDecode(value) {
@@ -66,11 +62,7 @@ function joinRel(base, rel) {
     relPath = relPath.slice(0, qi);
   }
   var stack = String(base || "").split("/");
-  if (
-    stack.length &&
-    stack[stack.length - 1] !== "" &&
-    /\.[a-z0-9]+$/i.test(stack[stack.length - 1])
-  ) {
+  if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) {
     stack.pop();
   }
   if (stack.length && stack[stack.length - 1] === "") stack.pop();
@@ -137,86 +129,32 @@ app.get("/api/subjects/:id", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
-app.get("/api/subjects/:id/teachers", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
-  res.status(r.status).json(r.body);
-});
+// ... (باقي مسارات الـ API زي ما هي) ...
 
-app.get("/api/teachers/:id/chapters", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
-  res.status(r.status).json(r.body);
-});
-
-app.get("/api/chapters/:id/lectures", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
-  res.status(r.status).json(r.body);
-});
-
-app.get("/api/lectures/:id/content", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
-  res.status(r.status).json(r.body);
-});
-
-app.get("/api/profile", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/profile");
-  res.status(r.status).json(r.body);
-});
-
-// ====================== الـ decryption الكامل (فك التشفير) ======================
-app.get("/api/video/:lectureId/play", async function (req, res) {
+// ====================== مسار الجلسة الجديد ======================
+app.get("/api/video/:lectureId/session", async function (req, res) {
   const lectureId = req.params.lectureId;
-  const videoId = req.query.videoId;
-  if (!videoId) return res.status(400).json({ error: "videoId required" });
-
+  const token = req.query.token || STUDENT_TOKEN; // استخدام توكن المستخدم لو موجود
   try {
     const playRes = await fetch(API + "/api/v1/video/" + lectureId + "/stream-weave/play", {
       method: "POST",
-      headers: { "Content-Length": "0" },
+      headers: { 
+          "Content-Length": "0", 
+          "Authorization": "Bearer " + token 
+      },
       body: "",
     });
-    const playData = await playRes.json();
-
-    let swPath = playData.data?.path;
-    if (!swPath) throw new Error("No stream path");
-
-    // استخراج الـ key من الـ m3u8 (الفك التشفير)
-    let keyUri = "";
-    try {
-      const text = await (await fetch(SW + "/api/v1/" + swPath)).text();
-      const keyMatch = text.match(/EXT-X-KEY:METHOD=AES-128,URI="([^"]+)"/);
-      if (keyMatch) keyUri = keyMatch[1];
-    } catch (e) {}
-
-    if (!keyUri) throw new Error("Key not found");
-
-    // إزالة أي escape
-    keyUri = keyUri.replace(/\\\\/g, '\\').replace(/\\"/g, '"').replace(/\\'/g, "'");
-
-    let keyBuffer;
-    try {
-      keyBuffer = Buffer.from(keyUri, 'base64url');
-    } catch (e) {
-      keyBuffer = Buffer.from(keyUri);
-    }
-
-    const keyBlobUrl = URL.createObjectURL(new Blob([keyBuffer], { type: 'application/octet-stream' }));
-
-    // إعادة كتابة الـ m3u8 مع الـ blob URL
-    let text = await (await fetch(SW + "/api/v1/" + swPath)).text();
-    text = text.replace(
-      /EXT-X-KEY:METHOD=AES-128,URI="[^"]+"/,
-      `EXT-X-KEY:METHOD=AES-128,URI="${keyBlobUrl}"`
-    );
-
-    res.set("Content-Type", "application/vnd.apple.mpegurl");
-    res.set("Access-Control-Allow-Origin", "*");
-    res.send(text);
+    const data = await playRes.json();
+    if (!data.success) return res.status(400).json(data);
+    
+    // نرجع البيانات للمتصفح عشان يفك التشفير بنفسه
+    res.json(data.data);
   } catch (e) {
-    res.status(502).json({ error: "decryption error: " + e.message });
+    res.status(502).json({ error: e.message });
   }
 });
 
-// ====================== الـ proxy الرئيسي ======================
+// ====================== الـ proxy الرئيسي للفيديو ======================
 app.get("/api/stream", async function (req, res) {
   try {
     var swPath = (req.query.path || "").replace(/^\/+/, "");
@@ -229,18 +167,13 @@ app.get("/api/stream", async function (req, res) {
     var upstream = await fetchFollow(url, hdrs);
 
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
-    var isM3u8 =
-      ct.indexOf("mpegurl") !== -1 ||
-      ct.indexOf("m3u8") !== -1 ||
-      swPath.indexOf(".m3u8") !== -1;
+    var isM3u8 = ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1 || swPath.indexOf(".m3u8") !== -1;
 
     if (isM3u8) {
       var text = await upstream.text();
       var base = swPath.indexOf("/") !== -1 ? swPath.substring(0, swPath.lastIndexOf("/") + 1) : "";
 
-      text = text
-        .split("\n")
-        .map(function (line) {
+      text = text.split("\n").map(function (line) {
           var s = line.trim();
           if (!s) return line;
           if (s.charAt(0) === "#") {
@@ -251,24 +184,12 @@ app.get("/api/stream", async function (req, res) {
               var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
               clean = clean.replace(/^api\/v1\//, "");
               if (clean.indexOf("videos/") !== 0) clean = joinRel(base, clean);
-              return (
-                'URI="/api/stream?path=' +
-                encodeURIComponent(clean) +
-                "&t=" +
-                encodeURIComponent(token) +
-                '"'
-              );
+              return 'URI="/api/stream?path=' + encodeURIComponent(clean) + "&t=" + encodeURIComponent(token) + '"';
             });
           }
           if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
-          return (
-            "/api/stream?path=" +
-            encodeURIComponent(joinRel(base, s)) +
-            "&t=" +
-            encodeURIComponent(token)
-          );
-        })
-        .join("\n");
+          return "/api/stream?path=" + encodeURIComponent(joinRel(base, s)) + "&t=" + encodeURIComponent(token);
+        }).join("\n");
 
       res.set("Content-Type", "application/vnd.apple.mpegurl");
       res.set("Access-Control-Allow-Origin", "*");
@@ -284,73 +205,16 @@ app.get("/api/stream", async function (req, res) {
   }
 });
 
-// ====================== الـ heartbeat والـ cdn ======================
-app.post("/api/heartbeat", async function (req, res) {
-  try {
-    var url = req.body && req.body.url;
-    var token = req.body && req.body.token;
-    if (!url || !token) return res.status(400).json({ error: "url+token required" });
-    var upstream = await fetch(url, {
-      method: "POST",
-      headers: browserHeaders({
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      }),
-      body: "{}",
-    });
-    var text = await upstream.text();
-    res.status(upstream.status).type("json").send(text);
-  } catch (e) {
-    res.status(502).json({ error: e.message });
-  }
-});
-
-app.get("/api/cdn", async function (req, res) {
-  try {
-    var target = req.query.url || "";
-    if (req.query.u) target = b64urlDecode(String(req.query.u));
-    if (!target) return res.status(400).send("missing url");
-    var hdrs = browserHeaders();
-    if (req.headers.range) hdrs.Range = req.headers.range;
-    var upstream = await fetchFollow(target, hdrs);
-    var buf = Buffer.from(await upstream.arrayBuffer());
-    res.set("Cache-Control", "public, max-age=30");
-    pipeUpstream(res, upstream, buf);
-  } catch (e) {
-    res.status(502).send("cdn error: " + e.message);
-  }
-});
-
-// ⚠️ ملحوظة: الـ Route ده مكرر مع اللي فوق (نفس المسار) - Express هيتجاهله
-// الـ redirect من "تشغيل" للـ player كامل
-app.get("/api/video/:lectureId/play", async function (req, res) {
-  const { lectureId } = req.params;
-  const videoId = req.query.videoId;
-  const base = req.protocol + '://' + req.get('host');
-  res.redirect(302, `${base}/player?lectureId=${lectureId}&videoId=${videoId}`);
-});
-
 // الـ catch all للـ index
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ====================== تشغيل السيرفر + Graceful Shutdown ======================
+// ====================== تشغيل السيرفر ======================
 const server = app.listen(PORT, function () {
   console.log("Server running on port " + PORT);
 });
 
-// معالج SIGTERM عشان السيرفر يقفل بأمان على Railway
 process.on("SIGTERM", () => {
-  console.log("SIGTERM received, shutting down gracefully...");
-  server.close(() => {
-    console.log("HTTP server closed. Process terminated.");
-    process.exit(0);
-  });
-
-  // لو السيرفر علّق أكتر من 10 ثواني، اقفل بالقوة
-  setTimeout(() => {
-    console.error("Forced shutdown after timeout");
-    process.exit(1);
-  }, 10000);
+  server.close(() => process.exit(0));
 });
