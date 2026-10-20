@@ -10,8 +10,10 @@ const videoEl     = document.getElementById("video");
 const playerWrap  = document.getElementById("player-wrap");
 const clickLayer  = document.getElementById("click-layer");
 
+/* ── icon helper ── */
 function ic(p,w){w=w||18;return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${w}" height="${w}">${p}</svg>`}
 
+/* ── api ── */
 async function api(path,opts){
   opts=opts||{};
   const tok=(() => { try{return localStorage.getItem("cstk_tok")||sessionStorage.getItem("cstk_tok")||null}catch(_){return null} })();
@@ -30,6 +32,9 @@ function goHome(){
 }
 function setView(v,extra){ if(extra)Object.assign(state,extra); state.view=v; render(); window.scrollTo(0,0) }
 
+/* ─────────────────────────────────────
+   RENDER ROUTER
+───────────────────────────────────── */
 async function render(){
   appEl.innerHTML=`<div class="loading-screen">
     <div class="spinner-ring"></div>
@@ -202,6 +207,7 @@ async function renderContent(){
 
   let vidHtml="";
   videos.forEach((v,i)=>{
+    // هنا بقى التحويل لصفحة player.html
     const t=String(v.title).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
     vidHtml+=`<div class="v-card reveal">
       <div class="v-thumb">
@@ -252,7 +258,7 @@ function _observe(){
   document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 }
 
-/* ==================== PLAYER: توجيه لصفحة منفصلة ==================== */
+// دالة التشغيل المعدلة
 function playVideo(videoId,title){
   const lectureId = state.lecture && state.lecture.id;
   if(!lectureId){
@@ -262,5 +268,5 @@ function playVideo(videoId,title){
   window.location.href = 'player.html?lectureId=' + encodeURIComponent(lectureId) + '&videoId=' + encodeURIComponent(videoId);
 }
 
-/* ==================== INIT ==================== */
+/* init */
 render();
