@@ -273,19 +273,12 @@ app.post("/api/heartbeat", async function (req, res) {
   }
 });
 
-// مسار مباشر لصفحة المواد (قبل الـ fallback)
-app.get("/subjects.html", function (req, res) {
-  res.sendFile(path.join(__dirname, "public", "subjects.html"));
-});
-
-app.get("/profile.html", function (req, res) {
-  res.sendFile(path.join(__dirname, "public", "profile.html"));
-});
-
+// SPA fallback
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, function () {
-  console.log("✅ Running on port " + PORT);
+  console.log("✅ Server running on port " + PORT);
+  console.log("📁 Serving static from: " + path.join(__dirname, "public"));
 });
