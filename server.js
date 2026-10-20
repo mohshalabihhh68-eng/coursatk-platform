@@ -190,16 +190,16 @@ app.get("/api/stream", async function (req, res) {
         if (!s) return line;
         if (s.charAt(0) === "#") {
           if (s.indexOf("#EXT-X-KEY:") === 0) {
-            return s.replace(/URI="[^"]+"/, `URI="${resolveMedia(s.replace(/#EXT-X-KEY:.*URI="[^"]+"/, ''), base, token)}"`);
+            return s.replace(/URI="[^"]+"/, `URI="/api/cdn?u=${b64urlEncode(s)}"`);
           }
           return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
-            if (uri.startsWith("http")) return `URI="${resolveMedia(uri, base, token)}"`;
+            if (uri.startsWith("http")) return `/api/cdn?u=${b64urlEncode(uri)}`;
             var clean = uri.startsWith("/") ? uri.slice(1) : uri;
             if (clean.includes("videos/")) clean = joinRel(base, clean);
             return `/api/stream?path=\( {encodeURIComponent(clean)}&t= \){encodeURIComponent(token)}`;
           });
         }
-        if (s.startsWith("http")) return "/api/cdn?u=" + b64urlEncode(s);
+        if (s.startsWith("http")) return `/api/cdn?u=${b64urlEncode(s)}`;
         var clean = s.startsWith("/") ? s.slice(1) : s;
         if (clean.includes("videos/")) clean = joinRel(base, clean);
         return `/api/stream?path=\( {encodeURIComponent(clean)}&t= \){encodeURIComponent(token)}`;
