@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشغل المحاضرة</title>
+    <!-- مكتبة HLS.js لتشغيل الفيديو -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
     <style>
         body { margin:0; background:#000; font-family: Arial, sans-serif; overflow: hidden; }
@@ -26,6 +27,7 @@
         const video = document.getElementById('video');
         let hls;
 
+        // دالة تحميل سكريبت فك التشفير الخاص بـ Stream-Weave
         function loadSWPlayer() {
             return new Promise((resolve, reject) => {
                 if (window.DecryptionUtils) return resolve(window.DecryptionUtils);
@@ -42,9 +44,10 @@
 
         async function playVideo(lectureId, videoId) {
             try {
-                // ⚠️ التعديل هنا: بنطلب من مسار /play ونستخدم POST
+                // ⚠️ هنا بنبعت طلب POST للمسار اللي في السيرفر بتاعك
                 const res = await fetch(`/api/video/${lectureId}/play`, { method: 'POST' });
                 
+                // التأكد إن الرد JSON مش HTML
                 const contentType = res.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
                     throw new Error("السيرفر رجع استجابة غير صالحة (HTML).");
@@ -52,22 +55,27 @@
 
                 const responseData = await res.json();
                 
+                // لو في خطأ (زي توكن منتهي)
                 if (!res.ok || !responseData.success) {
                     throw new Error(`خطأ: ${responseData.message || "توكن منتهي أو الفيديو غير متاح"}`);
                 }
 
-                // البيانات بتيجي جوه responseData.data
+                // استخراج البيانات من الرد
                 const session = responseData.data;
                 const { token, stream_url, video_id } = session;
                 
+                // تجهيز رابط البث عشان يعدي على السيرفر بتاعك
                 const urlObj = new URL(stream_url);
                 const path = urlObj.pathname.replace('/api/v1/', '');
                 const proxyUrl = `/api/stream?path=${encodeURIComponent(path)}&t=${token}`;
 
+                // تحميل أدوات فك التشفير
                 const crypto = await loadSWPlayer();
 
+                // تشغيل الفيديو باستخدام HLS.js
                 if (Hls.isSupported()) {
                     hls = new Hls({
+                        // اعتراض طلب المفتاح وفك تشفيره
                         keyLoader: function(keyInfo, keyXhr, resp) {
                             fetch(keyInfo.url)
                                 .then(r => r.arrayBuffer())
@@ -75,9 +83,9 @@
                                     const result = await crypto.decryptPlaybackKey(new Uint8Array(buffer), video_id);
                                     if (result && result.key) {
                                         resp.data = result.key.buffer; 
-                                        keyLoader(keyInfo, resp);
+                                        keyLoader(keyInfo, resp); // نجاح
                                     } else {
-                                        keyLoader(keyInfo, resp, new Error("فشل فك التشفير"));
+                                        keyLoader(keyInfo, resp, new Error("فشل فك تشفير المفتاح"));
                                     }
                                 })
                                 .catch(err => keyLoader(keyInfo, resp, err));
@@ -86,8 +94,29 @@
 
                     hls.loadSource(proxyUrl);
                     hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play().catch(e => console.log("Auto-play prevented:", e));
+                    });
+
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS Error:', data);
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    hls.destroy();
+                                    break;
+                            }
+                        }
+                    });
                 } else {
+                    // لو المتصفح بيدعم HLS مباشرة (زي سفاري)
                     video.src = proxyUrl;
                 }
             } catch (e) {
@@ -96,6 +125,7 @@
             }
         }
 
+        // استخراج الـ Parameters من الرابط
         const params = new URLSearchParams(window.location.search);
         const lectureId = params.get('lecturedId') || params.get('lectureId');
         const videoId = params.get('videold') || params.get('videoId');
