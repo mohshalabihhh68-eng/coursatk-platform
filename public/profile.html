@@ -8,8 +8,8 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="logo" onclick="window.location.href='/subjects.html'" style="cursor:pointer">ثانوية World</div>
-    <a href="/subjects.html" style="color:var(--accent);font-size:0.88rem;font-weight:600;text-decoration:none;padding:8px 14px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:8px">رجوع</a>
+    <div class="logo" onclick="window.location.href='/'" style="cursor:pointer">ثانوية World</div>
+    <a href="/" style="color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;padding:6px 12px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:8px">رجوع</a>
   </header>
 
   <main id="app">
@@ -19,8 +19,8 @@
   <script>
     (function () {
       var tok = null;
-      try { tok = localStorage.getItem("cstk_tok") || sessionStorage.getItem("cstk_tok"); } catch (e) {}
-      if (!tok) { window.location.href = "/index.html"; return; }
+      try { tok = localStorage.getItem("cstk_tok"); } catch (e) {}
+      if (!tok) { window.location.href = "/"; return; }
 
       var app = document.getElementById("app");
       var code = "—";
@@ -64,17 +64,7 @@
             '<div class="meta" style="font-size:1.5rem;color:var(--accent);margin-top:8px;font-weight:700">' + minutes + '</div>' +
           '</div>' +
         '</div>' +
-        '<button class="btn" style="max-width:300px" onclick="window.location.href=\'/subjects.html\'"><span>📚</span><span>رجوع للمواد</span></button>' +
-        '<button class="btn" style="max-width:300px;margin-top:10px;color:#fca5a5" onclick="doLogout()"><span>🚪</span><span>تسجيل الخروج</span></button>';
-
-      window.doLogout = function () {
-        try {
-          localStorage.removeItem("cstk_tok");
-          localStorage.removeItem("cstk_code");
-          localStorage.removeItem("cstk_me");
-        } catch (e) {}
-        window.location.href = "/index.html";
-      };
+        '<button class="btn" style="max-width:300px" onclick="window.location.href=\'/\'"><span>📚</span><span>رجوع للمواد</span></button>';
     })();
   </script>
 </body>
