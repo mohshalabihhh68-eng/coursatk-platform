@@ -1,12 +1,10 @@
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
-const crypto = require('crypto');
 const app = express();
 const port = 3000;
 
 app.use(express.static('public'));
-app.use('/styles.css', express.static('public/styles.css'));
 app.use(express.json());
 
 // الـ heartbeat للـ resume
@@ -14,7 +12,7 @@ app.get('/api/heartbeat', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// الـ proxy للـ stream + الـ decryption كامل (الفك الجديد)
+// الـ proxy للـ stream + الـ decryption كامل
 app.get('/api/video/:lectureId/play', async (req, res) => {
     const lectureId = req.params.lectureId;
     const videoId = req.query.videoId;
@@ -71,24 +69,34 @@ app.get('/api/video/:lectureId/play', async (req, res) => {
     }
 });
 
-// الـ cdn proxy
+// الـ cdn proxy (الـ route اللي كان مخطئ قبل كده)
 app.get('/api/cdn/:lectureId/play/:videoId', async (req, res) => {
     const { lectureId, videoId } = req.params;
     const base = req.protocol + '://' + req.get('host');
     const originalUrl = base + '/api/stream/' + lectureId + '/play/' + videoId;
-    const response = await fetch(originalUrl);
-        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+
+    try {
+        const response = await fetch(originalUrl);
+
+        if (!response.ok) {
+            throw new Error('Original stream error');
+        }
+
         const text = await response.text();
 
         // إزالة أي escape في الـ segments
         let modifiedText = text.replace(/\\\\/g, '\\').replace(/\\"/g, '"').replace(/\\'/g, "'");
 
+        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
         res.send(modifiedText);
+    } catch (e) {
+        res.status(500).send('Proxy error');
+    }
 });
 
 // الـ main player page (يفتح فورًا بدون أي صفحة خام)
 app.get('/player', (req, res) => {
-    res.sendFile(path.join(__path, 'public/player.html'));
+    res.sendFile(path.join(__dirname, 'public/player.html'));
 });
 
 // الـ redirect من "تشغيل" للـ player كامل
@@ -101,7 +109,7 @@ app.get('/api/video/:lectureId/play', async (req, res) => {
 
 // الـ catch all للـ player.html
 app.get('/player.html', (req, res) => {
-    res.sendFile(path.join(__path, 'public/player.html'));
+    res.sendFile(path.join(__dirname, 'public/player.html'));
 });
 
 // الـ app.js (ما غيرتش أي حاجة فيه)
