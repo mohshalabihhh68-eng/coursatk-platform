@@ -9,7 +9,12 @@
         body { margin:0; background:#000; font-family: Arial, sans-serif; overflow: hidden; }
         #video-container { position: relative; width: 100%; height: 100vh; }
         #video { width: 100%; height: 100%; object-fit: contain; }
-        .error-box { color: #fff; text-align: center; padding: 50px; font-size: 18px; }
+        .error-box { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #fff; text-align: center; padding: 20px; 
+            background: rgba(255,0,0,0.2); border: 1px solid #f44336; border-radius: 8px;
+            font-size: 18px; font-family: sans-serif; direction: rtl; max-width: 90%;
+        }
     </style>
 </head>
 <body>
@@ -17,12 +22,10 @@
         <video id="video" autoplay playsinline controls></video>
     </div>
 
-    <!-- الكود كله لازم يكون جوه السكريبت ده -->
     <script>
         const video = document.getElementById('video');
         let hls;
 
-        // دالة تحميل أدوات فك التشفير
         function loadSWPlayer() {
             return new Promise((resolve, reject) => {
                 if (window.DecryptionUtils) return resolve(window.DecryptionUtils);
@@ -30,37 +33,39 @@
                 script.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
                 script.onload = () => {
                     if (window.DecryptionUtils) resolve(window.DecryptionUtils);
-                    else reject(new Error("DecryptionUtils not found"));
+                    else reject(new Error("لم يتم العثور على أدوات فك التشفير"));
                 };
-                script.onerror = () => reject(new Error("Failed to load player.js"));
+                script.onerror = () => reject(new Error("فشل تحميل سكريبت المشغل"));
                 document.head.appendChild(script);
             });
         }
 
         async function playVideo(lectureId, videoId) {
             try {
-                // 1. طلب البيانات من السيرفر
-                const res = await fetch(`/api/video/${lectureId}/session`);
+                // ⚠️ التعديل هنا: بنطلب من مسار /play ونستخدم POST
+                const res = await fetch(`/api/video/${lectureId}/play`, { method: 'POST' });
                 
-                // لو السيرفر رجع صفحة HTML بدل JSON (زي اللي حصل في الصورة)
                 const contentType = res.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("السيرفر رجع صفحة HTML بدل البيانات. تأكد من رفع ملف server.js الجديد.");
+                    throw new Error("السيرفر رجع استجابة غير صالحة (HTML).");
                 }
 
-                if (!res.ok) throw new Error("فشل جلب بيانات الجلسة من السيرفر");
+                const responseData = await res.json();
+                
+                if (!res.ok || !responseData.success) {
+                    throw new Error(`خطأ: ${responseData.message || "توكن منتهي أو الفيديو غير متاح"}`);
+                }
 
-                const session = await res.json();
+                // البيانات بتيجي جوه responseData.data
+                const session = responseData.data;
                 const { token, stream_url, video_id } = session;
-
+                
                 const urlObj = new URL(stream_url);
                 const path = urlObj.pathname.replace('/api/v1/', '');
                 const proxyUrl = `/api/stream?path=${encodeURIComponent(path)}&t=${token}`;
 
-                // 2. تحميل أدوات فك التشفير
                 const crypto = await loadSWPlayer();
 
-                // 3. تشغيل HLS
                 if (Hls.isSupported()) {
                     hls = new Hls({
                         keyLoader: function(keyInfo, keyXhr, resp) {
@@ -87,7 +92,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                document.body.innerHTML = `<div class="error-box">❌ خطأ: ${e.message}</div>`;
+                document.body.innerHTML = `<div class="error-box">❌ فشل التشغيل<br><br><b>${e.message}</b></div>`;
             }
         }
 
@@ -98,7 +103,7 @@
         if (lectureId && videoId) {
             playVideo(lectureId, videoId);
         } else {
-            document.body.innerHTML = '<div class="error-box">❌ مفيش بيانات في الرابط</div>';
+            document.body.innerHTML = '<div class="error-box">❌ لم يتم العثور على lectureId أو videoId في الرابط</div>';
         }
     </script>
 </body>
