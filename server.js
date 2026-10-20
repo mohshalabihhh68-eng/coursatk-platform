@@ -6,10 +6,10 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// التوكن الجديد
+// ✅ التوكن الجديد اللي تم تحديثه
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDczNjMsInJvbGUiOiJzdHVkZW50IiwidXVpZCI6IjYwYTU0MzZiMDY2MzU4NmI1MDQwOTBhZTM3ZThmOWM5In0.Jz2LWCWeYW6O6Y3h_MntJJi8mcauFhRjcInC37Ns5wI";
 
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
@@ -162,6 +162,7 @@ app.get("/api/profile", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
+// مسار جلب الفيديو (اللي بيستخدمه الـ player)
 app.post("/api/video/:id/play", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
     method: "POST",
@@ -274,6 +275,7 @@ app.post("/api/heartbeat", async function (req, res) {
   }
 });
 
+// الـ catch all
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
