@@ -124,8 +124,6 @@ async function proxyJson(url, opts) {
   }
 }
 
-// ==================== Routes ====================
-
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
   res.status(r.status).json(r.body);
@@ -273,12 +271,10 @@ app.post("/api/heartbeat", async function (req, res) {
   }
 });
 
-// SPA fallback
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, function () {
-  console.log("✅ Server running on port " + PORT);
-  console.log("📁 Serving static from: " + path.join(__dirname, "public"));
+  console.log("Running on port " + PORT);
 });
