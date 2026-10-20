@@ -3,16 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>دخول — ثانوية World</title>
+  <title>ثانوية World</title>
   <link rel="stylesheet" href="/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
   <style>
-    .login-wrap {
-      min-height: 100vh;
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
+    .login-overlay.hidden { display: none; }
     .login-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -88,11 +93,6 @@
       display: none;
     }
     .login-status.show { display: block; }
-    .login-status.loading {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      color: #93c5fd;
-    }
     .login-status.error {
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -111,7 +111,7 @@
   </style>
 </head>
 <body>
-  <div class="login-wrap">
+  <div class="login-overlay hidden" id="login-overlay">
     <div class="login-box">
       <h1>ثانوية World</h1>
       <p>اكتب كود الاشتراك للدخول</p>
@@ -124,28 +124,71 @@
     </div>
   </div>
 
+  <header class="topbar">
+    <div class="logo" onclick="goHome()"> ثانوية World</div>
+    <div id="profile-chip" class="chip hidden"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="/profile.html" style="color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;padding:6px 12px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:8px">ملفي</a>
+      <button onclick="logout()" style="background:transparent;border:1px solid var(--border-light);color:var(--text-muted);padding:6px 12px;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit">خروج</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="loading">جاري التحميل...</div>
+  </main>
+
+  <div id="player-modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closePlayer()">✕</button>
+      <h3 id="player-title"></h3>
+      <video id="video" controls playsinline></video>
+      <div id="player-status" class="status"></div>
+    </div>
+  </div>
+
   <script>
     (function () {
-      try {
-        if (localStorage.getItem("cstk_tok")) {
-          window.location.href = "/subjects.html";
-          return;
-        }
-      } catch (e) {}
-
+      var overlay = document.getElementById("login-overlay");
       var form = document.getElementById("login-form");
       var input = document.getElementById("code-input");
       var btn = document.getElementById("login-btn");
       var status = document.getElementById("login-status");
 
-      input.addEventListener("input", function () {
-        input.value = input.value.replace(/\D/g, "").slice(0, 7);
-      });
+      function showLogin() {
+        overlay.classList.remove("hidden");
+      }
+      function hideLogin() {
+        overlay.classList.add("hidden");
+      }
 
       function show(type, text) {
         status.className = "login-status show " + type;
         status.textContent = text;
       }
+
+      window.logout = function () {
+        try {
+          localStorage.removeItem("cstk_tok");
+          localStorage.removeItem("cstk_code");
+          localStorage.removeItem("cstk_me");
+        } catch (e) {}
+        window.location.reload();
+      };
+
+      var hasToken = false;
+      try {
+        hasToken = !!localStorage.getItem("cstk_tok");
+      } catch (e) {}
+
+      if (hasToken) {
+        hideLogin();
+      } else {
+        showLogin();
+      }
+
+      input.addEventListener("input", function () {
+        input.value = input.value.replace(/\D/g, "").slice(0, 7);
+      });
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -155,7 +198,7 @@
           return;
         }
         btn.disabled = true;
-        show("loading", "جاري الدخول...");
+        show("success", "تمام! جاري التحميل...");
 
         var token = "bypass_" + code + "_" + Date.now();
         try {
@@ -168,12 +211,14 @@
           return;
         }
 
-        show("success", "تمام! جاري فتح المواد...");
+        hideLogin();
+        btn.disabled = false;
         setTimeout(function () {
-          window.location.href = "/subjects.html";
-        }, 400);
+          window.location.reload();
+        }, 300);
       });
     })();
   </script>
+  <script src="/app.js"></script>
 </body>
 </html>
