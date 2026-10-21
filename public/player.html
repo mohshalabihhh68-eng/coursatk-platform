@@ -5,27 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>مشغل المحاضرة | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <style>
 :root{--bg:#080d18;--panel:#111a2a;--line:#26344b;--text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif;height:100vh;display:flex;flex-direction:column}
-.top{background:#080d18ef;border-bottom:1px solid #ffffff12;padding:10px 16px;display:flex;align-items:center;gap:10px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.top{background:#080d18ef;border-bottom:1px solid #ffffff12;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .brand{font-weight:900}
 .btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;cursor:pointer;margin-right:auto}
-.wrap{flex:1;position:relative;background:#000}
-iframe{width:100%;height:100%;border:none}
+.wrap{flex:1;position:relative;background:#000;min-height:0}
+video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
 .loading{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#fff;z-index:10}
 .spin{width:38px;height:38px;border:3px solid #ffffff30;border-top-color:#5b8cff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .error{position:absolute;inset:0;background:#080d18;display:none;align-items:center;justify-content:center;flex-direction:column;color:#ff5252;padding:20px;text-align:center;z-index:20}
+.error .btn{margin:16px auto 0;margin-right:auto}
 </style>
 </head>
 <body>
   <header class="top">
     <div class="brand">ثانوية club</div>
-    <button class="btn" onclick="history.back()">رجوع للمحتوى</button>
+    <button class="btn" type="button" onclick="history.back()">رجوع للمحتوى</button>
   </header>
-  
+
   <div class="wrap" id="player-wrap">
     <div class="loading" id="loading">
       <div class="spin"></div>
@@ -33,54 +35,197 @@ iframe{width:100%;height:100%;border:none}
     </div>
     <div class="error" id="error">
       <div id="err-text">حدث خطأ</div>
+      <button class="btn" type="button" onclick="location.reload()">إعادة المحاولة</button>
     </div>
+    <video id="video" controls playsinline webkit-playsinline></video>
   </div>
 
 <script>
-(async function(){
-  const API_BASE = '';
-  const TOKEN_KEY = 'cstk_tok';
+(async function () {
+  const API_BASE = "";
+  const TOKEN_KEY = "cstk_tok";
   const token = localStorage.getItem(TOKEN_KEY);
-  
-  if (!token) { window.location.replace('index.html'); return; }
-  
-  const qs = new URLSearchParams(location.search);
-  const lectureId = qs.get('lectureId');
-  const videoId = qs.get('videoId');
-  
-  if (!lectureId || !videoId) {
-    showErr('رابط المشغل ناقص.');
+
+  if (!token) {
+    window.location.replace("index.html");
     return;
   }
-  
-  try {
-    // طلب البيانات من السيرفر
-    const res = await fetch(API_BASE + `/api/video/${videoId}/play`, { method: 'POST' });
-    const data = await res.json();
-    
-    if (!res.ok || !data.success) throw new Error(data.message || 'فشل جلب بيانات الفيديو');
-    
-    // الرابط الجاهز من الـ API
-    const streamUrl = data.data.stream_url;
-    if (!streamUrl) throw new Error('لم يتم العثور على رابط البث');
-    
-    // إخفاء التحميل وعرض الـ iframe
-    document.getElementById('loading').style.display = 'none';
-    const iframe = document.createElement('iframe');
-    iframe.src = streamUrl;
-    iframe.allow = "autoplay; fullscreen; encrypted-media";
-    iframe.allowFullscreen = true;
-    document.getElementById('player-wrap').appendChild(iframe);
-    
-  } catch (e) {
-    showErr(e.message);
+
+  const qs = new URLSearchParams(location.search);
+  const lectureId = qs.get("lectureId");
+  const videoId = qs.get("videoId");
+
+  if (!lectureId || !videoId) {
+    showErr("رابط المشغل ناقص.");
+    return;
   }
-  
+
+  const videoEl = document.getElementById("video");
+  let hls = null;
+  let heartbeatTimer = null;
+  let sessionData = null;
+
   function showErr(msg) {
-    document.getElementById('loading').style.display = 'none';
-    const errDiv = document.getElementById('error');
-    errDiv.style.display = 'flex';
-    document.getElementById('err-text').textContent = msg;
+    document.getElementById("loading").style.display = "none";
+    const errDiv = document.getElementById("error");
+    errDiv.style.display = "flex";
+    document.getElementById("err-text").textContent = msg || "حدث خطأ";
+    if (hls) {
+      try { hls.destroy(); } catch (e) {}
+      hls = null;
+    }
+    stopHeartbeat();
+  }
+
+  function hideLoading() {
+    document.getElementById("loading").style.display = "none";
+  }
+
+  function pathFromStreamUrl(streamUrl) {
+    try {
+      const u = new URL(streamUrl);
+      let p = u.pathname || "";
+      // /api/v1/videos/.../stream/master.m3u8  ->  videos/.../stream/master.m3u8
+      p = p.replace(/^\/api\/v1\//, "").replace(/^\//, "");
+      return p;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function buildProxyUrl(path, swToken) {
+    return (
+      API_BASE +
+      "/api/stream?path=" +
+      encodeURIComponent(path) +
+      "&t=" +
+      encodeURIComponent(swToken)
+    );
+  }
+
+  function startHeartbeat(heartbeatUrl, swToken) {
+    stopHeartbeat();
+    if (!heartbeatUrl || !swToken) return;
+
+    const tick = async () => {
+      try {
+        await fetch(API_BASE + "/api/heartbeat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: heartbeatUrl, token: swToken }),
+        });
+      } catch (e) {}
+    };
+
+    tick();
+    heartbeatTimer = setInterval(tick, 25000);
+  }
+
+  function stopHeartbeat() {
+    if (heartbeatTimer) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  }
+
+  function endSession() {
+    stopHeartbeat();
+    if (!sessionData || !sessionData.end_url || !sessionData.token) return;
+    try {
+      const body = JSON.stringify({ url: sessionData.end_url, token: sessionData.token });
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: "application/json" });
+        navigator.sendBeacon(API_BASE + "/api/heartbeat", blob);
+      } else {
+        fetch(API_BASE + "/api/heartbeat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+          keepalive: true,
+        }).catch(function () {});
+      }
+    } catch (e) {}
+  }
+
+  window.addEventListener("pagehide", endSession);
+  window.addEventListener("beforeunload", endSession);
+
+  try {
+    const res = await fetch(API_BASE + "/api/video/" + videoId + "/play", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token },
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error((data && data.message) || "فشل جلب بيانات الفيديو");
+    }
+
+    const d = data.data || {};
+    sessionData = d;
+
+    const streamUrl = d.stream_url;
+    const swToken = d.token;
+    if (!streamUrl || !swToken) {
+      throw new Error("لم يتم العثور على رابط البث أو التوكن");
+    }
+
+    const path = pathFromStreamUrl(streamUrl);
+    if (!path) throw new Error("رابط البث غير صالح");
+
+    const proxySrc = buildProxyUrl(path, swToken);
+
+    startHeartbeat(d.heartbeat_url, swToken);
+
+    hideLoading();
+
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        xhrSetup: function (xhr) {
+          // Range requests handled by browser / server proxy
+        },
+      });
+      hls.loadSource(proxySrc);
+      hls.attachMedia(videoEl);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        videoEl.play().catch(function () {});
+      });
+      hls.on(Hls.Events.ERROR, function (_ev, err) {
+        if (!err || !err.fatal) return;
+        if (err.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          try {
+            hls.startLoad();
+          } catch (e) {
+            showErr("خطأ في الشبكة أثناء تحميل الفيديو");
+          }
+        } else if (err.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          try {
+            hls.recoverMediaError();
+          } catch (e) {
+            showErr("خطأ في تشغيل الفيديو");
+          }
+        } else {
+          showErr("فشل تشغيل الفيديو المشفر");
+        }
+      });
+    } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+      // Safari native HLS
+      videoEl.src = proxySrc;
+      videoEl.addEventListener("loadedmetadata", function () {
+        videoEl.play().catch(function () {});
+      });
+      videoEl.addEventListener("error", function () {
+        showErr("فشل تشغيل الفيديو");
+      });
+    } else {
+      throw new Error("المتصفح لا يدعم تشغيل HLS");
+    }
+  } catch (e) {
+    showErr(e.message || "حدث خطأ غير متوقع");
   }
 })();
 </script>
