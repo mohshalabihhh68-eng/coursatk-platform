@@ -230,7 +230,6 @@ app.get("/api/stream", async function (req, res) {
               );
             });
           }
-          // CDN URL → مسار Stream-Weave عبر /api/stream (يتجاوز Cloudflare على الـ CDN)
           if (s.indexOf("http") === 0) {
             try {
               var pu = new URL(s);
