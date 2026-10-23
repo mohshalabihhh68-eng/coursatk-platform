@@ -230,9 +230,29 @@ app.get("/api/stream", async function (req, res) {
               );
             });
           }
-          // اترك روابط CDN الموقّعة كما هي — المتصفح يحمّلها مباشرة
-          // (Railway IP يتبلوك على Cloudflare لو مرّت على /api/cdn)
-          if (s.indexOf("http") === 0) return s;
+          // CDN URL → مسار Stream-Weave عبر /api/stream (يتجاوز Cloudflare على الـ CDN)
+          if (s.indexOf("http") === 0) {
+            try {
+              var pu = new URL(s);
+              var parts = pu.pathname.split("/").filter(Boolean);
+              var vi = parts.indexOf("videos");
+              if (vi >= 0 && parts.length >= vi + 3) {
+                var vid = parts[vi + 1];
+                var quality = parts[vi + 2];
+                var fname = (parts[vi + 3] || "").split("?")[0];
+                if (vid && quality && fname) {
+                  var swPath = "videos/" + vid + "/stream/" + quality + "/" + fname;
+                  return (
+                    "/api/stream?path=" +
+                    encodeURIComponent(swPath) +
+                    "&t=" +
+                    encodeURIComponent(token)
+                  );
+                }
+              }
+            } catch (e) {}
+            return "/api/cdn?u=" + b64urlEncode(s);
+          }
           return (
             "/api/stream?path=" +
             encodeURIComponent(joinRel(base, s)) +
