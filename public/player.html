@@ -517,12 +517,33 @@ function joinRel(base, rel) {
 }
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
   if (/^(blob:|data:)/i.test(uri)) return uri;
-  if (uri.indexOf('/api/stream') === 0 || uri.indexOf('/api/cdn') === 0) return location.origin + uri;
-  if (/^https?:\/\//i.test(uri)) return location.origin + '/api/cdn?u=' + toB64url(uri);
+
+  // لو السيرفر حوّل الرابط لـ /api/cdn?u=... فكّه وارجع للـ URL الأصلي الموقّع
+  // (Railway IP متبلوك على Cloudflare → 403)
+  try {
+    var absUri = uri;
+    if (uri.indexOf('/api/cdn') === 0 || uri.indexOf(location.origin + '/api/cdn') === 0) {
+      var cu = new URL(uri, location.origin);
+      var enc = cu.searchParams.get('u') || cu.searchParams.get('url');
+      if (enc) {
+        var decoded = fromB64url(enc);
+        if (/^https?:\/\//i.test(decoded)) return decoded;
+      }
+    }
+  } catch (e) {}
+
+  if (uri.indexOf('/api/stream') === 0) return uri;
+
+  // روابط CDN الموقّعة — المتصفح يحمّلها مباشرة
+  if (/^https?:\/\//i.test(uri)) return uri;
+
   if (variantFileUrl) {
-    try { return location.origin + '/api/cdn?u=' + toB64url(new URL(uri, variantFileUrl).href); } catch (e) {}
+    try {
+      var abs = new URL(uri, variantFileUrl).href;
+      if (/^https?:\/\//i.test(abs)) return abs;
+    } catch (e) {}
   }
-  return location.origin + '/api/stream?path=' + encodeURIComponent(joinRel(variantBasePath || '', uri)) + '&t=' + encodeURIComponent(streamToken);
+  return '/api/stream?path=' + encodeURIComponent(joinRel(variantBasePath || '', uri)) + '&t=' + encodeURIComponent(streamToken);
 }
 function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variantFileUrl) {
   return text.split('\n').map(function (line) {
@@ -1117,8 +1138,12 @@ async function playIndex(i,autoplay){
       hls.on(Hls.Events.ERROR, function(_e, d){
         if(my!==playToken || !d || !d.fatal) return;
         const code = d.response && d.response.code;
-        if(code === 401 || code === 403){
+        if(code === 401){
           showError('جلسة الدخول انتهت أو مفيش صلاحية لمشاهدة الفيديو ده.','انتهت الجلسة','leave');
+          return;
+        }
+        if(code === 403){
+          showError('السيرفر أو الـ CDN رفض تحميل مقطع الفيديو (403). جرّب من شبكة تانية أو حدّث الصفحة.','فشل تحميل المقطع');
           return;
         }
         if(d.type === Hls.ErrorTypes.NETWORK_ERROR){
