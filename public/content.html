@@ -2,10 +2,11 @@
 <html lang="ar-EG" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>محتوى المحاضرة | ثانوية club</title>
+<title>الفصول | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#070b14;--card:#121a2b;--ink:#eef2ff;--muted:#8b9bb8;--line:rgba(148,163,184,.12);--blue:#3b82f6;--blue3:#2563eb}
+/* نفس ستايلات الصفحة اللي فوق بالظبط، عشان الشكل يبقى موحد */
+:root{--bg:#070b14;--card:#121a2b;--ink:#eef2ff;--muted:#8b9bb8;--line:rgba(148,163,184,.12);--blue:#3b82f6;--blue2:#60a5fa;--blue3:#2563eb}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
 button{font:inherit;cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -25,15 +26,20 @@ button{font:inherit;cursor:pointer}
 .profile-menu button.danger{color:#ff8a80}
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink)}
-.page-head{margin-bottom:22px}
-.page-head h1{margin:0;font-size:24px;font-weight:900}
-.sec-title{font-size:18px;font-weight:900;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
-.vlist{display:grid;gap:10px}
-.vitem{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:.2s;display:flex;justify-content:space-between;align-items:center}
-.vitem:hover{background:#182234;border-color:rgba(59,130,246,.4)}
-.vtitle{font-weight:800;font-size:14px}
-.vbtn{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:12px}
-.pdf-item{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:14px;border-radius:16px;border:1px solid var(--line);margin-bottom:10px}
+.page-head{margin-bottom:22px;animation:fadeUp .4s ease}
+.page-head .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;margin-bottom:10px}
+.page-head h1{margin:0;font-size:26px;font-weight:900}
+.page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:20px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;animation:fadeUp .45s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.4);box-shadow:0 24px 50px rgba(37,99,235,.18)}
+.card-img{position:relative;aspect-ratio:16/9;background:#101b31;overflow:hidden}
+.card-img img{width:100%;height:100%;object-fit:cover;display:block}
+.card-img .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--muted)}
+.card-body{padding:16px;display:flex;flex-direction:column;min-height:130px}
+.card-body h3{margin:0;font-size:16px;font-weight:900}
+.card-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-weight:700}
+.card-btn{width:100%;margin-top:auto;padding:11px;border:0;border-radius:12px;font-weight:900;font-size:12px;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;cursor:pointer}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
 </style>
@@ -44,15 +50,15 @@ button{font:inherit;cursor:pointer}
     <div class="profile-wrap"><button type="button" class="profile-btn" id="profile-btn"><span class="av" id="nav-av">?</span><span id="nav-name">—</span></button><div class="profile-menu" id="profile-menu"><button type="button" id="menu-account">حسابي</button><button type="button" class="danger" id="menu-logout">خروج</button></div></div>
   </div></header>
 
-  <main class="wrap" id="main"><div class="loading"><div class="spinner"></div><p>جاري تحميل المحتوى...</p></div></main>
+  <main class="wrap" id="main"><div class="loading"><div class="spinner"></div><p>جاري تحميل الفصول...</p></div></main>
 
 <script>
 (function(){
 'use strict';
 const API_BASE = '', TOKEN_KEY = 'cstk_tok', token = localStorage.getItem(TOKEN_KEY);
-if (!token) { window.location.replace('index.html'); return; }
+/* no login gate — server holds token */
 const $ = id => document.getElementById(id);
-const qs = new URLSearchParams(location.search), lectureId = qs.get('lectureId');
+const qs = new URLSearchParams(location.search), teacherId = qs.get('teacherId');
 const api = async (path, opts = {}) => {
   const headers = { Accept: 'application/json', ...opts.headers };
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -64,23 +70,18 @@ const api = async (path, opts = {}) => {
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 async function load() {
-  if (!lectureId) { $('main').innerHTML = '<div style="text-align:center;padding:50px">معرف المحاضرة غير موجود.</div>'; return; }
+  if (!teacherId) { $('main').innerHTML = '<div style="text-align:center;padding:50px">معرف المدرس غير موجود.</div>'; return; }
   try {
-    const content = await api('/api/lectures/' + lectureId + '/content');
-    const videos = content.videos || [], pdfs = content.pdfs || [];
-    let html = `<button class="back-btn" onclick="history.back()">← رجوع</button><div class="page-head"><h1>محتوى المحاضرة</h1></div><div class="sec-title">🎬 الفيديوهات</div><div class="vlist">`;
-    if (videos.length) {
-      videos.forEach(v => {
-        html += `<div class="vitem"><div class="vtitle">${esc(v.title)}</div><button class="vbtn" onclick="location.href='player.html?lectureId=${lectureId}&videoId=${v.id}'">▶ تشغيل</button></div>`;
-      });
-    } else { html += '<div style="color:var(--muted)">لا يوجد فيديوهات.</div>'; }
-    html += `</div><div class="sec-title">📄 الملفات</div>`;
-    if (pdfs.length) {
-      pdfs.forEach(p => {
-        html += `<div class="pdf-item"><div class="vtitle">${esc(p.title)}</div><a class="vbtn" href="${p.url}" target="_blank">فتح</a></div>`;
-      });
-    } else { html += '<div style="color:var(--muted)">لا يوجد ملفات.</div>'; }
-    $('main').innerHTML = html;
+    const chapters = await api('/api/teachers/' + teacherId + '/chapters');
+    if (!chapters || !chapters.length) { $('main').innerHTML = '<div style="text-align:center;padding:50px;color:var(--muted)">لا يوجد فصول متاحة.</div>'; return; }
+    let html = `<button class="back-btn" onclick="history.back()">← رجوع</button><div class="page-head"><div class="badge">الفصول</div><h1>الفصول المتاحة</h1><p>اختار الفصل لعرض المحاضرات</p></div><div class="grid">`;
+    chapters.forEach(c => {
+      html += `<div class="card" onclick="window.location.href='lectures.html?chapterId=${c.id}'">
+        <div class="card-img"><img src="${esc(c.image_url || '')}" onerror="this.style.display='none'"><div class="ph" style="display:${c.image_url ? 'none' : 'grid'}"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div></div>
+        <div class="card-body"><h3>${esc(c.name)}</h3><div class="card-meta"><span>${c.lecture_count || 0} محاضرة</span></div><button class="card-btn">عرض المحاضرات ←</button></div>
+      </div>`;
+    });
+    html += '</div>'; $('main').innerHTML = html;
   } catch (e) { $('main').innerHTML = `<div style="text-align:center;color:#ff5252">خطأ: ${e.message}</div>`; }
 }
 async function loadProfile() { try { const me = await api('/api/profile'); $('nav-name').textContent = me.name || 'طالب'; $('nav-av').textContent = (me.name || 'ط').charAt(0); } catch (e) {} }
