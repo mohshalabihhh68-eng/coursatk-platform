@@ -6,10 +6,7 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// التوكن بتاعك
-const STUDENT_TOKEN =
-  process.env.COURSATK_TOKEN ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
+const STUDENT_TOKEN = process.env.COURSATK_TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
 
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
@@ -100,66 +97,107 @@ async function proxyJson(url, opts) {
 
 // ==================== Routes ====================
 
-// 1. مسار تسجيل الدخول الوهمي عشان الـ Front-end يعدي
 app.post("/api/auth/login", (req, res) => {
-  res.json({
-    success: true,
-    data: { token: "fake_token_for_session", user: { name: "طالب" } }
-  });
+  res.json({ success: true, data: { token: "fake_token_for_session", user: { name: "طالب" } } });
 });
 
-// 2. مسار البروفايل (بيجيب من المنصة الأصلية)
 app.get("/api/profile", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/profile");
-  // لو المنصة رجعت خطأ، بنرجع داتا وهمية عشان الصفحة متضربش
-  if (r.status !== 200) {
-     return res.json({ success: true, data: { name: "طالب ثانوية", code: "1234567" } });
-  }
+  if (r.status !== 200) return res.json({ success: true, data: { name: "طالب ثانوية", code: "1234567" } });
   res.status(r.status).json(r.body);
 });
 
-// 3. مسار السنوات الدراسية
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
   res.status(r.status).json(r.body);
 });
 
-// 4. مسار المواد (بيحتاج الـ ID بتاع السنة)
 app.get("/api/subjects/:id", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
   res.status(r.status).json(r.body);
 });
 
-// 5. مسار المدرسين
 app.get("/api/subjects/:id/teachers", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
   res.status(r.status).json(r.body);
 });
 
-// 6. مسار الفصول
 app.get("/api/teachers/:id/chapters", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
   res.status(r.status).json(r.body);
 });
 
-// 7. مسار المحاضرات
 app.get("/api/chapters/:id/lectures", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
   res.status(r.status).json(r.body);
 });
 
-// 8. مسار محتوى المحاضرة
 app.get("/api/lectures/:id/content", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
   res.status(r.status).json(r.body);
 });
 
-// 9. مسار تشغيل الفيديو
-app.post("/api/video/:id/play", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
-    method: "POST", headers: { "Content-Length": "0" }, body: "",
-  });
-  res.status(r.status).json(r.body);
+// ✅ المسار ده هو اللي هيجيب الفيديو ويشغله
+app.post("/api/video-proxy/:id", async function (req, res) {
+  try {
+    // 1. بنطلب من السيرفر الأصلي بيانات الفيديو
+    const playRes = await fetch(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+      method: "POST",
+      headers: headers(),
+      body: ""
+    });
+    
+    const playData = await playRes.json();
+    if (!playRes.ok) throw new Error(playData.message || "فشل جلب الفيديو");
+
+    // 2. بنستخرج المسار والتوكن (أحياناً بيكونوا جوه data)
+    const payload = playData.data || playData;
+    const pathStr = payload.path;
+    const tokenStr = payload.token;
+
+    if (!pathStr || !tokenStr) {
+       throw new Error("مفيش داتا للفيديو في الرد الأصلي.");
+    }
+
+    // 3. بنجيب ملف الـ m3u8 الأساسي من سيرفر الفيديوهات
+    const m3u8Url = SW + "/api/v1/" + pathStr.replace(/^\/+/, "");
+    const hdrs = browserHeaders({ Authorization: "Bearer " + tokenStr });
+    const upstream = await fetchFollow(m3u8Url, hdrs);
+    
+    // لو السيرفر رجع ملف m3u8 بنعدل اللينكات اللي جواه عشان تعدي على السيرفر بتاعنا
+    if (upstream.headers.get("content-type")?.includes("mpegurl") || upstream.url.includes(".m3u8")) {
+       let text = await upstream.text();
+       let base = pathStr.includes("/") ? pathStr.substring(0, pathStr.lastIndexOf("/") + 1) : "";
+       
+       text = text.split("\n").map(line => {
+         let s = line.trim();
+         if (!s) return line;
+         if (s.charAt(0) === "#") {
+           return s.replace(/URI="([^"]+)"/g, (_m, uri) => {
+             if (uri.indexOf("http") === 0) return 'URI="/api/cdn?u=' + b64urlEncode(uri) + '"';
+             let clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
+             clean = clean.replace(/^api\/v1\//, "");
+             if (clean.indexOf("videos/") !== 0) clean = joinRel(base, clean);
+             return `URI="/api/stream?path=${encodeURIComponent(clean)}&t=${encodeURIComponent(tokenStr)}"`;
+           });
+         }
+         if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
+         return `/api/stream?path=${encodeURIComponent(joinRel(base, s))}&t=${encodeURIComponent(tokenStr)}`;
+       }).join("\n");
+
+       res.set("Content-Type", "application/vnd.apple.mpegurl");
+       res.set("Access-Control-Allow-Origin", "*");
+       return res.status(200).send(text);
+    }
+
+    // لو رجع فيديو عادي (mp4)
+    var buf = Buffer.from(await upstream.arrayBuffer());
+    pipeUpstream(res, upstream, buf);
+
+  } catch (e) {
+    console.error("Video Proxy Error:", e);
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
 
 app.get("/api/cdn", async function (req, res) {
@@ -211,28 +249,11 @@ app.get("/api/stream", async function (req, res) {
 
       res.set("Content-Type", "application/vnd.apple.mpegurl");
       res.set("Access-Control-Allow-Origin", "*");
-      res.set("Cache-Control", "no-store");
       return res.status(upstream.status).send(text);
     }
 
     var buf = Buffer.from(await upstream.arrayBuffer());
-    res.set("Cache-Control", "no-store");
     pipeUpstream(res, upstream, buf);
-  } catch (e) { res.status(502).json({ error: e.message }); }
-});
-
-app.post("/api/heartbeat", async function (req, res) {
-  try {
-    var url = req.body && req.body.url;
-    var token = req.body && req.body.token;
-    if (!url || !token) return res.status(400).json({ error: "url+token required" });
-    var upstream = await fetch(url, {
-      method: "POST",
-      headers: browserHeaders({ Authorization: "Bearer " + token, "Content-Type": "application/json" }),
-      body: "{}",
-    });
-    var text = await upstream.text();
-    res.status(upstream.status).type("json").send(text);
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
