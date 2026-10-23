@@ -50,8 +50,6 @@ a{color:inherit;text-decoration:none}
 .profile-menu.open{display:block;animation:fadeUp .18s ease}
 .profile-menu button{width:100%;text-align:right;padding:11px 12px;border-radius:12px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;color:var(--ink);transition:background .2s}
 .profile-menu button:hover{background:var(--soft)}
-.profile-menu button.danger{color:#ef4444}
-.profile-menu button.danger:hover{background:rgba(239,68,68,.08)}
 
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
 .page-head{margin-bottom:22px;animation:fadeUp .4s ease}
@@ -112,7 +110,6 @@ a{color:inherit;text-decoration:none}
         </button>
         <div class="profile-menu" id="profile-menu">
           <button type="button" id="menu-account">حسابي</button>
-          <button type="button" class="danger" id="menu-logout">تسجيل خروج</button>
         </div>
       </div>
     </div>
@@ -131,10 +128,6 @@ a{color:inherit;text-decoration:none}
 
 const THEME_KEY = 'cstk_theme';
 const API_BASE = '';
-const token = localStorage.getItem('cstk_tok'); // للتحقق فقط
-
-// لو مفيش توكن (زائر)، ممكن نسمح له يكمل أو نرجعه، هنا هنسمح له يكمل عشان يشوف الداتا
-// if (!token) { window.location.replace('index.html'); return; }
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -163,7 +156,6 @@ const api = async (path) => {
     headers: { 'Accept': 'application/json' }
   });
   const data = await res.json().catch(() => ({}));
-  // بنرجع data.body لو موجودة (عشان السيرفر بتاعك بيرجع شكل معين)
   if (!res.ok || data.success === false) throw new Error(data.message || 'خطأ');
   return data.data || data.body?.data || data.body || data;
 };
@@ -172,7 +164,7 @@ async function loadData() {
   try {
     // 1. بنجيب السنوات
     const yearsRes = await api('/api/years');
-    let years = yearsRes.data || yearsRes; 
+    let years = yearsRes.data || yearsRes;
     if (!years || !years.length) throw new Error("لا توجد سنوات دراسية متاحة");
 
     const yearId = years[0].id;
@@ -202,7 +194,7 @@ async function loadData() {
     });
     html += `</div>`;
     $('main').innerHTML = html;
-    
+
   } catch (e) {
     $('main').innerHTML = `<div style="text-align:center;padding:50px;color:#ff5252">خطأ: ${e.message}</div>`;
   }
@@ -225,10 +217,6 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.profile-wrap')) $('profile-menu').classList.remove('open');
 });
 $('menu-account').onclick = () => window.location.href = 'profile.html';
-$('menu-logout').onclick = () => { 
-  localStorage.removeItem('cstk_tok'); 
-  window.location.replace('index.html'); 
-};
 
 loadData();
 loadProfile();
