@@ -51,7 +51,6 @@ img{display:block;max-width:100%}
 
 .titlebox{padding:16px 2px 0}
 .titlebox h1{font-size:20px;margin:0 0 10px;font-weight:900}
-.controls-under{display:flex;align-items:center;gap:8px;padding:14px 0 0}
 
 .panel{background:linear-gradient(155deg,#15233aee,#0d1524f5);border:1px solid #8ab4ff20;border-radius:20px;overflow:hidden;box-shadow:0 22px 70px #0003;position:sticky;top:78px}
 .panel-head{padding:16px;border-bottom:1px solid #ffffff0c}
@@ -60,7 +59,7 @@ img{display:block;max-width:100%}
 .item{display:flex;align-items:center;gap:10px;padding:9px;border-radius:14px;cursor:pointer;background:#ffffff05;border:1px solid transparent;transition:.2s}
 .item:hover{background:#ffffff08}
 .item.active{background:linear-gradient(105deg,#477ff51b,#477ff508);border-color:#5b8cff45}
-.itemtitle{font-size:12px;font-weight:800}
+.itemtitle{font-size:12px;font-weight:800;line-height:1.4}
 
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;gap:16px}
@@ -116,9 +115,7 @@ img{display:block;max-width:100%}
       <div class="panel-head">
         <h2>محتوى المحاضرة</h2>
       </div>
-      <div class="list" id="videosList">
-        <!-- قائمة الفيديوهات هتظهر هنا -->
-      </div>
+      <div class="list" id="videosList"></div>
     </div>
   </div>
 </div>
@@ -148,7 +145,6 @@ function showError(msg) {
   errorMsg.textContent = msg;
 }
 
-// 1. طلب محتوى المحاضرة عشان نجيب بيانات الفيديو الحقيقية
 async function loadVideoContent() {
   try {
     loading.classList.remove('hide');
@@ -159,13 +155,11 @@ async function loadVideoContent() {
       throw new Error(data.message || 'فشل في جلب بيانات المحاضرة');
     }
 
-    const videos = data.data?.videos || data.body?.data?.videos || data.body?.videos || [];
+    // استخراج الفيديوهات بشكل مرن (بيدور عليها في أي مكان في الرد)
+    const videos = data.data?.videos || data.body?.data?.videos || data.body?.videos || data.videos || [];
     
     if (videos.length > 0) {
-      // تحديث القائمة الجانبية
       renderList(videos);
-      
-      // تشغيل الفيديو المطلوب
       const currentVideo = videos.find(v => String(v.id) === String(videoId)) || videos[0];
       if (currentVideo) {
         $('pageTitle').textContent = currentVideo.title || 'مشاهدة المحاضرة';
@@ -181,13 +175,12 @@ async function loadVideoContent() {
   }
 }
 
-// 2. طلب رابط التشغيل من السيرفر وتشغيله
 async function playVideo(id) {
   try {
     loading.classList.remove('hide');
     errorBox.classList.remove('show');
     
-    // بنكلم السيرفر بتاعنا اللي بيكلم المنصة الأصلية ويرجع اللينك
+    // طلب تشغيل الفيديو من السيرفر
     const res = await fetch(API_BASE + '/api/video/' + id + '/play', { method: 'POST' });
     const data = await res.json();
     
@@ -195,20 +188,37 @@ async function playVideo(id) {
       throw new Error(data.message || 'تعذر الحصول على رابط تشغيل الفيديو');
     }
 
-    // استخراج رابط الفيديو والتوكن (حسب شكل الرد اللي جاي من السيرفر)
+    // طباعة شكل الرد في الكونسول عشان نعرف اللينك فين بالظبط
+    console.log("🔥 الرد الكامل من السيرفر:", data);
+
+    // استخراج المسار والتوكن بذكاء (بيدور عليهم في أي مكان)
     const payload = data.data || data.body?.data || data.body || data;
     
-    // السيرفر بيرجع مسار (path) وتوكن (token) للمشغل بتاع stream-weave
-    if (payload.token && payload.path) {
-      // بنبعت الفيديو للمسار اللي إحنا عملينه في server.js واللي بيقرأ الـ m3u8 ويفك تشفيره
-      videoEl.src = `/api/stream?path=${encodeURIComponent(payload.path)}&t=${encodeURIComponent(payload.token)}`;
+    let path = payload.path;
+    let token = payload.token;
+
+    // لو مش موجودين مباشرة، بندور جوه التفاصيل
+    if ((!path || !token) && payload.playback) {
+       path = payload.playback.path || path;
+       token = payload.playback.token || token;
+    }
+    if ((!path || !token) && payload.stream) {
+       path = payload.stream.path || path;
+       token = payload.stream.token || token;
+    }
+
+    if (path && token) {
+      // بنبعت الفيديو للمسار اللي إحنا عملينه في server.js
+      videoEl.src = `/api/stream?path=${encodeURIComponent(path)}&t=${encodeURIComponent(token)}`;
     } 
-    // لو السيرفر رجع رابط مباشر (hls_url أو url)
     else if (payload.hls_url) {
       videoEl.src = payload.hls_url;
-    } else if (payload.url) {
+    } 
+    else if (payload.url) {
       videoEl.src = payload.url;
-    } else {
+    } 
+    else {
+      console.error("مش لاقي path ولا token ولا url في الرد:", payload);
       throw new Error('لم يتم العثور على رابط فيديو صالح في رد السيرفر.');
     }
 
@@ -232,9 +242,7 @@ function renderList(videos) {
   videos.forEach(v => {
     const el = document.createElement('div');
     el.className = 'item' + (String(v.id) === String(videoId) ? ' active' : '');
-    el.innerHTML = `
-      <div class="itemtitle">${v.title}</div>
-    `;
+    el.innerHTML = `<div class="itemtitle">${v.title}</div>`;
     el.onclick = () => {
       $('pageTitle').textContent = v.title;
       document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
@@ -245,7 +253,6 @@ function renderList(videos) {
   });
 }
 
-// بدء التشغيل
 if (lectureId && videoId) {
   loadVideoContent();
 }
