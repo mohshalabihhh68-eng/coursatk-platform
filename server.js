@@ -137,34 +137,36 @@ app.get("/api/lectures/:id/content", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
-// ✅ المسار ده هو اللي هيجيب الفيديو ويشغله
+// ✅ مسار الفيديو المطور
 app.post("/api/video-proxy/:id", async function (req, res) {
   try {
-    // 1. بنطلب من السيرفر الأصلي بيانات الفيديو
     const playRes = await fetch(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
       method: "POST",
       headers: headers(),
       body: ""
     });
     
-    const playData = await playRes.json();
-    if (!playRes.ok) throw new Error(playData.message || "فشل جلب الفيديو");
+    const playText = await playRes.text();
+    let playData;
+    try { playData = JSON.parse(playText); } catch(e) { playData = playText; }
 
-    // 2. بنستخرج المسار والتوكن (أحياناً بيكونوا جوه data)
-    const payload = playData.data || playData;
-    const pathStr = payload.path;
-    const tokenStr = payload.token;
-
-    if (!pathStr || !tokenStr) {
-       throw new Error("مفيش داتا للفيديو في الرد الأصلي.");
+    if (!playRes.ok) {
+      throw new Error(`المنصة رفضت الطلب: ${JSON.stringify(playData)}`);
     }
 
-    // 3. بنجيب ملف الـ m3u8 الأساسي من سيرفر الفيديوهات
+    // استخراج المسار والتوكن بذكاء من أي مكان في الرد
+    const payload = playData.data || playData.body?.data || playData.body || playData;
+    let pathStr = payload.path || payload.playback?.path;
+    let tokenStr = payload.token || payload.playback?.token;
+    
+    if (!pathStr || !tokenStr) {
+       throw new Error(`لم يتم العثور على مسار الفيديو. الرد: ${JSON.stringify(playData)}`);
+    }
+
     const m3u8Url = SW + "/api/v1/" + pathStr.replace(/^\/+/, "");
     const hdrs = browserHeaders({ Authorization: "Bearer " + tokenStr });
     const upstream = await fetchFollow(m3u8Url, hdrs);
     
-    // لو السيرفر رجع ملف m3u8 بنعدل اللينكات اللي جواه عشان تعدي على السيرفر بتاعنا
     if (upstream.headers.get("content-type")?.includes("mpegurl") || upstream.url.includes(".m3u8")) {
        let text = await upstream.text();
        let base = pathStr.includes("/") ? pathStr.substring(0, pathStr.lastIndexOf("/") + 1) : "";
@@ -190,12 +192,11 @@ app.post("/api/video-proxy/:id", async function (req, res) {
        return res.status(200).send(text);
     }
 
-    // لو رجع فيديو عادي (mp4)
     var buf = Buffer.from(await upstream.arrayBuffer());
     pipeUpstream(res, upstream, buf);
 
   } catch (e) {
-    console.error("Video Proxy Error:", e);
+    console.error("❌ Video Proxy Error:", e.message);
     res.status(500).json({ success: false, message: e.message });
   }
 });
