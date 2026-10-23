@@ -518,29 +518,46 @@ function joinRel(base, rel) {
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
   if (/^(blob:|data:)/i.test(uri)) return uri;
 
-  // لو السيرفر حوّل الرابط لـ /api/cdn?u=... فكّه وارجع للـ URL الأصلي الموقّع
-  // (Railway IP متبلوك على Cloudflare → 403)
+  // فك /api/cdn?u=... لو موجود
   try {
-    var absUri = uri;
-    if (uri.indexOf('/api/cdn') === 0 || uri.indexOf(location.origin + '/api/cdn') === 0) {
+    if (uri.indexOf('/api/cdn') === 0 || (typeof location !== 'undefined' && uri.indexOf(location.origin + '/api/cdn') === 0)) {
       var cu = new URL(uri, location.origin);
       var enc = cu.searchParams.get('u') || cu.searchParams.get('url');
-      if (enc) {
-        var decoded = fromB64url(enc);
-        if (/^https?:\/\//i.test(decoded)) return decoded;
-      }
+      if (enc) uri = fromB64url(enc);
     }
   } catch (e) {}
 
   if (uri.indexOf('/api/stream') === 0) return uri;
 
-  // روابط CDN الموقّعة — المتصفح يحمّلها مباشرة
-  if (/^https?:\/\//i.test(uri)) return uri;
+  // روابط CDN الخارجية → حوّلها لمسار Stream-Weave عبر /api/stream
+  // مثال: https://suo2.floravon.online/.../videos/{vid}/480/seg-0-....woff2?expires=...
+  // يصبح: /api/stream?path=videos/{vid}/stream/480/seg-0-....woff2&t=TOKEN
+  if (/^https?:\/\//i.test(uri)) {
+    try {
+      var pu = new URL(uri);
+      var parts = pu.pathname.split('/').filter(Boolean);
+      // .../videos/{uuid}/{quality}/{filename}
+      var vi = parts.indexOf('videos');
+      if (vi >= 0 && parts.length >= vi + 3) {
+        var vid = parts[vi + 1];
+        var quality = parts[vi + 2];
+        var fname = parts[vi + 3] || '';
+        // شيل query من اسم الملف
+        fname = fname.split('?')[0];
+        if (vid && quality && fname) {
+          var swPath = 'videos/' + vid + '/stream/' + quality + '/' + fname;
+          return '/api/stream?path=' + encodeURIComponent(swPath) + '&t=' + encodeURIComponent(streamToken);
+        }
+      }
+    } catch (e) {}
+    // fallback: سيّب الرابط (قد يفشل CORS)
+    return uri;
+  }
 
   if (variantFileUrl) {
     try {
       var abs = new URL(uri, variantFileUrl).href;
-      if (/^https?:\/\//i.test(abs)) return abs;
+      if (/^https?:\/\//i.test(abs)) return resolveMedia(abs, variantBasePath, streamToken, null);
     } catch (e) {}
   }
   return '/api/stream?path=' + encodeURIComponent(joinRel(variantBasePath || '', uri)) + '&t=' + encodeURIComponent(streamToken);
