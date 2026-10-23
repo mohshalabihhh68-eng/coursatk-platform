@@ -945,9 +945,13 @@ async function playIndex(i,autoplay){
     const session = await api('/api/video/' + encodeURIComponent(item.id) + '/play', {method:'POST'});
     if(my!==playToken)return;
 
-    const streamToken = session.token || session.stream_token || (session.data && session.data.token);
-    const swVideoId = session.video_id || session.sw_video_id || (session.data && session.data.video_id);
-    const hbUrl = session.heartbeat_url || (session.data && session.data.heartbeat_url);
+    // session ممكن تكون {token, video_id, ...} أو متداخلة
+    const s = (session && (session.token || session.video_id)) ? session
+            : (session && session.data) ? session.data
+            : (session || {});
+    const streamToken = s.token || s.stream_token;
+    const swVideoId = s.video_id || s.sw_video_id;
+    const hbUrl = s.heartbeat_url;
 
     if(!streamToken || !swVideoId){
       throw new Error('الجلسة ناقصة (مفيش token أو video_id)');
@@ -1162,14 +1166,15 @@ async function init(){
   }
   try{
     const r=await api('/api/lectures/'+encodeURIComponent(lectureId)+'/content');
-    const d=r.data||{};
+    // api() بتفك .data بالفعل — متاخدش r.data تاني
+    const d = (r && (r.videos || r.lecture)) ? r : (r && r.data) ? r.data : (r || {});
     videos=(d.videos||[]).map((v,i)=>({
       id:v.id,
       title:v.title||v.name||`فيديو ${i+1}`,
       duration:+(v.duration||v.duration_seconds||v.length)||0,
       thumbnail:v.thumbnail||v.thumb||v.thumbnail_url||v.image_url||v.poster||''
     }));
-    const lectureName=d.lecture?.name||d.name||d.title||'المحاضرة';
+    const lectureName=(d.lecture&&d.lecture.name)||d.lecture_name||d.name||d.title||'المحاضرة';
     lectureTitle=lectureName;
     $('crumb').textContent='المحتوى / '+lectureName;
     $('lectureName').textContent=lectureName;
