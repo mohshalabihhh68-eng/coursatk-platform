@@ -518,39 +518,38 @@ function joinRel(base, rel) {
 function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
   if (/^(blob:|data:)/i.test(uri)) return uri;
 
+  var origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
+
   // فك /api/cdn?u=... لو موجود
   try {
-    if (uri.indexOf('/api/cdn') === 0 || (typeof location !== 'undefined' && uri.indexOf(location.origin + '/api/cdn') === 0)) {
-      var cu = new URL(uri, location.origin);
+    if (uri.indexOf('/api/cdn') === 0 || (origin && uri.indexOf(origin + '/api/cdn') === 0)) {
+      var cu = new URL(uri, origin || 'https://localhost');
       var enc = cu.searchParams.get('u') || cu.searchParams.get('url');
       if (enc) uri = fromB64url(enc);
     }
   } catch (e) {}
 
-  if (uri.indexOf('/api/stream') === 0) return uri;
+  // مهم: روابط /api/stream لازم تكون absolute
+  // لأن الـ playlist بيتحمّل من blob: URL → المسار النسبي بيتحوّل لـ blob:https:/api/...
+  if (uri.indexOf('/api/stream') === 0) return origin + uri;
+  if (origin && uri.indexOf(origin + '/api/stream') === 0) return uri;
 
-  // روابط CDN الخارجية → حوّلها لمسار Stream-Weave عبر /api/stream
-  // مثال: https://suo2.floravon.online/.../videos/{vid}/480/seg-0-....woff2?expires=...
-  // يصبح: /api/stream?path=videos/{vid}/stream/480/seg-0-....woff2&t=TOKEN
+  // روابط CDN الخارجية → مسار Stream-Weave عبر /api/stream (absolute)
   if (/^https?:\/\//i.test(uri)) {
     try {
       var pu = new URL(uri);
       var parts = pu.pathname.split('/').filter(Boolean);
-      // .../videos/{uuid}/{quality}/{filename}
       var vi = parts.indexOf('videos');
       if (vi >= 0 && parts.length >= vi + 3) {
         var vid = parts[vi + 1];
         var quality = parts[vi + 2];
-        var fname = parts[vi + 3] || '';
-        // شيل query من اسم الملف
-        fname = fname.split('?')[0];
+        var fname = (parts[vi + 3] || '').split('?')[0];
         if (vid && quality && fname) {
           var swPath = 'videos/' + vid + '/stream/' + quality + '/' + fname;
-          return '/api/stream?path=' + encodeURIComponent(swPath) + '&t=' + encodeURIComponent(streamToken);
+          return origin + '/api/stream?path=' + encodeURIComponent(swPath) + '&t=' + encodeURIComponent(streamToken);
         }
       }
     } catch (e) {}
-    // fallback: سيّب الرابط (قد يفشل CORS)
     return uri;
   }
 
@@ -560,7 +559,7 @@ function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
       if (/^https?:\/\//i.test(abs)) return resolveMedia(abs, variantBasePath, streamToken, null);
     } catch (e) {}
   }
-  return '/api/stream?path=' + encodeURIComponent(joinRel(variantBasePath || '', uri)) + '&t=' + encodeURIComponent(streamToken);
+  return origin + '/api/stream?path=' + encodeURIComponent(joinRel(variantBasePath || '', uri)) + '&t=' + encodeURIComponent(streamToken);
 }
 function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variantFileUrl) {
   return text.split('\n').map(function (line) {
