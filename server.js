@@ -169,7 +169,10 @@ app.get("/api/stream", async function (req, res) {
 
     var url = SW + "/api/v1/" + swPath;
     var hdrs = browserHeaders({ Authorization: "Bearer " + token });
+    
+    // ✅ إجبار السيرفر يقرأ الـ Range عشان يجيب أجزاء الفيديو
     if (req.headers.range) hdrs.Range = req.headers.range;
+    
     var upstream = await fetchFollow(url, hdrs);
 
     var ct = upstream.headers.get("content-type") || "application/octet-stream";
