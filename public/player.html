@@ -81,7 +81,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
   </div>
 </div>
 
-<!-- استدعاء مكتبات التشغيل وفك التشفير -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
 (function(){
@@ -130,7 +129,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
     return stack.join("/") + q;
   }
 
-  // تحميل سكريبت فك التشفير من المنصة الأصلية
   function findCrypto() {
     if (window.DecryptionUtils && typeof window.DecryptionUtils.decryptPlaybackKey === "function") return window.DecryptionUtils;
     var names = Object.getOwnPropertyNames(window);
@@ -220,7 +218,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
       loadingText.textContent = "جاري فتح الجلسة...";
       stopPlayback();
 
-      // 1. جلب التوكن
       const res = await fetch(API_BASE + '/api/video/' + id + '/play', { method: 'POST' });
       const sessionRes = await res.json();
       if (!res.ok || sessionRes.success === false) throw new Error(sessionRes.message || 'فشل جلب الجلسة');
@@ -232,11 +229,9 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
 
       if (!streamToken || !swVideoId) throw new Error("الجلسة ناقصة (مفيش token أو video_id)");
 
-      // 2. تحميل أداة فك التشفير
       loadingText.textContent = "تحميل أدوات فك التشفير...";
       if (!cryptoUtils) cryptoUtils = await loadPlayerScript();
 
-      // 3. جلب قائمة التشغيل
       loadingText.textContent = "جلب قائمة التشغيل...";
       var masterUrl = "/api/stream?path=" + encodeURIComponent("videos/" + swVideoId + "/stream/master.m3u8") + "&t=" + encodeURIComponent(streamToken);
       var masterRes = await fetch(masterUrl);
@@ -269,7 +264,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
       if (!variantRes.ok) throw new Error("variant → HTTP " + variantRes.status);
       var variantText = await variantRes.text();
 
-      // 4. فك تشفير المفتاح
       loadingText.textContent = "فك المفتاح...";
       var keyLine = variantText.split("\n").find(l => l.indexOf("EXT-X-KEY") !== -1);
       var keyPath = "videos/" + swVideoId + "/key";
@@ -306,7 +300,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
       var keyBlob = new Blob([keyBytes], { type: "application/octet-stream" });
       currentKeyBlobUrl = URL.createObjectURL(keyBlob);
 
-      // 5. تعديل ملف التشغيل
       var fixedVariant = rewritePlaylist(variantText, streamToken, currentKeyBlobUrl, variantBasePath, variantFileUrl);
       if (fixedVariant.indexOf("#EXTM3U") !== 0) fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
       if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
@@ -319,7 +312,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
 
       loadingText.textContent = "جاري التشغيل...";
 
-      // 6. بدء نبضات القلب (Heartbeat)
       hbTimer = setInterval(function () {
         fetch("/api/heartbeat", {
           method: "POST",
@@ -328,7 +320,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
         }).catch(function () {});
       }, 25000);
 
-      // 7. التشغيل
       if (window.Hls && Hls.isSupported()) {
         hls = new Hls({ enableWorker: false, maxBufferLength: 30, maxMaxBufferLength: 60 });
         hls.loadSource(currentPlaylistBlobUrl);
@@ -380,7 +371,6 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
     });
   }
 
-  // بدء التشغيل
   if (lectureId && videoId) {
     loadContent();
   } else {
