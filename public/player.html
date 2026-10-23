@@ -7,85 +7,55 @@
 <title>مشغل المحاضرة | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#080d18;--panel:#111a2a;--panel2:#172338;--line:#26344b;
-  --text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;--blue2:#8ab4ff;--green:#34d399;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{margin:0;background:radial-gradient(900px 380px at 50% -180px,#173b76 0,transparent 70%),var(--bg);color:var(--text);font-family:Cairo,system-ui,sans-serif;overflow-x:hidden}
-button,select,input{font:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none}
-img{display:block;max-width:100%}
-
+:root{--bg:#080d18;--panel:#111a2a;--line:#26344b;--text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;--blue2:#8ab4ff;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif;}
+button{cursor:pointer;border:0;background:none;color:inherit;}
 .top{position:sticky;top:0;z-index:100;background:#080d18ef;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff12}
 .topin{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
-.brand{font-weight:900;display:flex;align-items:center;gap:10px;min-width:0}
-.logo{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 8px 24px #2563eb40}
-.brand-txt b{display:block;font-size:14px;font-weight:900;line-height:1.1}
-.brand-txt span{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
-.grow{flex:1;min-width:0}
-.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:background .18s;white-space:nowrap}
-.btn:hover{background:#ffffff12}
-.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-
-.wrap{max-width:1180px;margin:auto;padding:16px 14px 60px}
+.brand{font-weight:900;display:flex;align-items:center;gap:10px;}
+.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#60a5fa,#1d4ed8);display:grid;place-items:center;}
+.brand-txt b{display:block;font-size:14px;}
+.brand-txt span{display:block;font-size:10px;color:var(--muted);}
+.grow{flex:1;}
+.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
+.wrap{max-width:1180px;margin:auto;padding:16px 14px;}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
 .main{min-width:0}
-
-.player-card{background:linear-gradient(180deg,#131d30,#0f1726);border:1px solid #ffffff16;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px #0004}
-.screen{position:relative;background:#000;aspect-ratio:16/9;overflow:hidden;isolation:isolate}
-.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:1}
-
-.loading{position:absolute;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#000a;font-weight:800;font-size:13px;color:#fff}
+.player-card{background:#131d30;border:1px solid #ffffff16;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px #0004}
+.screen{position:relative;background:#000;aspect-ratio:16/9;}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+.loading{position:absolute;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#000a;font-weight:800;font-size:13px;color:#fff;}
 .loading.hide{display:none}
 .spin{width:38px;height:38px;border:3px solid #ffffff30;border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.error{display:none;position:absolute;inset:0;background:linear-gradient(#080d18f7,#0a1222fa);z-index:16;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:14px 18px}
+.error{display:none;position:absolute;inset:0;background:#0a1222fa;z-index:16;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:14px;}
 .error.show{display:flex}
-.error b{font-size:14.5px;font-weight:900}
-.error p{color:var(--muted);margin:0;font-size:12px}
-.ctrl{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:12px;padding:9px 14px;font-weight:800;margin-top:10px}
-.ctrl:hover{background:#ffffff18}
-
+.error b{font-size:14.5px;}
+.error p{color:var(--muted);margin:0;font-size:12px;}
+.ctrl{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:12px;padding:9px 14px;font-weight:800;margin-top:10px;}
 .titlebox{padding:16px 2px 0}
 .titlebox h1{font-size:20px;margin:0 0 10px;font-weight:900}
-
-.panel{background:linear-gradient(155deg,#15233aee,#0d1524f5);border:1px solid #8ab4ff20;border-radius:20px;overflow:hidden;box-shadow:0 22px 70px #0003;position:sticky;top:78px}
+.panel{background:#111a2a;border:1px solid #8ab4ff20;border-radius:20px;overflow:hidden;position:sticky;top:78px}
 .panel-head{padding:16px;border-bottom:1px solid #ffffff0c}
-.panel-head h2{font-size:14px;margin:0;font-weight:900}
-.list{padding:9px 10px 13px;display:flex;flex-direction:column;gap:7px;max-height:min(62vh,680px);overflow:auto}
-.item{display:flex;align-items:center;gap:10px;padding:9px;border-radius:14px;cursor:pointer;background:#ffffff05;border:1px solid transparent;transition:.2s}
+.panel-head h2{font-size:14px;margin:0;}
+.list{padding:9px;display:flex;flex-direction:column;gap:7px;max-height:calc(100vh - 200px);overflow:auto}
+.item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;cursor:pointer;background:#ffffff05;border:1px solid transparent;}
 .item:hover{background:#ffffff08}
-.item.active{background:linear-gradient(105deg,#477ff51b,#477ff508);border-color:#5b8cff45}
-.itemtitle{font-size:12px;font-weight:800;line-height:1.4}
-
-@media(max-width:900px){
-  .layout{grid-template-columns:1fr;gap:16px}
-  .panel{position:relative;top:auto}
-  .list{max-height:440px}
-}
+.item.active{background:#477ff51b;border-color:#5b8cff45}
+.itemtitle{font-size:12px;font-weight:800;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}.panel{position:relative;top:auto;}}
 </style>
 </head>
 <body>
-
 <header class="top">
   <div class="topin">
     <div class="brand">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"><path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/></svg>
-      </div>
-      <div class="brand-txt">
-        <b>ثانوية club</b>
-        <span>مشغل المحاضرة</span>
-      </div>
+      <div class="logo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"><path d="m2 8 10-5 10 5-10 5L2 8Z"/><path d="M6 10v5c3.5 3 8.5 3 12 0v-5"/></svg></div>
+      <div class="brand-txt"><b>ثانوية club</b><span>مشغل المحاضرة</span></div>
     </div>
     <div class="grow"></div>
-    <button class="btn" onclick="history.back()">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      رجوع
-    </button>
+    <button class="btn" onclick="history.back()">← رجوع</button>
   </div>
 </header>
 
@@ -93,170 +63,131 @@ img{display:block;max-width:100%}
   <div class="layout">
     <div class="main">
       <div class="player-card">
-        <div class="screen" id="screen">
+        <div class="screen">
+          <!-- بنستخدم مشغل hls.js عشان يقرأ ملفات الفيديو المقسمة -->
           <video id="video" controls playsinline crossorigin="anonymous"></video>
-          <div class="loading" id="loading">
-            <div class="spin"></div>
-            <span>جاري تحميل الفيديو...</span>
-          </div>
+          <div class="loading" id="loading"><div class="spin"></div><span>جاري تحميل الفيديو...</span></div>
           <div class="error" id="error">
-            <b>عذراً، حدث خطأ</b>
-            <p id="errorMsg">تعذر تحميل الفيديو.</p>
+            <b>عذراً، حدث خطأ</b><p id="errorMsg">تعذر تحميل الفيديو.</p>
             <button class="ctrl" onclick="location.reload()">إعادة المحاولة</button>
           </div>
         </div>
       </div>
-      <div class="titlebox">
-        <h1 id="pageTitle">مشاهدة المحاضرة</h1>
-      </div>
+      <div class="titlebox"><h1 id="pageTitle">مشاهدة المحاضرة</h1></div>
     </div>
-
     <div class="panel">
-      <div class="panel-head">
-        <h2>محتوى المحاضرة</h2>
-      </div>
+      <div class="panel-head"><h2>محتوى المحاضرة</h2></div>
       <div class="list" id="videosList"></div>
     </div>
   </div>
 </div>
 
+<!-- استدعاء مكتبة hls.js عشان الفيديو يشتغل على كل المتصفحات -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
 (function(){
-'use strict';
+  const API_BASE = '';
+  const $ = id => document.getElementById(id);
+  const qs = new URLSearchParams(location.search);
+  const lectureId = qs.get('lectureId');
+  const videoId = qs.get('videoId');
+  const videoEl = $('video');
+  const loading = $('loading');
+  const errorBox = $('error');
+  const errorMsg = $('errorMsg');
 
-const API_BASE = '';
-const $ = id => document.getElementById(id);
-const qs = new URLSearchParams(location.search);
-const lectureId = qs.get('lectureId');
-const videoId = qs.get('videoId');
+  function showError(msg) {
+    loading.classList.add('hide');
+    errorBox.classList.add('show');
+    errorMsg.textContent = msg;
+  }
 
-const videoEl = $('video');
-const loading = $('loading');
-const errorBox = $('error');
-const errorMsg = $('errorMsg');
-
-if (!lectureId || !videoId) {
-  showError('معرف المحاضرة أو الفيديو غير موجود في الرابط.');
-}
-
-function showError(msg) {
-  loading.classList.add('hide');
-  errorBox.classList.add('show');
-  errorMsg.textContent = msg;
-}
-
-async function loadVideoContent() {
-  try {
-    loading.classList.remove('hide');
-    const res = await fetch(API_BASE + '/api/lectures/' + lectureId + '/content');
-    const data = await res.json();
-    
-    if (!res.ok || data.success === false) {
-      throw new Error(data.message || 'فشل في جلب بيانات المحاضرة');
-    }
-
-    // استخراج الفيديوهات بشكل مرن (بيدور عليها في أي مكان في الرد)
-    const videos = data.data?.videos || data.body?.data?.videos || data.body?.videos || data.videos || [];
-    
-    if (videos.length > 0) {
-      renderList(videos);
-      const currentVideo = videos.find(v => String(v.id) === String(videoId)) || videos[0];
-      if (currentVideo) {
-        $('pageTitle').textContent = currentVideo.title || 'مشاهدة المحاضرة';
-        await playVideo(currentVideo.id);
+  async function loadContent() {
+    try {
+      loading.classList.remove('hide');
+      const res = await fetch(API_BASE + '/api/lectures/' + lectureId + '/content');
+      const data = await res.json();
+      const videos = data.data?.videos || data.body?.data?.videos || data.body?.videos || data.videos || [];
+      
+      if (videos.length > 0) {
+        renderList(videos);
+        const currentVid = videos.find(v => String(v.id) === String(videoId)) || videos[0];
+        if (currentVid) {
+          $('pageTitle').textContent = currentVid.title || 'مشاهدة المحاضرة';
+          playVideo(currentVid.id);
+        }
       } else {
-        throw new Error('الفيديو المطلوب غير موجود في هذه المحاضرة.');
+        throw new Error('لا توجد فيديوهات متاحة.');
       }
-    } else {
-      throw new Error('لا توجد فيديوهات متاحة لهذه المحاضرة.');
+    } catch (err) {
+      showError(err.message);
     }
-  } catch (err) {
-    showError(err.message || 'حدث خطأ أثناء جلب المحتوى.');
   }
-}
 
-async function playVideo(id) {
-  try {
-    loading.classList.remove('hide');
-    errorBox.classList.remove('show');
-    
-    // طلب تشغيل الفيديو من السيرفر
-    const res = await fetch(API_BASE + '/api/video/' + id + '/play', { method: 'POST' });
-    const data = await res.json();
-    
-    if (!res.ok || data.success === false) {
-      throw new Error(data.message || 'تعذر الحصول على رابط تشغيل الفيديو');
+  async function playVideo(id) {
+    try {
+      loading.classList.remove('hide');
+      errorBox.classList.remove('show');
+      
+      // بنكلم المسار الجديد بتاعنا اللي بيعمل بروكسي للفيديو
+      const res = await fetch(API_BASE + '/api/video-proxy/' + id, { method: 'POST' });
+      
+      // لو السيرفر رجع ملف فيديو مباشر (m3u8 أو mp4)
+      if (res.headers.get("content-type")?.includes("mpegurl") || res.headers.get("content-type")?.includes("video")) {
+        
+        // بنعمل بلوب (Blob) ونشغله في المشغل
+        const blob = await res.blob();
+        const videoUrl = URL.createObjectURL(blob);
+
+        if (Hls.isSupported() && videoUrl.includes("mpegurl")) {
+           // لو المتصفح مش بيدعم hls مدمج، بنستخدم المكتبة
+           const hls = new Hls();
+           hls.loadSource(videoUrl);
+           hls.attachMedia(videoEl);
+           hls.on(Hls.Events.MANIFEST_PARSED, () => {
+             loading.classList.add('hide');
+             videoEl.play();
+           });
+        } else {
+           // متصفحات سفاري وبعض المتصفحات بتشغل الفيديو مباشرة
+           videoEl.src = videoUrl;
+           videoEl.oncanplay = () => {
+             loading.classList.add('hide');
+             videoEl.play();
+           };
+        }
+      } else {
+        // لو رجع JSON فيه خطأ
+        const data = await res.json();
+        throw new Error(data.message || 'فشل تشغيل الفيديو');
+      }
+    } catch (err) {
+      showError(err.message);
     }
+  }
 
-    // طباعة شكل الرد في الكونسول عشان نعرف اللينك فين بالظبط
-    console.log("🔥 الرد الكامل من السيرفر:", data);
-
-    // استخراج المسار والتوكن بذكاء (بيدور عليهم في أي مكان)
-    const payload = data.data || data.body?.data || data.body || data;
-    
-    let path = payload.path;
-    let token = payload.token;
-
-    // لو مش موجودين مباشرة، بندور جوه التفاصيل
-    if ((!path || !token) && payload.playback) {
-       path = payload.playback.path || path;
-       token = payload.playback.token || token;
-    }
-    if ((!path || !token) && payload.stream) {
-       path = payload.stream.path || path;
-       token = payload.stream.token || token;
-    }
-
-    if (path && token) {
-      // بنبعت الفيديو للمسار اللي إحنا عملينه في server.js
-      videoEl.src = `/api/stream?path=${encodeURIComponent(path)}&t=${encodeURIComponent(token)}`;
-    } 
-    else if (payload.hls_url) {
-      videoEl.src = payload.hls_url;
-    } 
-    else if (payload.url) {
-      videoEl.src = payload.url;
-    } 
-    else {
-      console.error("مش لاقي path ولا token ولا url في الرد:", payload);
-      throw new Error('لم يتم العثور على رابط فيديو صالح في رد السيرفر.');
-    }
-
-    videoEl.load();
-    videoEl.play().catch(e => {
-       console.log('المتصفح منع التشغيل التلقائي، محتاج المستخدم يدوس بلاي');
+  function renderList(videos) {
+    const list = $('videosList');
+    list.innerHTML = '';
+    videos.forEach(v => {
+      const el = document.createElement('div');
+      el.className = 'item' + (String(v.id) === String(videoId) ? ' active' : '');
+      el.innerHTML = `<div class="itemtitle">${v.title}</div>`;
+      el.onclick = () => {
+        $('pageTitle').textContent = v.title;
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        playVideo(v.id);
+      };
+      list.appendChild(el);
     });
-
-    videoEl.oncanplay = () => {
-      loading.classList.add('hide');
-    };
-
-  } catch (err) {
-    showError(err.message || 'حدث خطأ أثناء تشغيل الفيديو.');
   }
-}
 
-function renderList(videos) {
-  const list = $('videosList');
-  list.innerHTML = '';
-  videos.forEach(v => {
-    const el = document.createElement('div');
-    el.className = 'item' + (String(v.id) === String(videoId) ? ' active' : '');
-    el.innerHTML = `<div class="itemtitle">${v.title}</div>`;
-    el.onclick = () => {
-      $('pageTitle').textContent = v.title;
-      document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
-      el.classList.add('active');
-      playVideo(v.id);
-    };
-    list.appendChild(el);
-  });
-}
-
-if (lectureId && videoId) {
-  loadVideoContent();
-}
-
+  if (lectureId && videoId) {
+    loadContent();
+  } else {
+    showError('معرف المحاضرة أو الفيديو غير موجود.');
+  }
 })();
 </script>
 </body>
