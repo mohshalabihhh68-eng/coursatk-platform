@@ -6,7 +6,9 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const STUDENT_TOKEN = process.env.COURSATK_TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
+const STUDENT_TOKEN =
+  process.env.COURSATK_TOKEN ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
 
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
@@ -101,12 +103,6 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ success: true, data: { token: "fake_token_for_session", user: { name: "طالب" } } });
 });
 
-app.get("/api/profile", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/profile");
-  if (r.status !== 200) return res.json({ success: true, data: { name: "طالب ثانوية", code: "1234567" } });
-  res.status(r.status).json(r.body);
-});
-
 app.get("/api/years", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/years");
   res.status(r.status).json(r.body);
@@ -137,68 +133,18 @@ app.get("/api/lectures/:id/content", async function (req, res) {
   res.status(r.status).json(r.body);
 });
 
-// ✅ مسار الفيديو المطور
-app.post("/api/video-proxy/:id", async function (req, res) {
-  try {
-    const playRes = await fetch(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
-      method: "POST",
-      headers: headers(),
-      body: ""
-    });
-    
-    const playText = await playRes.text();
-    let playData;
-    try { playData = JSON.parse(playText); } catch(e) { playData = playText; }
+app.get("/api/profile", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/profile");
+  res.status(r.status).json(r.body);
+});
 
-    if (!playRes.ok) {
-      throw new Error(`المنصة رفضت الطلب: ${JSON.stringify(playData)}`);
-    }
-
-    // استخراج المسار والتوكن بذكاء من أي مكان في الرد
-    const payload = playData.data || playData.body?.data || playData.body || playData;
-    let pathStr = payload.path || payload.playback?.path;
-    let tokenStr = payload.token || payload.playback?.token;
-    
-    if (!pathStr || !tokenStr) {
-       throw new Error(`لم يتم العثور على مسار الفيديو. الرد: ${JSON.stringify(playData)}`);
-    }
-
-    const m3u8Url = SW + "/api/v1/" + pathStr.replace(/^\/+/, "");
-    const hdrs = browserHeaders({ Authorization: "Bearer " + tokenStr });
-    const upstream = await fetchFollow(m3u8Url, hdrs);
-    
-    if (upstream.headers.get("content-type")?.includes("mpegurl") || upstream.url.includes(".m3u8")) {
-       let text = await upstream.text();
-       let base = pathStr.includes("/") ? pathStr.substring(0, pathStr.lastIndexOf("/") + 1) : "";
-       
-       text = text.split("\n").map(line => {
-         let s = line.trim();
-         if (!s) return line;
-         if (s.charAt(0) === "#") {
-           return s.replace(/URI="([^"]+)"/g, (_m, uri) => {
-             if (uri.indexOf("http") === 0) return 'URI="/api/cdn?u=' + b64urlEncode(uri) + '"';
-             let clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
-             clean = clean.replace(/^api\/v1\//, "");
-             if (clean.indexOf("videos/") !== 0) clean = joinRel(base, clean);
-             return `URI="/api/stream?path=${encodeURIComponent(clean)}&t=${encodeURIComponent(tokenStr)}"`;
-           });
-         }
-         if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
-         return `/api/stream?path=${encodeURIComponent(joinRel(base, s))}&t=${encodeURIComponent(tokenStr)}`;
-       }).join("\n");
-
-       res.set("Content-Type", "application/vnd.apple.mpegurl");
-       res.set("Access-Control-Allow-Origin", "*");
-       return res.status(200).send(text);
-    }
-
-    var buf = Buffer.from(await upstream.arrayBuffer());
-    pipeUpstream(res, upstream, buf);
-
-  } catch (e) {
-    console.error("❌ Video Proxy Error:", e.message);
-    res.status(500).json({ success: false, message: e.message });
-  }
+app.post("/api/video/:id/play", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST",
+    headers: { "Content-Length": "0" },
+    body: "",
+  });
+  res.status(r.status).json(r.body);
 });
 
 app.get("/api/cdn", async function (req, res) {
@@ -250,11 +196,28 @@ app.get("/api/stream", async function (req, res) {
 
       res.set("Content-Type", "application/vnd.apple.mpegurl");
       res.set("Access-Control-Allow-Origin", "*");
+      res.set("Cache-Control", "no-store");
       return res.status(upstream.status).send(text);
     }
 
     var buf = Buffer.from(await upstream.arrayBuffer());
+    res.set("Cache-Control", "no-store");
     pipeUpstream(res, upstream, buf);
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+app.post("/api/heartbeat", async function (req, res) {
+  try {
+    var url = req.body && req.body.url;
+    var token = req.body && req.body.token;
+    if (!url || !token) return res.status(400).json({ error: "url+token required" });
+    var upstream = await fetch(url, {
+      method: "POST",
+      headers: browserHeaders({ Authorization: "Bearer " + token, "Content-Type": "application/json" }),
+      body: "{}",
+    });
+    var text = await upstream.text();
+    res.status(upstream.status).type("json").send(text);
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
