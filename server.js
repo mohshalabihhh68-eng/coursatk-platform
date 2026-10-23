@@ -230,7 +230,9 @@ app.get("/api/stream", async function (req, res) {
               );
             });
           }
-          if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
+          // اترك روابط CDN الموقّعة كما هي — المتصفح يحمّلها مباشرة
+          // (Railway IP يتبلوك على Cloudflare لو مرّت على /api/cdn)
+          if (s.indexOf("http") === 0) return s;
           return (
             "/api/stream?path=" +
             encodeURIComponent(joinRel(base, s)) +
