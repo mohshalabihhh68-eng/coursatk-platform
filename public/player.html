@@ -32,7 +32,7 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
 .error{display:none;position:absolute;inset:0;background:#0a1222fa;z-index:16;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:14px;}
 .error.show{display:flex}
 .error b{font-size:14.5px;}
-.error p{color:var(--muted);margin:0;font-size:12px;}
+.error p{color:var(--muted);margin:0;font-size:12px;line-height:1.6;word-break:break-all;}
 .ctrl{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:12px;padding:9px 14px;font-weight:800;margin-top:10px;}
 .titlebox{padding:16px 2px 0}
 .titlebox h1{font-size:20px;margin:0 0 10px;font-weight:900}
@@ -64,9 +64,8 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
     <div class="main">
       <div class="player-card">
         <div class="screen">
-          <!-- بنستخدم مشغل hls.js عشان يقرأ ملفات الفيديو المقسمة -->
           <video id="video" controls playsinline crossorigin="anonymous"></video>
-          <div class="loading" id="loading"><div class="spin"></div><span>جاري تحميل الفيديو...</span></div>
+          <div class="loading" id="loading"><div class="spin"></div><span id="loadingText">جاري تحميل الفيديو...</span></div>
           <div class="error" id="error">
             <b>عذراً، حدث خطأ</b><p id="errorMsg">تعذر تحميل الفيديو.</p>
             <button class="ctrl" onclick="location.reload()">إعادة المحاولة</button>
@@ -82,7 +81,7 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
   </div>
 </div>
 
-<!-- استدعاء مكتبة hls.js عشان الفيديو يشتغل على كل المتصفحات -->
+<!-- استدعاء مكتبات التشغيل وفك التشفير -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
 (function(){
@@ -91,15 +90,107 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
   const qs = new URLSearchParams(location.search);
   const lectureId = qs.get('lectureId');
   const videoId = qs.get('videoId');
+  
   const videoEl = $('video');
   const loading = $('loading');
+  const loadingText = $('loadingText');
   const errorBox = $('error');
   const errorMsg = $('errorMsg');
+  
+  let hls = null;
+  let cryptoUtils = null;
+  let hbTimer = null;
+  let currentKeyBlobUrl = null;
+  let currentPlaylistBlobUrl = null;
 
   function showError(msg) {
     loading.classList.add('hide');
     errorBox.classList.add('show');
     errorMsg.textContent = msg;
+  }
+
+  function toB64url(str) {
+    return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+  function fromB64url(value) {
+    var s = String(value).replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    return decodeURIComponent(escape(atob(s)));
+  }
+  function joinRel(base, rel) {
+    var q = ""; var relPath = String(rel); var qi = relPath.indexOf("?");
+    if (qi !== -1) { q = relPath.slice(qi); relPath = relPath.slice(0, qi); }
+    var stack = String(base || "").split("/");
+    if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) stack.pop();
+    if (stack.length && stack[stack.length - 1] === "") stack.pop();
+    relPath.split("/").forEach(function (part) {
+      if (!part || part === ".") return;
+      if (part === "..") stack.pop(); else stack.push(part);
+    });
+    return stack.join("/") + q;
+  }
+
+  // تحميل سكريبت فك التشفير من المنصة الأصلية
+  function findCrypto() {
+    if (window.DecryptionUtils && typeof window.DecryptionUtils.decryptPlaybackKey === "function") return window.DecryptionUtils;
+    var names = Object.getOwnPropertyNames(window);
+    for (var i = 0; i < names.length; i++) {
+      try {
+        var obj = window[names[i]];
+        if (obj && typeof obj === "object" && typeof obj.decryptPlaybackKey === "function") return obj;
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  function loadPlayerScript() {
+    return new Promise(function (resolve, reject) {
+      if (findCrypto()) return resolve(findCrypto());
+      var existing = document.querySelector('script[src*="player.stream-weave.com"]');
+      if (existing) {
+        var tries = 0; var t = setInterval(function () {
+          var c = findCrypto(); if (c) { clearInterval(t); resolve(c); }
+          else if (++tries > 40) { clearInterval(t); reject(new Error("timeout crypto")); }
+        }, 150);
+        return;
+      }
+      var s = document.createElement("script");
+      s.src = "https://player.stream-weave.com/assets/player.js?v=1.1.1";
+      s.onload = function () {
+        var tries = 0; var t = setInterval(function () {
+          var c = findCrypto(); if (c) { clearInterval(t); resolve(c); }
+          else if (++tries > 40) { clearInterval(t); reject(new Error("crypto not found")); }
+        }, 150);
+      };
+      s.onerror = function () { reject(new Error("failed to load player.js")); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) {
+    if (/^(blob:|data:)/i.test(uri)) return uri;
+    if (uri.indexOf("/api/stream") === 0 || uri.indexOf("/api/cdn") === 0) return location.origin + uri;
+    if (/^https?:\/\//i.test(uri)) return location.origin + "/api/cdn?u=" + toB64url(uri);
+    if (variantFileUrl) {
+      try { return location.origin + "/api/cdn?u=" + toB64url(new URL(uri, variantFileUrl).href); } catch (e) {}
+    }
+    return location.origin + "/api/stream?path=" + encodeURIComponent(joinRel(variantBasePath || "", uri)) + "&t=" + encodeURIComponent(streamToken);
+  }
+
+  function rewritePlaylist(text, streamToken, keyBlobUrl, variantBasePath, variantFileUrl) {
+    return text.split("\n").map(function (line) {
+        var s = line.trim();
+        if (!s) return line;
+        if (s.charAt(0) === "#") {
+          if (s.indexOf("#EXT-X-KEY:") === 0 && keyBlobUrl) {
+            return s.replace(/URI="[^"]+"/, 'URI="' + keyBlobUrl + '"');
+          }
+          return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
+            return 'URI="' + resolveMedia(uri, variantBasePath, streamToken, variantFileUrl) + '"';
+          });
+        }
+        return resolveMedia(s, variantBasePath, streamToken, variantFileUrl);
+      }).join("\n");
   }
 
   async function loadContent() {
@@ -119,51 +210,157 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
       } else {
         throw new Error('لا توجد فيديوهات متاحة.');
       }
-    } catch (err) {
-      showError(err.message);
-    }
+    } catch (err) { showError(err.message); }
   }
 
   async function playVideo(id) {
     try {
       loading.classList.remove('hide');
       errorBox.classList.remove('show');
-      
-      // بنكلم المسار الجديد بتاعنا اللي بيعمل بروكسي للفيديو
-      const res = await fetch(API_BASE + '/api/video-proxy/' + id, { method: 'POST' });
-      
-      // لو السيرفر رجع ملف فيديو مباشر (m3u8 أو mp4)
-      if (res.headers.get("content-type")?.includes("mpegurl") || res.headers.get("content-type")?.includes("video")) {
-        
-        // بنعمل بلوب (Blob) ونشغله في المشغل
-        const blob = await res.blob();
-        const videoUrl = URL.createObjectURL(blob);
+      loadingText.textContent = "جاري فتح الجلسة...";
+      stopPlayback();
 
-        if (Hls.isSupported() && videoUrl.includes("mpegurl")) {
-           // لو المتصفح مش بيدعم hls مدمج، بنستخدم المكتبة
-           const hls = new Hls();
-           hls.loadSource(videoUrl);
-           hls.attachMedia(videoEl);
-           hls.on(Hls.Events.MANIFEST_PARSED, () => {
-             loading.classList.add('hide');
-             videoEl.play();
-           });
-        } else {
-           // متصفحات سفاري وبعض المتصفحات بتشغل الفيديو مباشرة
-           videoEl.src = videoUrl;
-           videoEl.oncanplay = () => {
-             loading.classList.add('hide');
-             videoEl.play();
-           };
-        }
+      // 1. جلب التوكن
+      const res = await fetch(API_BASE + '/api/video/' + id + '/play', { method: 'POST' });
+      const sessionRes = await res.json();
+      if (!res.ok || sessionRes.success === false) throw new Error(sessionRes.message || 'فشل جلب الجلسة');
+
+      const session = sessionRes.data || sessionRes.body || sessionRes;
+      const streamToken = session.token;
+      const swVideoId = session.video_id;
+      const hbUrl = session.heartbeat_url;
+
+      if (!streamToken || !swVideoId) throw new Error("الجلسة ناقصة (مفيش token أو video_id)");
+
+      // 2. تحميل أداة فك التشفير
+      loadingText.textContent = "تحميل أدوات فك التشفير...";
+      if (!cryptoUtils) cryptoUtils = await loadPlayerScript();
+
+      // 3. جلب قائمة التشغيل
+      loadingText.textContent = "جلب قائمة التشغيل...";
+      var masterUrl = "/api/stream?path=" + encodeURIComponent("videos/" + swVideoId + "/stream/master.m3u8") + "&t=" + encodeURIComponent(streamToken);
+      var masterRes = await fetch(masterUrl);
+      if (!masterRes.ok) throw new Error("master.m3u8 → HTTP " + masterRes.status);
+      var masterText = await masterRes.text();
+
+      var variantRel = masterText.split("\n").map(l => l.trim()).find(l => l && l.charAt(0) !== "#");
+      if (!variantRel) throw new Error("مفيش variant في الـ master");
+
+      var variantUrl;
+      var variantBasePath = "videos/" + swVideoId + "/stream/";
+      var variantFileUrl = null;
+
+      if (variantRel.indexOf("/api/stream") === 0 || variantRel.indexOf("/api/cdn") === 0) {
+        variantUrl = variantRel;
+        try {
+          var vu = new URL(variantRel, location.origin);
+          if (vu.pathname.indexOf("/api/stream") === 0 && vu.searchParams.get("path")) variantBasePath = vu.searchParams.get("path");
+          if (vu.pathname.indexOf("/api/cdn") === 0 && vu.searchParams.get("u")) variantFileUrl = fromB64url(vu.searchParams.get("u"));
+        } catch (e) {}
+      } else if (variantRel.indexOf("http") === 0) {
+        variantFileUrl = variantRel;
+        variantUrl = "/api/cdn?u=" + toB64url(variantRel);
       } else {
-        // لو رجع JSON فيه خطأ
-        const data = await res.json();
-        throw new Error(data.message || 'فشل تشغيل الفيديو');
+        variantBasePath = "videos/" + swVideoId + "/stream/" + variantRel;
+        variantUrl = "/api/stream?path=" + encodeURIComponent(variantBasePath) + "&t=" + encodeURIComponent(streamToken);
       }
-    } catch (err) {
-      showError(err.message);
+
+      var variantRes = await fetch(variantUrl);
+      if (!variantRes.ok) throw new Error("variant → HTTP " + variantRes.status);
+      var variantText = await variantRes.text();
+
+      // 4. فك تشفير المفتاح
+      loadingText.textContent = "فك المفتاح...";
+      var keyLine = variantText.split("\n").find(l => l.indexOf("EXT-X-KEY") !== -1);
+      var keyPath = "videos/" + swVideoId + "/key";
+      var ivHex = null;
+
+      if (keyLine) {
+        var keyUriMatch = keyLine.match(/URI="([^"]+)"/);
+        var ivMatch = keyLine.match(/IV=0x([0-9a-fA-F]+)/i);
+        if (ivMatch) ivHex = ivMatch[1];
+        if (keyUriMatch) {
+          var uri = keyUriMatch[1];
+          if (uri.indexOf("/api/stream") === 0 || uri.indexOf(location.origin + "/api/stream") === 0) {
+            try {
+              var u = new URL(uri, location.origin);
+              var pth = u.searchParams.get("path");
+              if (pth) keyPath = pth;
+            } catch (e) {}
+          } else if (uri.indexOf("http") !== 0 && uri.indexOf("/api/cdn") !== 0) {
+            keyPath = uri.replace(/^\//, "").replace(/^api\/v1\//, "");
+          }
+        }
+      }
+
+      var keyUrl = "/api/stream?path=" + encodeURIComponent(keyPath) + "&t=" + encodeURIComponent(streamToken);
+      var keyRes = await fetch(keyUrl);
+      if (!keyRes.ok) throw new Error("key → HTTP " + keyRes.status);
+      var wrappedKey = new Uint8Array(await keyRes.arrayBuffer());
+
+      var keyResult = await cryptoUtils.decryptPlaybackKey(wrappedKey, swVideoId);
+      var aesKey = keyResult && keyResult.key;
+      if (!aesKey || aesKey.byteLength !== 16) throw new Error("المفتاح غير صالح");
+
+      var keyBytes = aesKey instanceof ArrayBuffer ? aesKey : aesKey.buffer.slice(aesKey.byteOffset, aesKey.byteOffset + aesKey.byteLength);
+      var keyBlob = new Blob([keyBytes], { type: "application/octet-stream" });
+      currentKeyBlobUrl = URL.createObjectURL(keyBlob);
+
+      // 5. تعديل ملف التشغيل
+      var fixedVariant = rewritePlaylist(variantText, streamToken, currentKeyBlobUrl, variantBasePath, variantFileUrl);
+      if (fixedVariant.indexOf("#EXTM3U") !== 0) fixedVariant = "#EXTM3U\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
+      if (fixedVariant.indexOf("EXT-X-KEY") === -1) {
+        var ivPart = ivHex ? ",IV=0x" + ivHex : "";
+        fixedVariant = '#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI="' + currentKeyBlobUrl + '"' + ivPart + "\n" + fixedVariant.replace(/^#EXTM3U\s*/m, "");
+      }
+
+      var playlistBlob = new Blob([fixedVariant], { type: "application/vnd.apple.mpegurl" });
+      currentPlaylistBlobUrl = URL.createObjectURL(playlistBlob);
+
+      loadingText.textContent = "جاري التشغيل...";
+
+      // 6. بدء نبضات القلب (Heartbeat)
+      hbTimer = setInterval(function () {
+        fetch("/api/heartbeat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: hbUrl, token: streamToken }),
+        }).catch(function () {});
+      }, 25000);
+
+      // 7. التشغيل
+      if (window.Hls && Hls.isSupported()) {
+        hls = new Hls({ enableWorker: false, maxBufferLength: 30, maxMaxBufferLength: 60 });
+        hls.loadSource(currentPlaylistBlobUrl);
+        hls.attachMedia(videoEl);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          loading.classList.add('hide');
+          videoEl.play().catch(function () { loadingText.textContent = "اضغط Play يدويًا"; });
+        });
+
+        hls.on(Hls.Events.ERROR, function (_, data) {
+          if (!data.fatal) return;
+          var msg = data.type + (data.details ? " / " + data.details : "");
+          if (data.response && data.response.code) msg += " HTTP " + data.response.code;
+          showError("خطأ HLS: " + msg);
+        });
+      } else {
+        showError("المتصفح لا يدعم HLS.js");
+      }
+
+    } catch (e) {
+      console.error(e);
+      showError("فشل: " + (e.message || e));
     }
+  }
+
+  function stopPlayback() {
+    if (hbTimer) { clearInterval(hbTimer); hbTimer = null; }
+    if (hls) { hls.destroy(); hls = null; }
+    if (currentKeyBlobUrl) { URL.revokeObjectURL(currentKeyBlobUrl); currentKeyBlobUrl = null; }
+    if (currentPlaylistBlobUrl) { URL.revokeObjectURL(currentPlaylistBlobUrl); currentPlaylistBlobUrl = null; }
+    if (videoEl) { videoEl.removeAttribute("src"); videoEl.load(); }
   }
 
   function renderList(videos) {
@@ -183,6 +380,7 @@ button{cursor:pointer;border:0;background:none;color:inherit;}
     });
   }
 
+  // بدء التشغيل
   if (lectureId && videoId) {
     loadContent();
   } else {
