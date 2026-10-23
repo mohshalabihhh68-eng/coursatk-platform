@@ -126,11 +126,72 @@ async function proxyJson(url, opts) {
 }
 
 // ==================== Routes ====================
-app.get("/api/years", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/years");
-  res.status(r.status).json(r.body);
+
+// ✅ 1. إضافة مسار تسجيل الدخول (عشان تقدر تدخل بأي كود)
+app.post("/api/auth/login", (req, res) => {
+  const { code } = req.body || {};
+  
+  // التحقق إن الكود 7 أرقام
+  if (!code || !/^\d{7}$/.test(code)) {
+    return res.status(400).json({ success: false, message: "الكود لازم يكون 7 أرقام." });
+  }
+
+  // بنعمل توكن وهمي ونبعت بيانات نجاح
+  res.json({
+    success: true,
+    data: {
+      token: "fake_token_" + Date.now(),
+      user: {
+        name: "طالب ثانوية",
+        code: code
+      }
+    }
+  });
 });
 
+// ✅ 2. إضافة مسار المواد (عشان صفحة subjects.html تشتغل)
+app.get("/api/subjects", (req, res) => {
+  // بنبعت مواد ثابتة عشان الصفحة متبقاش فاضية
+  const subjects = [
+    { id: 1, name: "اللغة العربية", image_url: "" },
+    { id: 2, name: "الرياضيات", image_url: "" },
+    { id: 3, name: "الفيزياء", image_url: "" },
+    { id: 4, name: "الكيمياء", image_url: "" },
+    { id: 5, name: "الأحياء", image_url: "" },
+    { id: 6, name: "اللغة الإنجليزية", image_url: "" },
+    { id: 7, name: "التاريخ", image_url: "" },
+    { id: 8, name: "الجغرافيا", image_url: "" },
+  ];
+  
+  res.json({
+    success: true,
+    data: subjects
+  });
+});
+
+// ✅ 3. مسار عشان صفحة subjects.html لما تطلب سنة دراسية
+app.get("/api/years", (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { id: 1, name: "الصف الثالث الثانوي" }
+    ]
+  });
+});
+
+// ✅ 4. إضافة مسار البروفايل (عشان الاسم يظهر فوق)
+app.get("/api/profile", (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      name: "طالب ثانوية",
+      code: "1234567"
+    }
+  });
+});
+
+
+// ==================== باقي مساراتك ====================
 app.get("/api/subjects/:id", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
   res.status(r.status).json(r.body);
@@ -153,11 +214,6 @@ app.get("/api/chapters/:id/lectures", async function (req, res) {
 
 app.get("/api/lectures/:id/content", async function (req, res) {
   const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
-  res.status(r.status).json(r.body);
-});
-
-app.get("/api/profile", async function (req, res) {
-  const r = await proxyJson(API + "/api/v1/user/profile");
   res.status(r.status).json(r.body);
 });
 
