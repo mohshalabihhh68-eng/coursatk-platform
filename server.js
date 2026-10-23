@@ -1,239 +1,245 @@
-<!DOCTYPE html>
-<html lang="ar-EG" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b14">
-<title>المواد الدراسية | ثانوية club</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#070b14; --bg2:#0c1220; --card:#121a2b; --card2:#182234;
-  --ink:#eef2ff; --muted:#8b9bb8; --line:rgba(148,163,184,.12);
-  --blue:#3b82f6; --blue2:#60a5fa; --blue3:#2563eb;
-  --green:#34d399;
-  --nav-bg:rgba(7,11,20,.88);
-  --soft:rgba(255,255,255,.04);
+const express = require("express");
+const fetch = require("node-fetch");
+const path = require("path");
+const cors = require("cors");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// التوكن بتاعك
+const STUDENT_TOKEN =
+  process.env.COURSATK_TOKEN ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3NTEwMiwicm9sZSI6InN0dWRlbnQiLCJ1dWlkIjoiNzUzYzY2MWI0NWMxZDg1ZTdlNDEzNWQ0YWU3MGEyNTIifQ.1lJvhhxz4zz6AXjRcRmRRqb68cdaG0gVmFoe3ULH2uY";
+
+const API = "https://api.coursatk.online";
+const SW = "https://api.stream-weave.com";
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+function headers() {
+  return {
+    Authorization: "Bearer " + STUDENT_TOKEN,
+    Accept: "application/json",
+    Origin: "https://coursatk.online",
+    Referer: "https://coursatk.online/",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+  };
 }
-[data-theme="light"]{
-  --bg:#f4f7fc; --bg2:#eef3fb; --card:#ffffff; --card2:#f4f8ff;
-  --ink:#0f172a; --muted:#5b6b82; --line:rgba(15,23,42,.1);
-  --blue:#2563eb; --blue2:#3b82f6; --blue3:#1d4ed8;
-  --green:#0ea67c;
-  --nav-bg:rgba(255,255,255,.85);
-  --soft:rgba(37,99,235,.06);
+
+function browserHeaders(extra) {
+  return Object.assign({
+      Origin: "https://coursatk.online",
+      Referer: "https://coursatk.online/",
+      Accept: "*/*",
+      "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+    }, extra || {});
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif;transition:background .35s,color .35s}
-button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
-a{color:inherit;text-decoration:none}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes spin{to{transform:rotate(360deg)}}
 
-.app-nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);transition:background .35s,border-color .35s}
-.app-nav-in{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px;cursor:pointer}
-.brand img{width:36px;height:36px;border-radius:11px}
-.brand small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
-.nav-actions{margin-right:auto;display:flex;align-items:center;gap:8px}
-
-.theme-toggle{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;transition:transform .2s,border-color .2s,background .35s,color .35s}
-.theme-toggle:hover{transform:translateY(-2px);border-color:var(--blue2)}
-.theme-toggle .icon-sun{display:none}
-[data-theme="light"] .theme-toggle .icon-sun{display:block}
-[data-theme="light"] .theme-toggle .icon-moon{display:none}
-
-.profile-wrap{position:relative}
-.profile-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px 5px 5px;font-weight:800;font-size:12px;color:var(--ink);transition:background .35s,border-color .35s,color .35s}
-.profile-btn .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
-.profile-menu{position:absolute;top:calc(100% + 8px);left:0;min-width:210px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 24px 60px rgba(0,0,0,.45);display:none;z-index:50;transition:background .35s,border-color .35s}
-.profile-menu.open{display:block;animation:fadeUp .18s ease}
-.profile-menu button{width:100%;text-align:right;padding:11px 12px;border-radius:12px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;color:var(--ink);transition:background .2s}
-.profile-menu button:hover{background:var(--soft)}
-.profile-menu button.danger{color:#ef4444}
-.profile-menu button.danger:hover{background:rgba(239,68,68,.08)}
-
-.wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
-.page-head{margin-bottom:22px;animation:fadeUp .4s ease}
-.page-head .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;margin-bottom:10px}
-[data-theme="light"] .page-head .badge{background:rgba(37,99,235,.08);color:var(--blue)}
-.page-head h1{margin:0;font-size:26px;font-weight:900;color:var(--ink)}
-.page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:20px;align-items:stretch}
-.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s,border-color .3s,background .35s;animation:fadeUp .45s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-[data-theme="light"] .card{box-shadow:0 10px 30px rgba(15,23,42,.08)}
-.card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.4);box-shadow:0 24px 50px rgba(37,99,235,.18)}
-.card-img{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#101b31,#0b1220);overflow:hidden}
-[data-theme="light"] .card-img{background:linear-gradient(135deg,#e8f1ff,#dbeafe)}
-.card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
-.card:hover .card-img img{transform:scale(1.08)}
-.card-img .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--blue2)}
-[data-theme="light"] .card-img .ph{color:var(--blue)}
-.badge-live{position:absolute;top:10px;right:10px;background:rgba(16,185,129,.18);color:var(--green);border:1px solid rgba(52,211,153,.3);border-radius:999px;padding:4px 10px;font-size:10px;font-weight:800;backdrop-filter:blur(8px);display:flex;align-items:center;gap:5px}
-.badge-live::before{content:"";width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 0 3px rgba(52,211,153,.2)}
-.card-body{padding:16px;display:flex;flex-direction:column;min-height:140px}
-.card-body h3{margin:0;font-size:16px;font-weight:900;line-height:1.5;color:var(--ink)}
-.card-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-weight:700}
-.card-btn{width:100%;margin-top:auto;padding:11px;border-radius:12px;font-weight:900;font-size:12px;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.card:hover .card-btn{box-shadow:0 8px 22px rgba(37,99,235,.35)}
-
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
-.spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
-
-@media(max-width:650px){
-  .app-nav-in{padding:10px 12px;gap:8px}
-  .brand{font-size:14px}
-  .brand img{width:32px;height:32px}
-  .theme-toggle{width:36px;height:36px;border-radius:10px}
-  .profile-btn{padding:4px 10px 4px 4px;font-size:11px}
-  .profile-btn .av{width:28px;height:28px;font-size:12px}
-  .wrap{padding:18px 12px 80px}
-  .page-head h1{font-size:22px}
-  .grid{grid-template-columns:1fr;gap:16px}
+function b64urlEncode(value) {
+  var buf = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
+  return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
-</style>
-</head>
-<body>
-  <header class="app-nav"><div class="app-nav-in">
-    <div class="brand" id="brand-home">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232563eb'/%3E%3Cpath d='M32 14 8 26l24 12 24-12z' fill='%23fff'/%3E%3Cpath d='M18 33v10c0 4 7 8 14 8s14-4 14-8V33l-14 7z' fill='%23bfdbfe'/%3E%3C/svg%3E" alt="">
-      <div>ثانوية club<small>منصة الثانوية العامة</small></div>
-    </div>
-    <div class="nav-actions">
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="تبديل الوضع">
-        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
-        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      </button>
-      <div class="profile-wrap">
-        <button type="button" class="profile-btn" id="profile-btn">
-          <span class="av" id="nav-av">؟</span>
-          <span id="nav-name">طالب</span>
-        </button>
-        <div class="profile-menu" id="profile-menu">
-          <button type="button" id="menu-account">حسابي</button>
-          <button type="button" class="danger" id="menu-logout">تسجيل خروج</button>
-        </div>
-      </div>
-    </div>
-  </div></header>
 
-  <main class="wrap" id="main">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>جاري تحميل المواد...</p>
-    </div>
-  </main>
-
-<script>
-(function(){
-'use strict';
-
-const THEME_KEY = 'cstk_theme';
-const API_BASE = '';
-const token = localStorage.getItem('cstk_tok'); // للتحقق فقط
-
-// لو مفيش توكن (زائر)، ممكن نسمح له يكمل أو نرجعه، هنا هنسمح له يكمل عشان يشوف الداتا
-// if (!token) { window.location.replace('index.html'); return; }
-
-const $ = id => document.getElementById(id);
-const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-// Theme
-const rootEl = document.documentElement;
-function applyTheme(theme){
-  if(theme === 'light') rootEl.setAttribute('data-theme','light');
-  else rootEl.removeAttribute('data-theme');
+function b64urlDecode(value) {
+  var s = String(value).replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  return Buffer.from(s, "base64").toString("utf8");
 }
-function getInitialTheme(){
-  try{ const s = localStorage.getItem(THEME_KEY); if(s==='light'||s==='dark') return s; }catch(_){}
-  return 'dark';
-}
-applyTheme(getInitialTheme());
-$('themeToggle').addEventListener('click', () => {
-  const isLight = rootEl.getAttribute('data-theme') === 'light';
-  const next = isLight ? 'dark' : 'light';
-  applyTheme(next);
-  try{ localStorage.setItem(THEME_KEY, next); }catch(_){}
-});
 
-// API fetch
-const api = async (path) => {
-  const res = await fetch(API_BASE + path, {
-    headers: { 'Accept': 'application/json' }
+function joinRel(base, rel) {
+  var q = ""; var relPath = String(rel);
+  var qi = relPath.indexOf("?");
+  if (qi !== -1) { q = relPath.slice(qi); relPath = relPath.slice(0, qi); }
+  var stack = String(base || "").split("/");
+  if (stack.length && stack[stack.length - 1] !== "" && /\.[a-z0-9]+$/i.test(stack[stack.length - 1])) { stack.pop(); }
+  if (stack.length && stack[stack.length - 1] === "") stack.pop();
+  relPath.split("/").forEach(function (part) {
+    if (!part || part === ".") return;
+    if (part === "..") stack.pop(); else stack.push(part);
   });
-  const data = await res.json().catch(() => ({}));
-  // بنرجع data.body لو موجودة (عشان السيرفر بتاعك بيرجع شكل معين)
-  if (!res.ok || data.success === false) throw new Error(data.message || 'خطأ');
-  return data.data || data.body?.data || data.body || data;
-};
+  return stack.join("/") + q;
+}
 
-async function loadData() {
-  try {
-    // 1. بنجيب السنوات
-    const yearsRes = await api('/api/years');
-    let years = yearsRes.data || yearsRes; 
-    if (!years || !years.length) throw new Error("لا توجد سنوات دراسية متاحة");
-
-    const yearId = years[0].id;
-
-    // 2. بنجيب المواد
-    const subjectsRes = await api('/api/subjects/' + yearId);
-    let subjects = subjectsRes.data || subjectsRes;
-    if (!subjects || !subjects.length) throw new Error("لا توجد مواد متاحة");
-
-    let html = `<div class="page-head"><div class="badge">المواد الدراسية</div><h1>موادك المتاحة</h1><p>اختار المادة لعرض المدرسين</p></div><div class="grid">`;
-    subjects.forEach(s => {
-      html += `
-        <div class="card" onclick="window.location.href='teachers.html?subjectId=${s.id}'">
-          <div class="card-img">
-            <img src="${esc(s.image_url || '')}" onerror="this.style.display='none'" alt="">
-            <div class="ph" style="display:${s.image_url ? 'none' : 'grid'}">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            </div>
-            <span class="badge-live">متاح</span>
-          </div>
-          <div class="card-body">
-            <h3>${esc(s.name)}</h3>
-            <div class="card-meta"><span>مادة دراسية</span></div>
-            <button class="card-btn">عرض المدرسين ←</button>
-          </div>
-        </div>`;
-    });
-    html += `</div>`;
-    $('main').innerHTML = html;
-    
-  } catch (e) {
-    $('main').innerHTML = `<div style="text-align:center;padding:50px;color:#ff5252">خطأ: ${e.message}</div>`;
+async function fetchFollow(url, hdrs, left) {
+  if (left == null) left = 5;
+  var res = await fetch(url, { headers: hdrs, redirect: "manual" });
+  if ([301, 302, 303, 307, 308].indexOf(res.status) !== -1 && left > 0) {
+    var loc = res.headers.get("location");
+    if (!loc) return res;
+    try { if (res.body && res.body.cancel) await res.body.cancel(); else await res.arrayBuffer(); } catch (e) {}
+    var next = new URL(loc, url).href;
+    var nextHeaders = Object.assign({}, hdrs);
+    if (new URL(next).host !== new URL(url).host) delete nextHeaders.Authorization;
+    return fetchFollow(next, nextHeaders, left - 1);
   }
+  return res;
 }
 
-async function loadProfile() {
-  try {
-    const res = await api('/api/profile');
-    const me = res.data || res;
-    if(me.name) {
-      $('nav-name').textContent = me.name;
-      $('nav-av').textContent = me.name.charAt(0);
-    }
-  } catch (e) { console.warn('فشل جلب البروفايل', e); }
+function pipeUpstream(res, upstream, buf) {
+  var ct = upstream.headers.get("content-type") || "application/octet-stream";
+  res.set("Content-Type", ct);
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Accept-Ranges", upstream.headers.get("accept-ranges") || "bytes");
+  var cr = upstream.headers.get("content-range");
+  if (cr) res.set("Content-Range", cr);
+  res.status(upstream.status).send(buf);
 }
 
-$('brand-home').onclick = () => window.location.href = 'index.html';
-$('profile-btn').onclick = () => $('profile-menu').classList.toggle('open');
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.profile-wrap')) $('profile-menu').classList.remove('open');
+async function proxyJson(url, opts) {
+  opts = opts || {};
+  const res = await fetch(url, {
+    method: opts.method || "GET",
+    headers: Object.assign({}, headers(), opts.headers || {}),
+    body: opts.body,
+  });
+  const text = await res.text();
+  try { return { status: res.status, body: JSON.parse(text) }; } catch (e) { return { status: res.status, body: text }; }
+}
+
+// ==================== Routes ====================
+
+// 1. مسار تسجيل الدخول الوهمي عشان الـ Front-end يعدي
+app.post("/api/auth/login", (req, res) => {
+  res.json({
+    success: true,
+    data: { token: "fake_token_for_session", user: { name: "طالب" } }
+  });
 });
-$('menu-account').onclick = () => window.location.href = 'profile.html';
-$('menu-logout').onclick = () => { 
-  localStorage.removeItem('cstk_tok'); 
-  window.location.replace('index.html'); 
-};
 
-loadData();
-loadProfile();
+// 2. مسار البروفايل (بيجيب من المنصة الأصلية)
+app.get("/api/profile", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/profile");
+  // لو المنصة رجعت خطأ، بنرجع داتا وهمية عشان الصفحة متضربش
+  if (r.status !== 200) {
+     return res.json({ success: true, data: { name: "طالب ثانوية", code: "1234567" } });
+  }
+  res.status(r.status).json(r.body);
+});
 
-})();
-</script>
-</body>
-</html>
+// 3. مسار السنوات الدراسية
+app.get("/api/years", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/years");
+  res.status(r.status).json(r.body);
+});
+
+// 4. مسار المواد (بيحتاج الـ ID بتاع السنة)
+app.get("/api/subjects/:id", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id);
+  res.status(r.status).json(r.body);
+});
+
+// 5. مسار المدرسين
+app.get("/api/subjects/:id/teachers", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/subjects/" + req.params.id + "/teachers");
+  res.status(r.status).json(r.body);
+});
+
+// 6. مسار الفصول
+app.get("/api/teachers/:id/chapters", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/teachers/" + req.params.id + "/chapters");
+  res.status(r.status).json(r.body);
+});
+
+// 7. مسار المحاضرات
+app.get("/api/chapters/:id/lectures", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/chapters/" + req.params.id + "/lectures");
+  res.status(r.status).json(r.body);
+});
+
+// 8. مسار محتوى المحاضرة
+app.get("/api/lectures/:id/content", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/user/lectures/" + req.params.id + "/content");
+  res.status(r.status).json(r.body);
+});
+
+// 9. مسار تشغيل الفيديو
+app.post("/api/video/:id/play", async function (req, res) {
+  const r = await proxyJson(API + "/api/v1/video/" + req.params.id + "/stream-weave/play", {
+    method: "POST", headers: { "Content-Length": "0" }, body: "",
+  });
+  res.status(r.status).json(r.body);
+});
+
+app.get("/api/cdn", async function (req, res) {
+  try {
+    var target = req.query.url || "";
+    if (req.query.u) target = b64urlDecode(String(req.query.u));
+    if (!target) return res.status(400).send("missing url");
+    var hdrs = browserHeaders();
+    if (req.headers.range) hdrs.Range = req.headers.range;
+    var upstream = await fetchFollow(target, hdrs);
+    var buf = Buffer.from(await upstream.arrayBuffer());
+    res.set("Cache-Control", "public, max-age=30");
+    pipeUpstream(res, upstream, buf);
+  } catch (e) { res.status(502).send("cdn error: " + e.message); }
+});
+
+app.get("/api/stream", async function (req, res) {
+  try {
+    var swPath = (req.query.path || "").replace(/^\/+/, "");
+    var token = req.query.t;
+    if (!token || !swPath) return res.status(400).json({ error: "missing path or token" });
+
+    var url = SW + "/api/v1/" + swPath;
+    var hdrs = browserHeaders({ Authorization: "Bearer " + token });
+    if (req.headers.range) hdrs.Range = req.headers.range;
+    var upstream = await fetchFollow(url, hdrs);
+
+    var ct = upstream.headers.get("content-type") || "application/octet-stream";
+    var isM3u8 = ct.indexOf("mpegurl") !== -1 || ct.indexOf("m3u8") !== -1 || swPath.indexOf(".m3u8") !== -1;
+
+    if (isM3u8) {
+      var text = await upstream.text();
+      var base = swPath.indexOf("/") !== -1 ? swPath.substring(0, swPath.lastIndexOf("/") + 1) : "";
+      text = text.split("\n").map(function (line) {
+          var s = line.trim();
+          if (!s) return line;
+          if (s.charAt(0) === "#") {
+            return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
+              if (uri.indexOf("http") === 0) return 'URI="/api/cdn?u=' + b64urlEncode(uri) + '"';
+              var clean = uri.charAt(0) === "/" ? uri.slice(1) : uri;
+              clean = clean.replace(/^api\/v1\//, "");
+              if (clean.indexOf("videos/") !== 0) clean = joinRel(base, clean);
+              return 'URI="/api/stream?path=' + encodeURIComponent(clean) + "&t=" + encodeURIComponent(token) + '"';
+            });
+          }
+          if (s.indexOf("http") === 0) return "/api/cdn?u=" + b64urlEncode(s);
+          return "/api/stream?path=" + encodeURIComponent(joinRel(base, s)) + "&t=" + encodeURIComponent(token);
+        }).join("\n");
+
+      res.set("Content-Type", "application/vnd.apple.mpegurl");
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Cache-Control", "no-store");
+      return res.status(upstream.status).send(text);
+    }
+
+    var buf = Buffer.from(await upstream.arrayBuffer());
+    res.set("Cache-Control", "no-store");
+    pipeUpstream(res, upstream, buf);
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+app.post("/api/heartbeat", async function (req, res) {
+  try {
+    var url = req.body && req.body.url;
+    var token = req.body && req.body.token;
+    if (!url || !token) return res.status(400).json({ error: "url+token required" });
+    var upstream = await fetch(url, {
+      method: "POST",
+      headers: browserHeaders({ Authorization: "Bearer " + token, "Content-Type": "application/json" }),
+      body: "{}",
+    });
+    var text = await upstream.text();
+    res.status(upstream.status).type("json").send(text);
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.listen(PORT, function () {
+  console.log("Running on port " + PORT);
+});
