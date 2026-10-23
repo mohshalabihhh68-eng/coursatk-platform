@@ -66,7 +66,7 @@ button{font:inherit;cursor:pointer}
 const API_BASE = '';
 const TOKEN_KEY = 'cstk_tok';
 const token = localStorage.getItem(TOKEN_KEY);
-if (!token) { window.location.replace('index.html'); return; }
+/* no login gate — server holds token */
 
 const $ = id => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
