@@ -52,7 +52,7 @@ button{font:inherit;cursor:pointer}
 (function(){
 'use strict';
 const API_BASE = '', TOKEN_KEY = 'cstk_tok', token = localStorage.getItem(TOKEN_KEY);
-if (!token) { window.location.replace('index.html'); return; }
+/* no login gate — server holds token */
 const $ = id => document.getElementById(id);
 const qs = new URLSearchParams(location.search), chapterId = qs.get('chapterId');
 const api = async (path, opts = {}) => {
