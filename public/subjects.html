@@ -34,18 +34,44 @@ button{font:inherit;cursor:pointer}
 
 /* Grid & Cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;cursor:pointer;transition:all .3s cubic-bezier(0.4,0,0.2,1);animation:fadeUp .45s ease both;position:relative}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;cursor:pointer;transition:all .3s cubic-bezier(0.4,0,0.2,1);animation:fadeUp .45s ease both;position:relative;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.5);box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(59,130,246,.1)}
-.card-img{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--blue3),#1e1b4b);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
-.card:hover .card-img img{transform:scale(1.05)}
-.card-img .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--muted)}
-.card-body{padding:20px;display:flex;flex-direction:column;position:relative;background:linear-gradient(180deg,rgba(18,26,43,0) 0%,var(--card) 20%)}
+
+/* تصميم الأيقونة والخلفية الملونة */
+.card-icon-area{
+  width:100%;
+  height:160px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg, #1e293b, #0f172a);
+}
+.card-icon-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+  z-index: 1;
+}
+.card-icon-area svg{
+  width:70px;
+  height:70px;
+  stroke-width:1.5;
+  z-index:2;
+  opacity:0.9;
+  transition:transform .3s ease;
+}
+.card:hover .card-icon-area svg{
+  transform:scale(1.1) rotate(-5deg);
+}
+.card-body{padding:20px;display:flex;flex-direction:column;flex:1;position:relative;background:var(--card);z-index:3}
 .card-body h3{margin:0;font-size:18px;font-weight:900;margin-bottom:4px}
 .card-body .sub{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:16px}
 
 /* Modern Button */
-.action-btn{width:100%;padding:12px;border:0;border-radius:14px;font-weight:800;font-size:14px;background:rgba(59,130,246,.1);color:var(--blue2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease}
+.action-btn{width:100%;padding:12px;border:0;border-radius:14px;font-weight:800;font-size:14px;background:rgba(59,130,246,.1);color:var(--blue2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s ease;margin-top:auto}
 .card:hover .action-btn{background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;box-shadow:0 4px 15px rgba(37,99,235,.4)}
 .action-btn svg{width:16px;height:16px;fill:currentColor;transition:transform .2s}
 .card:hover .action-btn svg{transform:translateX(-4px)}
@@ -54,7 +80,7 @@ button{font:inherit;cursor:pointer}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
 
-@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}.card-body{padding:16px}.card-body h3{font-size:16px}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}.card-icon-area{height:120px}.card-icon-area svg{width:50px;height:50px}.card-body{padding:16px}.card-body h3{font-size:16px}}
 </style>
 </head>
 <body>
@@ -71,7 +97,7 @@ button{font:inherit;cursor:pointer}
 const API_BASE = '', TOKEN_KEY = 'cstk_tok', token = localStorage.getItem(TOKEN_KEY);
 const $ = id => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
-const subjectId = qs.get('subjectId') || '4'; // افتراضي 4
+const subjectId = qs.get('subjectId') || '4';
 
 const api = async (path, opts = {}) => {
   const headers = { Accept: 'application/json', ...opts.headers };
@@ -82,6 +108,54 @@ const api = async (path, opts = {}) => {
   return data.data;
 };
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// دالة لإرجاع الأيقونة واللون حسب اسم المادة
+function getSubjectStyle(name) {
+  const n = String(name).toLowerCase();
+  
+  if (n.includes('عربي') || n.includes('عربية') || n.includes('لغة')) {
+    return { 
+      bg: 'linear-gradient(135deg, #ef4444, #991b1b)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` 
+    };
+  }
+  if (n.includes('english') || n.includes('إنجليزي') || n.includes('انجليزي')) {
+    return { 
+      bg: 'linear-gradient(135deg, #8b5cf6, #4c1d95)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>` 
+    };
+  }
+  if (n.includes('فيزياء') || n.includes('فيزيا')) {
+    return { 
+      bg: 'linear-gradient(135deg, #3b82f6, #1e3a8a)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><circle cx="12" cy="12" r="3"/><path d="M19 12c0 3.9-3.1 7-7 7s-7-3.1-7-7 3.1-7 7-7 7 3.1 7 7z"/><path d="M12 5c3.9 0 7 3.1 7 7s-3.1 7-7 7-7-3.1-7-7 3.1-7 7-7z"/></svg>` 
+    };
+  }
+  if (n.includes('كيمياء') || n.includes('كيميا')) {
+    return { 
+      bg: 'linear-gradient(135deg, #f97316, #9a3412)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>` 
+    };
+  }
+  if (n.includes('أحياء') || n.includes('احياء')) {
+    return { 
+      bg: 'linear-gradient(135deg, #10b981, #064e3b)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>` 
+    };
+  }
+  if (n.includes('رياضيات') || n.includes('رياضة') || n.includes('ماث') || n.includes('math')) {
+    return { 
+      bg: 'linear-gradient(135deg, #ec4899, #831843)', 
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="M19 5 5 19"/><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M19 5 5 5"/></svg>` 
+    };
+  }
+  
+  // الافتراضي (لو المادة مش معروفة)
+  return { 
+    bg: 'linear-gradient(135deg, #64748b, #334155)', 
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="white"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` 
+  };
+}
 
 async function load() {
   try {
@@ -97,10 +171,11 @@ async function load() {
     <div class="grid">`;
     
     subjects.forEach(s => {
+      const style = getSubjectStyle(s.name);
+      
       html += `<div class="card" onclick="window.location.href='teachers.html?subjectId=${s.id}&subjectName=${encodeURIComponent(s.name)}'">
-        <div class="card-img">
-          ${s.image_url ? `<img src="${esc(s.image_url)}" alt="${esc(s.name)}" onerror="this.style.display='none'">` : ''}
-          <div class="ph" style="display:${s.image_url ? 'none' : 'grid'}"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+        <div class="card-icon-area" style="background: ${style.bg}">
+          ${style.svg}
         </div>
         <div class="card-body">
           <h3>${esc(s.name)}</h3>
