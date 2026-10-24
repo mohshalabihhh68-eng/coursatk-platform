@@ -10,6 +10,8 @@
 button{font:inherit;cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Navbar */
 .app-nav{position:sticky;top:0;z-index:40;background:rgba(7,11,20,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 .app-nav-in{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px;cursor:pointer}
@@ -23,20 +25,39 @@ button{font:inherit;cursor:pointer}
 .profile-menu button{width:100%;text-align:right;border:0;background:transparent;padding:11px 12px;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;color:var(--ink)}
 .profile-menu button:hover{background:rgba(255,255,255,.04)}
 .profile-menu button.danger{color:#ff8a80}
+
+/* Main Content */
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
-.back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink)}
-.page-head{margin-bottom:22px;animation:fadeUp .4s ease}
+.back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink);transition:.2s}
+.back-btn:hover{background:var(--card-hover)}
+.page-head{margin-bottom:24px;animation:fadeUp .4s ease}
 .page-head .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;margin-bottom:10px}
 .page-head h1{margin:0;font-size:26px;font-weight:900}
 .page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
-.list{display:flex;flex-direction:column;gap:12px}
-.list-item{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px;cursor:pointer;transition:.2s;animation:fadeUp .35s ease both}
-.list-item:hover{background:#182234;transform:translateX(-4px);border-color:rgba(59,130,246,.4)}
-.list-item img{width:60px;height:60px;border-radius:12px;object-fit:cover;background:#101b31}
-.list-item .title{font-size:16px;font-weight:800;margin-bottom:4px}
-.list-item .meta{font-size:12px;color:var(--muted)}
+
+/* Grid Cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;cursor:pointer;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);animation:fadeUp .45s ease both;position:relative;text-decoration:none;color:var(--ink)}
+.card:hover{transform:translateY(-6px);border-color:rgba(59,130,246,.4);box-shadow:0 15px 35px rgba(0,0,0,.3)}
+.card-img{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg, var(--blue3), #1e1b4b);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;transition:transform .3s ease}
+.card:hover .card-img img{transform:scale(1.05)}
+.card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg, rgba(13,20,36,1) 0%, transparent 60%)}
+.card-icon{position:relative;z-index:2;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;transition:.3s}
+.card:hover .card-icon{background:var(--blue);transform:scale(1.1)}
+.card-icon svg{width:24px;height:24px;fill:currentColor;margin-left:3px}
+.card-body{padding:18px;display:flex;flex-direction:column;flex:1}
+.card-title{font-size:16px;font-weight:800;line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.card-meta{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--muted);padding-top:12px;border-top:1px solid var(--line);margin-top:auto}
+.card-meta svg{width:16px;height:16px;fill:currentColor;color:var(--blue2)}
+
+/* Loading */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -80,17 +101,32 @@ async function load() {
       <h1>محاضرات الفصل</h1>
       <p>اختار المحاضرة لفتح المحتوى</p>
     </div>
-    <div class="list">`;
+    <div class="grid">`;
     
     lectures.forEach(l => {
-      // هنا التعديل: ضفنا lectureName=${encodeURIComponent(l.name)} في الرابط
-      html += `<div class="list-item" onclick="window.location.href='content.html?lectureId=${l.id}&chapterName=${encodeURIComponent(chapterName)}&teacherName=${encodeURIComponent(teacherName)}&subjectName=${encodeURIComponent(subjectName)}&lectureName=${encodeURIComponent(l.name)}'">
-        <img src="${esc(l.image_url || '')}" onerror="this.style.opacity=0.2">
-        <div><div class="title">${esc(l.name)}</div><div class="meta">${l.video_count || 0} فيديو</div></div>
+      // التصميم الجديد للكارت
+      const thumb = l.image_url ? `<img src="${esc(l.image_url)}" onerror="this.style.display='none'">` : '';
+      html += `<div class="card" onclick="window.location.href='content.html?lectureId=${l.id}&chapterName=${encodeURIComponent(chapterName)}&teacherName=${encodeURIComponent(teacherName)}&subjectName=${encodeURIComponent(subjectName)}&lectureName=${encodeURIComponent(l.name)}'">
+        
+        <div class="card-img">
+          ${thumb}
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="card-title">${esc(l.name)}</div>
+          <div class="card-meta">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            <span>${l.video_count || 0} فيديو</span>
+          </div>
+        </div>
+
       </div>`;
     });
     html += '</div>'; $('main').innerHTML = html;
-  } catch (e) { $('main').innerHTML = `<div style="text-align:center;color:#ff5252">خطأ: ${e.message}</div>`; }
+  } catch (e) { $('main').innerHTML = `<div style="text-align:center;color:#ff5252;padding:50px;">خطأ: ${e.message}</div>`; }
 }
 async function loadProfile() { try { const me = await api('/api/profile'); $('nav-name').textContent = me.name || 'طالب'; $('nav-av').textContent = (me.name || 'ط').charAt(0); } catch (e) {} }
 $('brand-home').onclick = () => window.location.href = 'subjects.html';
