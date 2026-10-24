@@ -138,7 +138,8 @@ a { text-decoration: none; color: inherit; }
   const qs = new URLSearchParams(location.search);
   const lectureId = qs.get('lectureId'); 
   
-  // سحب الأسماء من الرابط
+  // استقبال الاسم الجديد من الرابط
+  const urlLectureName = qs.get('lectureName') || '';
   const urlTeacher = qs.get('teacherName') || '';
   const urlChapter = qs.get('chapterName') || '';
   const urlSubject = qs.get('subjectName') || '';
@@ -182,7 +183,8 @@ a { text-decoration: none; color: inherit; }
       const videos = data.videos || data.video || [];
       const files = data.files || data.file || data.attachments || data.pdfs || data.documents || [];
       
-      const lectureName = (data.lecture && data.lecture.name) || data.lecture_name || data.name || data.title || 'محتوى المحاضرة';
+      // هنا التعديل: الاسم بقى ياخد من الرابط الأول
+      const lectureName = urlLectureName || (data.lecture && data.lecture.name) || data.lecture_name || data.name || data.title || 'محتوى المحاضرة';
       
       const teacherName = urlTeacher || data.teacher_name || (data.teacher && data.teacher.name) || '';
       const chapterName = urlChapter || data.chapter_name || (data.chapter && data.chapter.name) || '';
