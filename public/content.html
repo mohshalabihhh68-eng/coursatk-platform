@@ -41,7 +41,7 @@ a { text-decoration: none; color: inherit; }
 
 /* Header Area */
 .top-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; animation: fadeUp .4s ease both; flex-wrap: wrap; gap: 16px;}
-.header-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; width: 100%; justify-content: flex-end;}
+.header-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; width: 100%; justify-content: flex-end; min-height: 30px;}
 .tag { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: #d1d5db; display: inline-flex; align-items: center; gap: 6px; }
 .tag.active { background: rgba(59,130,246,.15); color: var(--blue2); border-color: rgba(59,130,246,.3); }
 .tag svg { width: 14px; height: 14px; fill: currentColor; }
@@ -174,27 +174,45 @@ a { text-decoration: none; color: inherit; }
     try {
       const data = await api('/api/lectures/' + lectureId + '/content'); 
       
-      // بنجرب نجيب الملفات والفيديوهات بأي اسم ممكن السيرفر يبعته
       const videos = data.videos || data.video || [];
       const files = data.files || data.file || data.attachments || data.pdfs || data.documents || [];
       
-      // اسم المحاضرة
+      // بنجيب اسم المحاضرة
       const lectureName = (data.lecture && data.lecture.name) || data.lecture_name || data.name || data.title || 'محتوى المحاضرة';
+      
+      // بنجيب اسم المدرس والمادة لو موجودين في السيرفر (عشان التاجات)
+      const teacherName = data.teacher_name || (data.teacher && data.teacher.name) || data.teacherName || '';
+      const subjectName = data.subject_name || (data.subject && data.subject.name) || data.subjectName || '';
+      const chapterName = data.chapter_name || (data.chapter && data.chapter.name) || data.chapterName || '';
+
+      // تجهيز التاجات
+      let tagsHtml = '';
+      if (teacherName) {
+        tagsHtml += `
+          <span class="tag active">
+             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+             مع أ. ${esc(teacherName)}
+          </span>
+        `;
+      }
+      if (chapterName) {
+        tagsHtml += `
+          <span class="tag">
+             <svg viewBox="0 0 24 24" style="color:#ef4444"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+             ${esc(chapterName)}
+          </span>
+        `;
+      }
+      if (subjectName) {
+        tagsHtml += `<span class="tag">${esc(subjectName)}</span>`;
+      }
 
       let html = `
         <!-- الهيدر العلوي -->
         <div class="top-header">
-          <div style="display:flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+          <div style="display:flex; flex-direction: column; gap: 16px; align-items: flex-start; width: 100%;">
              <div class="header-tags">
-                <span class="tag active">
-                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                   مع د. أحمد الجوهري
-                </span>
-                <span class="tag">
-                   <svg viewBox="0 0 24 24" style="color:#ef4444"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                   فصل كورس التنسيق الهرموني + الورشة
-                </span>
-                <span class="tag">أحياء</span>
+                ${tagsHtml}
              </div>
              <div>
                 <h1 class="page-title">${esc(lectureName)} <span style="font-size: 32px;">🧪</span></h1>
@@ -271,7 +289,7 @@ a { text-decoration: none; color: inherit; }
 
       html += `</div></div>`; // إغلاق الشبكة وصندوق الفيديوهات
 
-      // صندوق الملفات (لو موجودة)
+      // صندوق الملفات
       if (files.length > 0) {
         html += `
           <div class="section-box">
@@ -289,7 +307,6 @@ a { text-decoration: none; color: inherit; }
             <div class="file-list">
         `;
         files.forEach(f => {
-          // بنجرب نجيب اسم الملف ولينكه من أي مفتاح ممكن
           const fileName = f.title || f.name || f.file_name || f.filename || 'ملف مرفق';
           const fileUrl = f.file_url || f.url || f.link || f.path || f.download_url || '#';
 
@@ -309,13 +326,6 @@ a { text-decoration: none; color: inherit; }
           `;
         });
         html += `</div></div>`;
-      } else {
-        // رسالة تدل إن السيرفر مفيهوش ملفات للمحاضرة دي (عشان تعرف المشكلة فين)
-        html += `
-          <div class="section-box" style="text-align: center; padding: 40px;">
-            <div style="color: var(--muted); font-weight: 700; font-size: 15px;">لا توجد ملفات أو مذكرات مرفقة بهذه المحاضرة حالياً.</div>
-          </div>
-        `;
       }
 
       $('main').innerHTML = html;
