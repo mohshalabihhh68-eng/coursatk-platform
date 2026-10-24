@@ -58,13 +58,6 @@ a { text-decoration: none; color: inherit; }
 .section-title-icon svg { width: 24px; height: 24px; }
 .section-subtitle { font-size: 13px; color: var(--muted); font-weight: 700; margin-top: 4px; }
 
-/* Warning Box */
-.warning-box { background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-.warning-text { color: #fbbf24; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-.warning-btns { display: flex; gap: 8px; }
-.warning-btn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: .2s; }
-.warning-btn:hover { background: rgba(245, 158, 11, 0.25); }
-
 /* Video Grid */
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
 .video-card { background: #0d1424; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; display: flex; flex-direction: column;}
@@ -76,7 +69,7 @@ a { text-decoration: none; color: inherit; }
 .video-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(13,20,36,1) 0%, transparent 50%); }
 .play-icon-circle { width: 64px; height: 64px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform .2s; }
 .video-card:hover .play-icon-circle { transform: scale(1.1); }
-.play-icon-circle svg { width: 24px; height: 24px; fill: var(--blue3); margin-left: 4px; } /* عشان السهم يبان في النص */
+.play-icon-circle svg { width: 24px; height: 24px; fill: var(--blue3); margin-left: 4px; }
 
 /* Badges */
 .badge-top-right { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; z-index: 3; }
@@ -108,7 +101,6 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 768px) {
   .top-header { flex-direction: column; align-items: flex-start; }
   .header-tags { justify-content: flex-start; }
-  .warning-box { flex-direction: column; align-items: flex-start; }
   .video-grid { grid-template-columns: 1fr; }
 }
 </style>
@@ -157,7 +149,6 @@ a { text-decoration: none; color: inherit; }
   
   const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  // دالة تنسيق المدة الزمنية
   function formatDuration(seconds) {
     if (!seconds || isNaN(seconds)) return '00:00';
     const h = Math.floor(seconds / 3600);
@@ -167,7 +158,6 @@ a { text-decoration: none; color: inherit; }
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  // دالة فحص هل الفيديو تمت مشاهدته (بتبحث في الـ localStorage)
   function isVideoWatched(videoId) {
     try {
       const saved = JSON.parse(localStorage.getItem('cstk_w_' + videoId) || 'null');
@@ -183,10 +173,12 @@ a { text-decoration: none; color: inherit; }
     
     try {
       const data = await api('/api/lectures/' + lectureId + '/content'); 
+      
+      // بنجرب نجيب الملفات والفيديوهات بأي اسم ممكن السيرفر يبعته
       const videos = data.videos || data.video || [];
-      const files = data.files || data.file || [];
-
-      // اسم المحاضرة (لو موجود في الـ API)
+      const files = data.files || data.file || data.attachments || data.pdfs || data.documents || [];
+      
+      // اسم المحاضرة
       const lectureName = (data.lecture && data.lecture.name) || data.lecture_name || data.name || data.title || 'محتوى المحاضرة';
 
       let html = `
@@ -205,7 +197,7 @@ a { text-decoration: none; color: inherit; }
                 <span class="tag">أحياء</span>
              </div>
              <div>
-                <h1 class="page-title">محتوى ورشة التنسيق الهرموني <span style="font-size: 32px;">🧪</span></h1>
+                <h1 class="page-title">${esc(lectureName)} <span style="font-size: 32px;">🧪</span></h1>
                 <p class="page-subtitle">ذاكر المحاضرة كاملة من فيديوهات وملفات، وفي الآخر اختبر نفسك.</p>
              </div>
           </div>
@@ -228,24 +220,6 @@ a { text-decoration: none; color: inherit; }
                   <div class="section-subtitle">${videos.length} فيديو متاح</div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- تنبيه المشغل -->
-          <div class="warning-box">
-            <div class="warning-text">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-              تنبيه هام: عشان الفيديوهات تشتغل معاك لازم تكون محمل مشغل كورساتك الخاص بينا.
-            </div>
-            <div class="warning-btns">
-              <button class="warning-btn">
-                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                 تحميل للكمبيوتر (Windows)
-              </button>
-              <button class="warning-btn">
-                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
-                 تحميل للأندرويد (APK)
-              </button>
             </div>
           </div>
 
@@ -297,7 +271,7 @@ a { text-decoration: none; color: inherit; }
 
       html += `</div></div>`; // إغلاق الشبكة وصندوق الفيديوهات
 
-      // صندوق الملفات
+      // صندوق الملفات (لو موجودة)
       if (files.length > 0) {
         html += `
           <div class="section-box">
@@ -315,15 +289,19 @@ a { text-decoration: none; color: inherit; }
             <div class="file-list">
         `;
         files.forEach(f => {
+          // بنجرب نجيب اسم الملف ولينكه من أي مفتاح ممكن
+          const fileName = f.title || f.name || f.file_name || f.filename || 'ملف مرفق';
+          const fileUrl = f.file_url || f.url || f.link || f.path || f.download_url || '#';
+
           html += `
             <div class="file-item">
               <div class="file-info">
                 <div class="file-icon">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
                 </div>
-                <div class="file-text">${esc(f.title || f.name || 'ملف مرفق')}</div>
+                <div class="file-text">${esc(fileName)}</div>
               </div>
-              <button class="file-btn" onclick="window.open('${esc(f.file_url || f.url || '#')}', '_blank')">
+              <button class="file-btn" onclick="window.open('${esc(fileUrl)}', '_blank')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 فتح الملف
               </button>
@@ -331,6 +309,13 @@ a { text-decoration: none; color: inherit; }
           `;
         });
         html += `</div></div>`;
+      } else {
+        // رسالة تدل إن السيرفر مفيهوش ملفات للمحاضرة دي (عشان تعرف المشكلة فين)
+        html += `
+          <div class="section-box" style="text-align: center; padding: 40px;">
+            <div style="color: var(--muted); font-weight: 700; font-size: 15px;">لا توجد ملفات أو مذكرات مرفقة بهذه المحاضرة حالياً.</div>
+          </div>
+        `;
       }
 
       $('main').innerHTML = html;
