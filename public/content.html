@@ -137,6 +137,11 @@ a { text-decoration: none; color: inherit; }
   
   const qs = new URLSearchParams(location.search);
   const lectureId = qs.get('lectureId'); 
+  
+  // سحب الأسماء من الرابط (لو الصفحة اللي قبلها باعتاهم)
+  const urlTeacher = qs.get('teacherName') || '';
+  const urlChapter = qs.get('chapterName') || '';
+  const urlSubject = qs.get('subjectName') || '';
 
   const api = async (path, opts = {}) => {
     const headers = { Accept: 'application/json', ...opts.headers };
@@ -180,10 +185,10 @@ a { text-decoration: none; color: inherit; }
       // بنجيب اسم المحاضرة
       const lectureName = (data.lecture && data.lecture.name) || data.lecture_name || data.name || data.title || 'محتوى المحاضرة';
       
-      // بنجيب اسم المدرس والمادة لو موجودين في السيرفر (عشان التاجات)
-      const teacherName = data.teacher_name || (data.teacher && data.teacher.name) || data.teacherName || '';
-      const subjectName = data.subject_name || (data.subject && data.subject.name) || data.subjectName || '';
-      const chapterName = data.chapter_name || (data.chapter && data.chapter.name) || data.chapterName || '';
+      // بنجيب الأسماء (بنشوف لو موجودة في السيرفر الأول، لو مش موجودة بناخدها من الرابط)
+      const teacherName = urlTeacher || data.teacher_name || (data.teacher && data.teacher.name) || '';
+      const chapterName = urlChapter || data.chapter_name || (data.chapter && data.chapter.name) || '';
+      const subjectName = urlSubject || data.subject_name || (data.subject && data.subject.name) || '';
 
       // تجهيز التاجات
       let tagsHtml = '';
