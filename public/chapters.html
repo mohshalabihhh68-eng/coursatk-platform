@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html lang="ar-EG" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>الفصول | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#070b14;--card:#121a2b;--ink:#eef2ff;--muted:#8b9bb8;--line:rgba(148,163,184,.12);--blue:#3b82f6;--blue2:#60a5fa;--blue3:#2563eb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
+:root{
+  --bg:#070b14;
+  --card:#121a2b;
+  --card-hover:#162036;
+  --ink:#eef2ff;
+  --muted:#8b9bb8;
+  --line:rgba(148,163,184,.12);
+  --blue:#3b82f6;
+  --blue2:#60a5fa;
+  --blue3:#2563eb;
+}
+
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
 button{font:inherit;cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Navbar */
 .app-nav{position:sticky;top:0;z-index:40;background:rgba(7,11,20,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 .app-nav-in{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px;cursor:pointer}
@@ -23,24 +37,184 @@ button{font:inherit;cursor:pointer}
 .profile-menu button{width:100%;text-align:right;border:0;background:transparent;padding:11px 12px;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;color:var(--ink)}
 .profile-menu button:hover{background:rgba(255,255,255,.04)}
 .profile-menu button.danger{color:#ff8a80}
+
+/* Main Content */
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
-.back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink);transition:.2s}
 .page-head{margin-bottom:22px;animation:fadeUp .4s ease}
 .page-head .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;margin-bottom:10px}
 .page-head h1{margin:0;font-size:26px;font-weight:900}
 .page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:20px}
-.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;animation:fadeUp .45s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.4);box-shadow:0 24px 50px rgba(37,99,235,.18)}
-.card-img{position:relative;aspect-ratio:16/9;background:#101b31;overflow:hidden}
-.card-img img{width:100%;height:100%;object-fit:cover;display:block}
-.card-img .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--muted)}
-.card-body{padding:16px;display:flex;flex-direction:column;min-height:130px}
-.card-body h3{margin:0;font-size:16px;font-weight:900}
-.card-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-weight:700}
-.card-btn{width:100%;margin-top:auto;padding:11px;border:0;border-radius:12px;font-weight:900;font-size:12px;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;cursor:pointer}
+
+/* Grid Layout */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+
+/* New Card Style */
+.chapter-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  position:relative;
+  transition:all .3s ease;
+  animation:fadeUp .45s ease both;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+.chapter-card:hover{
+  border-color:rgba(59,130,246,.4);
+  box-shadow:0 15px 40px rgba(37,99,235,.15);
+  transform:translateY(-4px);
+}
+
+/* Top Part: Text + Image */
+.card-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.card-text{
+  flex:1;
+  padding-top:4px;
+}
+.chapter-label{
+  font-size:13px;
+  font-weight:800;
+  color:var(--blue2);
+  margin-bottom:4px;
+  display:block;
+}
+.chapter-title{
+  font-size:20px;
+  font-weight:900;
+  color:var(--ink);
+  line-height:1.4;
+  margin:0;
+}
+.chapter-teacher{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+/* Image Container */
+.card-image{
+  width:100px;
+  height:100px;
+  border-radius:18px;
+  position:relative;
+  flex-shrink:0;
+  background:linear-gradient(135deg, #1e293b, #0f172a);
+  padding:3px; /* عشان نعمل إطار */
+}
+.card-image::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  padding:2px;
+  background:linear-gradient(135deg, var(--blue), var(--blue3));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  z-index:1;
+}
+.card-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:16px;
+  position:relative;
+  z-index:2;
+  background:#1e293b;
+}
+.image-placeholder{
+  width:100%;
+  height:100%;
+  border-radius:16px;
+  background:linear-gradient(135deg, #1e293b, #0f172a);
+  display:grid;
+  place-items:center;
+  color:var(--muted);
+  position:relative;
+  z-index:2;
+}
+.image-placeholder svg{width:30px;height:30px;opacity:.6}
+
+/* Lectures Count Bar */
+.lectures-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#0d1424;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:14px;
+  padding:12px 16px;
+}
+.lectures-bar-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+  color:#cbd5e1;
+}
+.lectures-bar-label svg{
+  width:18px;
+  height:18px;
+  color:var(--blue2);
+}
+.lectures-badge{
+  background:linear-gradient(135deg, var(--blue), var(--blue3));
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  box-shadow:0 4px 10px rgba(59,130,246,.3);
+}
+
+/* Action Button */
+.view-btn{
+  background:linear-gradient(90deg, var(--blue3), var(--blue));
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:14px;
+  font-size:15px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  transition:all .2s ease;
+  width:100%;
+}
+.view-btn:hover{
+  background:linear-gradient(90deg, var(--blue), var(--blue2));
+  box-shadow:0 6px 20px rgba(59,130,246,.4);
+}
+.view-btn svg{
+  width:18px;
+  height:18px;
+  fill:currentColor;
+}
+
+/* Loading */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -58,7 +232,6 @@ const API_BASE = '', TOKEN_KEY = 'cstk_tok', token = localStorage.getItem(TOKEN_
 const $ = id => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
 const teacherId = qs.get('teacherId');
-// بنستقبل اسم المدرس والمادة
 const teacherName = qs.get('teacherName') || '';
 const subjectName = qs.get('subjectName') || '';
 
@@ -86,15 +259,48 @@ async function load() {
     </div>
     <div class="grid">`;
     
-    chapters.forEach(c => {
-      // بنبعت اسم الفصل + المدرس + المادة للمحاضرات
-      html += `<div class="card" onclick="window.location.href='lectures.html?chapterId=${c.id}&chapterName=${encodeURIComponent(c.name)}&teacherName=${encodeURIComponent(teacherName)}&subjectName=${encodeURIComponent(subjectName)}'">
-        <div class="card-img"><img src="${esc(c.image_url || '')}" onerror="this.style.display='none'"><div class="ph" style="display:${c.image_url ? 'none' : 'grid'}"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div></div>
-        <div class="card-body"><h3>${esc(c.name)}</h3><div class="card-meta"><span>${c.lecture_count || 0} محاضرة</span></div><button class="card-btn">عرض المحاضرات ←</button></div>
+    chapters.forEach((c, index) => {
+      const imgUrl = c.image_url || '';
+      const imgHtml = imgUrl 
+        ? `<img src="${esc(imgUrl)}" alt="${esc(c.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">` 
+        : '';
+      
+      const phHtml = `<div class="image-placeholder" style="display:${imgUrl ? 'none' : 'grid'};">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>`;
+
+      html += `
+      <div class="chapter-card" onclick="window.location.href='lectures.html?chapterId=${c.id}&chapterName=${encodeURIComponent(c.name)}&teacherName=${encodeURIComponent(teacherName)}&subjectName=${encodeURIComponent(subjectName)}'">
+        
+        <div class="card-top">
+          <div class="card-text">
+            <span class="chapter-label">الفصل ${index + 1}</span>
+            <h2 class="chapter-title">${esc(c.name)}</h2>
+            <!-- شيلنا اسم المستر زي ما طلبت -->
+          </div>
+          <div class="card-image">
+            ${imgHtml}
+            ${phHtml}
+          </div>
+        </div>
+
+        <div class="lectures-bar">
+          <div class="lectures-bar-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            عدد المحاضرات
+          </div>
+          <div class="lectures-badge">${c.lecture_count || 0}</div>
+        </div>
+
+        <button class="view-btn">
+          عرض المحاضرات
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+
       </div>`;
     });
     html += '</div>'; $('main').innerHTML = html;
-  } catch (e) { $('main').innerHTML = `<div style="text-align:center;color:#ff5252">خطأ: ${e.message}</div>`; }
+  } catch (e) { $('main').innerHTML = `<div style="text-align:center;color:#ff5252;padding:50px;">خطأ: ${e.message}</div>`; }
 }
 async function loadProfile() { try { const me = await api('/api/profile'); $('nav-name').textContent = me.name || 'طالب'; $('nav-av').textContent = (me.name || 'ط').charAt(0); } catch (e) {} }
 $('brand-home').onclick = () => window.location.href = 'subjects.html';
