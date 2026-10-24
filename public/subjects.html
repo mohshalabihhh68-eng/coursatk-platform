@@ -40,13 +40,13 @@ button{font:inherit;cursor:pointer; outline: none;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;transition:all .3s ease;animation:fadeUp .45s ease both;position:relative;display:flex;flex-direction:column;cursor:default;}
 .card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.5);box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(59,130,246,.1)}
 
-/* ✨ تعديل الصورة عشان نخفي اللوجو بالكامل ✨ */
+/* ✨ تعديل الصورة عشان نخفي اللوجو والسواد ✨ */
 .card-img{
   width:100%;
-  aspect-ratio: 16/10; /* نسبة عرض أفضل للكارت */
+  aspect-ratio: 16/10;
   background:#101b31;
   display:flex;
-  align-items:center;
+  align-items:flex-end; /* نثبت الصورة من تحت */
   justify-content:center;
   overflow:hidden;
   position:relative;
@@ -54,14 +54,14 @@ button{font:inherit;cursor:pointer; outline: none;}
 }
 .card-img img{
   width:100%;
-  height:100%;
+  height:115%; /* رفعنا الارتفاع شوية عشان نغطي السواد */
   object-fit: cover;
-  object-position: center bottom; /* تثبيت الصورة من تحت */
-  transform: translateY(15%); /* نزولها لتحت بنسبة أكبر */
+  object-position: center bottom; /* نثبت الجزء السفلي */
+  transform: translateY(0); 
   transition: transform .4s ease;
 }
 .card:hover .card-img img{
-  transform: translateY(15%) scale(1.03);
+  transform: scale(1.05); 
 }
 
 .card-body{padding:20px;display:flex;flex-direction:column;flex:1;position:relative;background:var(--card);z-index:3}
