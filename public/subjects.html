@@ -7,8 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#070b14;--card:#121a2b;--card-hover:#182338;--ink:#eef2ff;--muted:#8b9bb8;--line:rgba(148,163,184,.12);--blue:#3b82f6;--blue2:#60a5fa;--blue3:#2563eb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
-button{font:inherit;cursor:pointer}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;} /* شيلنا اللون الأزرق اللي بيظهر عند اللمس في الموبايل */
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
+button{font:inherit;cursor:pointer; outline: none;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -34,10 +35,28 @@ button{font:inherit;cursor:pointer}
 
 /* Grid & Cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;cursor:pointer;transition:all .3s cubic-bezier(0.4,0,0.2,1);animation:fadeUp .45s ease both;position:relative;display:flex;flex-direction:column}
-.card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.5);box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(59,130,246,.1)}
 
-/* تصميم الأيقونة والخلفية الملونة */
+/* الكارت نفسه ملوش أي وظيفة لما تدوس عليه */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  overflow:hidden;
+  transition:all .3s ease;
+  animation:fadeUp .45s ease both;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  cursor: default; /*-pointer بيتشال عشان ميبقاش شكله زرار */
+}
+
+.card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(59,130,246,.5);
+  box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(59,130,246,.1);
+}
+
+/* الصورة والأيقونة ميعملوش أي حاجة لما تدوس عليهم */
 .card-icon-area{
   width:100%;
   height:160px;
@@ -46,7 +65,9 @@ button{font:inherit;cursor:pointer}
   justify-content:center;
   position:relative;
   overflow:hidden;
+  pointer-events: none; /* بيخلي الصورة كأنها صورة عادية مش لينك */
 }
+
 .card-icon-area::before {
   content: '';
   position: absolute;
@@ -63,14 +84,11 @@ button{font:inherit;cursor:pointer}
   transition:transform .3s ease;
   color: #fff;
 }
-.card:hover .card-icon-area svg{
-  transform:scale(1.1) rotate(-5deg);
-}
 .card-body{padding:20px;display:flex;flex-direction:column;flex:1;position:relative;background:var(--card);z-index:3}
 .card-body h3{margin:0;font-size:18px;font-weight:900;margin-bottom:4px}
 .card-body .sub{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:16px}
 
-/* Modern Button (معدل) */
+/* الزرار هو الوحيد اللي فيه أكشن */
 .action-btn{
   width:100%;
   padding:12px;
@@ -78,8 +96,8 @@ button{font:inherit;cursor:pointer}
   border-radius:14px;
   font-weight:800;
   font-size:14px;
-  background:linear-gradient(135deg,var(--blue),var(--blue3)); /* لون أزرق ثابت */
-  color:#fff; /* لون النص أبيض */
+  background:linear-gradient(135deg,var(--blue),var(--blue3));
+  color:#fff;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -87,13 +105,15 @@ button{font:inherit;cursor:pointer}
   gap:8px;
   transition:all .2s ease;
   margin-top:auto;
-  box-shadow: 0 4px 12px rgba(37,99,235,.2); /* ظل خفيف */
+  box-shadow: 0 4px 12px rgba(37,99,235,.2);
 }
+
 .action-btn:hover{
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(37,99,235,.4); /* ظل أقوى */
-  filter: brightness(1.1); /* سطوع أعلى شوية */
+  box-shadow: 0 8px 20px rgba(37,99,235,.4);
+  filter: brightness(1.1);
 }
+
 .action-btn svg{width:16px;height:16px;fill:currentColor;transition:transform .2s}
 .action-btn:hover svg{transform:translateX(-4px)}
 
@@ -130,52 +150,27 @@ const api = async (path, opts = {}) => {
 };
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-// دالة لإرجاع الأيقونة واللون حسب اسم المادة
 function getSubjectStyle(name) {
   const n = String(name).toLowerCase();
-  
   if (n.includes('عربي') || n.includes('عربية') || n.includes('لغة')) {
-    return { 
-      bg: 'linear-gradient(135deg, #ef4444, #991b1b)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #ef4444, #991b1b)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` };
   }
   if (n.includes('english') || n.includes('إنجليزي') || n.includes('انجليزي')) {
-    return { 
-      bg: 'linear-gradient(135deg, #8b5cf6, #4c1d95)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #8b5cf6, #4c1d95)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>` };
   }
   if (n.includes('فيزياء') || n.includes('فيزيا')) {
-    return { 
-      bg: 'linear-gradient(135deg, #3b82f6, #1e3a8a)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12c0 3.9-3.1 7-7 7s-7-3.1-7-7 3.1-7 7-7 7 3.1 7 7z"/><path d="M12 5c3.9 0 7 3.1 7 7s-3.1 7-7 7-7-3.1-7-7 3.1-7 7-7z"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #3b82f6, #1e3a8a)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12c0 3.9-3.1 7-7 7s-7-3.1-7-7 3.1-7 7-7 7 3.1 7 7z"/><path d="M12 5c3.9 0 7 3.1 7 7s-3.1 7-7 7-7-3.1-7-7 3.1-7 7-7z"/></svg>` };
   }
   if (n.includes('كيمياء') || n.includes('كيميا')) {
-    return { 
-      bg: 'linear-gradient(135deg, #f97316, #9a3412)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #f97316, #9a3412)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>` };
   }
   if (n.includes('أحياء') || n.includes('احياء')) {
-    return { 
-      bg: 'linear-gradient(135deg, #10b981, #064e3b)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #10b981, #064e3b)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>` };
   }
   if (n.includes('رياضيات') || n.includes('رياضة') || n.includes('ماث') || n.includes('math')) {
-    return { 
-      bg: 'linear-gradient(135deg, #ec4899, #831843)', 
-      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 5 5 19"/><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M19 5 5 5"/></svg>` 
-    };
+    return { bg: 'linear-gradient(135deg, #ec4899, #831843)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 5 5 19"/><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M19 5 5 5"/></svg>` };
   }
-  
-  // الافتراضي
-  return { 
-    bg: 'linear-gradient(135deg, #64748b, #334155)', 
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` 
-  };
+  return { bg: 'linear-gradient(135deg, #64748b, #334155)', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` };
 }
 
 async function load() {
@@ -194,14 +189,15 @@ async function load() {
     subjects.forEach(s => {
       const style = getSubjectStyle(s.name);
       
-      html += `<div class="card" onclick="window.location.href='teachers.html?subjectId=${s.id}&subjectName=${encodeURIComponent(s.name)}'">
+      // التعديل هنا: الـ onclick اتنقل للزرار بدل الكارت
+      html += `<div class="card">
         <div class="card-icon-area" style="background: ${style.bg}">
           ${style.svg}
         </div>
         <div class="card-body">
           <h3>${esc(s.name)}</h3>
           <div class="sub">مادة دراسية</div>
-          <button class="action-btn">
+          <button class="action-btn" onclick="window.location.href='teachers.html?subjectId=${s.id}&subjectName=${encodeURIComponent(s.name)}'">
             عرض المدرسين
             <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
