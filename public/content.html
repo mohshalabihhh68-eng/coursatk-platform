@@ -6,6 +6,7 @@
 <title>محتوى المحاضرة | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+/* نفس ستايلاتك بالظبط */
 :root {
   --bg: #070b14;
   --card: #121a2b;
@@ -18,120 +19,41 @@
   --blue3: #2563eb;
   --radius: 18px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--ink); font-family: 'Cairo', sans-serif; overflow-x: hidden; }
 button { font: inherit; cursor: pointer; border: none; outline: none; }
 a { text-decoration: none; color: inherit; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.app-nav {
-  position: sticky; top: 0; z-index: 40;
-  background: rgba(7, 11, 20, .85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line);
-}
-.app-nav-in {
-  max-width: 1120px; margin: 0 auto; padding: 14px 16px;
-  display: flex; align-items: center; gap: 12px;
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.app-nav { position: sticky; top: 0; z-index: 40; background: rgba(7, 11, 20, .85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
+.app-nav-in { max-width: 1120px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 16px; cursor: pointer; }
 .brand img { width: 38px; height: 38px; border-radius: 12px; box-shadow: 0 4px 12px rgba(37,99,235,.3); }
 .brand small { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 2px; }
 .profile-wrap { position: relative; margin-right: auto; }
-.profile-btn {
-  display: flex; align-items: center; gap: 8px;
-  border: 1px solid var(--line); background: var(--card);
-  border-radius: 999px; padding: 5px 12px 5px 5px;
-  font-weight: 800; font-size: 13px; color: var(--ink);
-}
-.profile-btn .av {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), var(--blue3));
-  color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 14px;
-}
-
+.profile-btn { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 5px 12px 5px 5px; font-weight: 800; font-size: 13px; color: var(--ink); }
+.profile-btn .av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--blue3)); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 14px; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 90px; }
-
-.back-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid var(--line); background: var(--card);
-  border-radius: 999px; padding: 10px 18px;
-  font-weight: 800; font-size: 13px; color: var(--ink);
-  margin-bottom: 24px; transition: all .2s ease;
-}
+.back-btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 10px 18px; font-weight: 800; font-size: 13px; color: var(--ink); margin-bottom: 24px; transition: all .2s ease; }
 .back-btn:hover { background: var(--card-hover); transform: translateX(4px); }
-
 .page-head { margin-bottom: 32px; animation: fadeUp .4s ease both; }
 .page-head h1 { font-size: 28px; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px; }
-
-.section-title {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 18px; font-weight: 800; margin: 32px 0 16px;
-  color: var(--ink); animation: fadeUp .5s ease both;
-}
+.section-title { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; margin: 32px 0 16px; color: var(--ink); animation: fadeUp .5s ease both; }
 .section-title svg { color: var(--blue2); width: 22px; height: 22px; }
-
 .list-grid { display: flex; flex-direction: column; gap: 14px; }
-
-.item-card {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 16px 20px;
-  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: fadeUp .45s ease both;
-  position: relative; overflow: hidden;
-}
-.item-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(59,130,246,.05), transparent);
-  opacity: 0; transition: opacity .3s;
-}
-.item-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(59,130,246,.4);
-  box-shadow: 0 12px 30px rgba(0,0,0,.3);
-  background: var(--card-hover);
-}
+.item-card { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); animation: fadeUp .45s ease both; position: relative; overflow: hidden; }
+.item-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(59,130,246,.05), transparent); opacity: 0; transition: opacity .3s; }
+.item-card:hover { transform: translateY(-3px); border-color: rgba(59,130,246,.4); box-shadow: 0 12px 30px rgba(0,0,0,.3); background: var(--card-hover); }
 .item-card:hover::before { opacity: 1; }
-
-.item-info {
-  display: flex; align-items: center; gap: 14px; flex: 1;
-  position: relative; z-index: 1;
-}
-.item-icon {
-  width: 40px; height: 40px; border-radius: 12px;
-  background: rgba(59,130,246,.12); color: var(--blue2);
-  display: grid; place-items: center; flex-shrink: 0;
-}
-.item-text {
-  font-size: 14px; font-weight: 700; line-height: 1.5;
-  color: var(--ink); word-break: break-word;
-}
-
-.action-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: linear-gradient(135deg, var(--blue), var(--blue3));
-  color: #fff; padding: 10px 20px; border-radius: 12px;
-  font-weight: 800; font-size: 13px; flex-shrink: 0;
-  transition: all .2s ease; box-shadow: 0 4px 12px rgba(37,99,235,.2);
-  position: relative; z-index: 1;
-}
+.item-info { display: flex; align-items: center; gap: 14px; flex: 1; position: relative; z-index: 1; }
+.item-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(59,130,246,.12); color: var(--blue2); display: grid; place-items: center; flex-shrink: 0; }
+.item-text { font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--ink); word-break: break-word; }
+.action-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--blue), var(--blue3)); color: #fff; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; flex-shrink: 0; transition: all .2s ease; box-shadow: 0 4px 12px rgba(37,99,235,.2); position: relative; z-index: 1; }
 .action-btn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(37,99,235,.4); }
-.action-btn.file-btn {
-  background: rgba(59,130,246,.1); color: var(--blue2);
-  border: 1px solid rgba(59,130,246,.3); box-shadow: none;
-}
+.action-btn.file-btn { background: rgba(59,130,246,.1); color: var(--blue2); border: 1px solid rgba(59,130,246,.3); box-shadow: none; }
 .action-btn.file-btn:hover { background: rgba(59,130,246,.2); }
-
 .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px; color: var(--muted); }
 .spinner { width: 40px; height: 40px; border: 3px solid var(--line); border-top-color: var(--blue); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 @media (max-width: 600px) {
   .item-card { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
   .action-btn { width: 100%; justify-content: center; padding: 12px; }
@@ -168,8 +90,10 @@ a { text-decoration: none; color: inherit; }
   const TOKEN_KEY = 'cstk_tok'; 
   const token = localStorage.getItem(TOKEN_KEY);
   const $ = id => document.getElementById(id);
+  
+  // التعديل هنا: بنقرأ lectureId (اللي جاي من صفحة الفصول)
   const qs = new URLSearchParams(location.search);
-  const lectureId = qs.get('lectureId') || qs.get('id');
+  const lectureId = qs.get('lectureId'); 
 
   const api = async (path, opts = {}) => {
     const headers = { Accept: 'application/json', ...opts.headers };
@@ -184,11 +108,12 @@ a { text-decoration: none; color: inherit; }
 
   async function load() {
     if (!lectureId) {
-      $('main').innerHTML = '<div style="text-align:center;padding:50px">معرف المحاضرة غير موجود.</div>';
+      $('main').innerHTML = '<div style="text-align:center;padding:50px">معرف المحاضرة غير موجود في الرابط (lectureId).</div>';
       return;
     }
     
     try {
+      // بنجيب المحتوى باستخدام lectureId
       const data = await api('/api/lectures/' + lectureId + '/content'); 
       
       const videos = data.videos || data.video || [];
@@ -213,7 +138,7 @@ a { text-decoration: none; color: inherit; }
           <div class="list-grid">
         `;
         videos.forEach(v => {
-          // التعديل هنا: بنبعت lectureId مش id
+          // التعديل الجوهري هنا: بنبعت الـ lectureId (بتاع المحاضرة) مش الـ v.id (بتاع الفيديو)
           html += `
             <div class="item-card">
               <div class="item-info">
@@ -222,7 +147,7 @@ a { text-decoration: none; color: inherit; }
                 </div>
                 <div class="item-text">${esc(v.title || v.name || 'فيديو')}</div>
               </div>
-              <button class="action-btn" onclick="window.location.href='player.html?lectureId=${v.id}'">
+              <button class="action-btn" onclick="window.location.href='player.html?lectureId=${lectureId}&videoId=${v.id}'">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 تشغيل
               </button>
