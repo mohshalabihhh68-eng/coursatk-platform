@@ -26,7 +26,7 @@ button{font:inherit;cursor:pointer; outline: none;}
 /* Content */
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
 
-/* زرار الرجوع البارز */
+/* زرار الرجوع */
 .back-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg, var(--blue), var(--blue3));color:#fff;border:0;border-radius:12px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:24px;transition:all .2s ease;box-shadow: 0 4px 12px rgba(37,99,235,.3);}
 .back-btn:hover{transform:translateX(4px);box-shadow: 0 6px 16px rgba(37,99,235,.5);filter:brightness(1.1);}
 .back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;}
@@ -37,22 +37,23 @@ button{font:inherit;cursor:pointer; outline: none;}
 .page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
 
 /* Grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px; align-items: stretch;}
 
-/* كارت المحاضرة الجديد */
+/* كارت المحاضرة */
 .lecture-card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:24px;
   padding:20px;
   display:flex;
-  flex-direction:column;
+  flex-direction:column; /* عشان نتحكم في ارتفاع العناصر */
   gap:16px;
   position:relative;
   transition:all .3s ease;
   animation:fadeUp .45s ease both;
   box-shadow:0 10px 30px rgba(0,0,0,.2);
   cursor: default;
+  height: 100%; /* الكارت ياخد طول الشبكة بالكامل */
 }
 .lecture-card:hover{
   border-color:rgba(59,130,246,.4);
@@ -65,16 +66,37 @@ button{font:inherit;cursor:pointer; outline: none;}
   align-items:flex-start;
   justify-content:space-between;
   gap:12px;
+  flex: 1; /* الجزء العلوي ياخد المساحة الفاضية عشان يزق الزرار لتحت */
 }
-.card-text{flex:1;padding-top:4px;}
+.card-text{
+  flex:1;
+  padding-top:4px;
+  display: flex;
+  flex-direction: column;
+}
 .lecture-label{font-size:13px;font-weight:800;color:var(--blue2);margin-bottom:4px;display:block;}
-.lecture-title{font-size:20px;font-weight:900;color:var(--ink);line-height:1.4;margin:0;}
+
+/* تحديد ارتفاع ثابت للعنوان عشان التناسق */
+.lecture-title{
+  font-size:18px;
+  font-weight:900;
+  color:var(--ink);
+  line-height:1.5;
+  margin:0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* يسمح بـ 3 سطور كحد أقصى */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 81px; /* ارتفاع ثابت لـ 3 سطور */
+}
+
 .lecture-meta{font-size:12px;color:var(--muted);font-weight:700;margin-top:6px;}
 
-/* الصورة مش بتعمل أي أكشن */
+/* الصورة */
 .card-image{
-  width:100px;
-  height:100px;
+  width:90px;
+  height:90px;
   border-radius:18px;
   position:relative;
   flex-shrink:0;
@@ -99,7 +121,7 @@ button{font:inherit;cursor:pointer; outline: none;}
 .image-placeholder svg{width:30px;height:30px;opacity:.6}
 
 /* شريط الفيديوهات */
-.videos-bar{display:flex;align-items:center;justify-content:space-between;background:#0d1424;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:12px 16px;}
+.videos-bar{display:flex;align-items:center;justify-content:space-between;background:#0d1424;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:12px 16px; margin-top: auto;}
 .videos-bar-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#cbd5e1;}
 .videos-bar-label svg{width:18px;height:18px;color:var(--blue2);}
 .videos-badge{background:linear-gradient(135deg, var(--blue), var(--blue3));color:#fff;font-size:14px;font-weight:900;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;box-shadow:0 4px 10px rgba(59,130,246,.3);}
@@ -189,7 +211,6 @@ async function load() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>`;
 
-      // التعديل هنا: شيلنا الـ onclick من الكارت، وحطيناه على الزرار بس
       html += `
       <div class="lecture-card">
         
