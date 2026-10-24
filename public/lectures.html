@@ -5,7 +5,6 @@
 <title>المحاضرات | ثانوية club</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* نفس الستايلات عشان يبقى في توحيد للشكل */
 :root{--bg:#070b14;--card:#121a2b;--ink:#eef2ff;--muted:#8b9bb8;--line:rgba(148,163,184,.12);--blue:#3b82f6;--blue2:#60a5fa;--blue3:#2563eb}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,sans-serif}
 button{font:inherit;cursor:pointer}
@@ -52,9 +51,14 @@ button{font:inherit;cursor:pointer}
 (function(){
 'use strict';
 const API_BASE = '', TOKEN_KEY = 'cstk_tok', token = localStorage.getItem(TOKEN_KEY);
-/* no login gate — server holds token */
 const $ = id => document.getElementById(id);
-const qs = new URLSearchParams(location.search), chapterId = qs.get('chapterId');
+const qs = new URLSearchParams(location.search);
+const chapterId = qs.get('chapterId');
+// بنستقبل كل الأسماء
+const chapterName = qs.get('chapterName') || '';
+const teacherName = qs.get('teacherName') || '';
+const subjectName = qs.get('subjectName') || '';
+
 const api = async (path, opts = {}) => {
   const headers = { Accept: 'application/json', ...opts.headers };
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -70,9 +74,18 @@ async function load() {
   try {
     const lectures = await api('/api/chapters/' + chapterId + '/lectures');
     if (!lectures || !lectures.length) { $('main').innerHTML = '<div style="text-align:center;padding:50px;color:var(--muted)">لا يوجد محاضرات.</div>'; return; }
-    let html = `<button class="back-btn" onclick="history.back()">← رجوع</button><div class="page-head"><div class="badge">المحاضرات</div><h1>محاضرات الفصل</h1><p>اختار المحاضرة لفتح المحتوى</p></div><div class="list">`;
+    
+    let html = `<button class="back-btn" onclick="history.back()">← رجوع</button>
+    <div class="page-head">
+      <div class="badge">المحاضرات</div>
+      <h1>محاضرات الفصل</h1>
+      <p>اختار المحاضرة لفتح المحتوى</p>
+    </div>
+    <div class="list">`;
+    
     lectures.forEach(l => {
-      html += `<div class="list-item" onclick="window.location.href='content.html?lectureId=${l.id}'">
+      // بنبعت كل الأسماء للمحتوى
+      html += `<div class="list-item" onclick="window.location.href='content.html?lectureId=${l.id}&chapterName=${encodeURIComponent(chapterName)}&teacherName=${encodeURIComponent(teacherName)}&subjectName=${encodeURIComponent(subjectName)}'">
         <img src="${esc(l.image_url || '')}" onerror="this.style.opacity=0.2">
         <div><div class="title">${esc(l.name)}</div><div class="meta">${l.video_count || 0} فيديو</div></div>
       </div>`;
