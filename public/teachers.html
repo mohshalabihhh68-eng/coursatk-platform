@@ -11,7 +11,6 @@
 button{font:inherit;cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .app-nav{position:sticky;top:0;z-index:40;background:rgba(7,11,20,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 .app-nav-in{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px;cursor:pointer}
@@ -25,7 +24,6 @@ button{font:inherit;cursor:pointer}
 .profile-menu button{width:100%;text-align:right;border:0;background:transparent;padding:11px 12px;border-radius:12px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;color:var(--ink)}
 .profile-menu button:hover{background:rgba(255,255,255,.04)}
 .profile-menu button.danger{color:#ff8a80}
-
 .wrap{max-width:1120px;margin:0 auto;padding:24px 16px 90px}
 .back-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:12px;cursor:pointer;margin-bottom:14px;color:var(--ink)}
 .back-btn:hover{border-color:rgba(59,130,246,.35);background:var(--card2)}
@@ -33,7 +31,6 @@ button{font:inherit;cursor:pointer}
 .page-head .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);color:var(--blue2);border:1px solid rgba(59,130,246,.2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:800;margin-bottom:10px}
 .page-head h1{margin:0;font-size:26px;font-weight:900}
 .page-head p{margin:8px 0 0;color:var(--muted);font-size:13px}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:20px}
 .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;animation:fadeUp .45s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.4);box-shadow:0 24px 50px rgba(37,99,235,.18)}
@@ -44,7 +41,6 @@ button{font:inherit;cursor:pointer}
 .card-body h3{margin:0;font-size:16px;font-weight:900}
 .card-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-weight:700}
 .card-btn{width:100%;margin-top:auto;padding:11px;border:0;border-radius:12px;font-weight:900;font-size:12px;background:linear-gradient(135deg,var(--blue),var(--blue3));color:#fff;cursor:pointer}
-
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;color:var(--muted)}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}
 </style>
@@ -66,11 +62,12 @@ button{font:inherit;cursor:pointer}
 const API_BASE = '';
 const TOKEN_KEY = 'cstk_tok';
 const token = localStorage.getItem(TOKEN_KEY);
-/* no login gate — server holds token */
 
 const $ = id => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
 const subjectId = qs.get('subjectId');
+// بنستقبل اسم المادة
+const subjectName = qs.get('subjectName') || '';
 
 const api = async (path, opts = {}) => {
   const headers = { Accept: 'application/json', ...opts.headers };
@@ -93,7 +90,8 @@ async function load() {
     let html = `<button class="back-btn" onclick="history.back()">← رجوع للمواد</button>
                 <div class="page-head"><div class="badge">المدرسين</div><h1>اختر المدرس</h1><p>دول المدرسين المتاحين للمادة دي</p></div><div class="grid">`;
     teachers.forEach(t => {
-      html += `<div class="card" onclick="window.location.href='chapters.html?teacherId=${t.id}'">
+      // بنبعت اسم المدرس والمادة للفصول
+      html += `<div class="card" onclick="window.location.href='chapters.html?teacherId=${t.id}&teacherName=${encodeURIComponent(t.name)}&subjectName=${encodeURIComponent(subjectName)}'">
         <div class="card-img">
           <img src="${esc(t.image_url || '')}" onerror="this.style.display='none'">
           <div class="ph" style="display:${t.image_url ? 'none' : 'grid'}"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></div>
