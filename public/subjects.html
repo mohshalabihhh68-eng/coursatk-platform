@@ -40,23 +40,27 @@ button{font:inherit;cursor:pointer; outline: none;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;transition:all .3s ease;animation:fadeUp .45s ease both;position:relative;display:flex;flex-direction:column;cursor:default;}
 .card:hover{transform:translateY(-8px);border-color:rgba(59,130,246,.5);box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(59,130,246,.1)}
 
+/* ✨ تعديل الصورة: من غير زوم، بس ننزلها لتحت ✨ */
 .card-img{
-  width:100%; aspect-ratio:4/3; background:#101b31;
-  display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+  width:100%;
+  aspect-ratio:4/3;
+  background:#101b31;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
   pointer-events: none;
 }
-
-/* ✨ التعديل السحري هنا: بنكبر الصورة عشان اللوجو يختفي ✨ */
 .card-img img{
   width:100%;
   height:100%;
   object-fit:cover;
-  transform: scale(1.4) translateY(10px); /* تكبير الصورة 1.4 مرة وتنزيلها شوية لتحت */
-  transition:transform .4s ease;
-  object-position: center 30%; /* تركيز الصورة على الجزء العلوي */
+  transform: translateY(15%); /* نزول الصورة لتحت بنسبة 15% عشان نخفي الجزء العلوي اللي فيه اللوجو */
+  transition: transform .4s ease;
 }
 .card:hover .card-img img{
-  transform: scale(1.5) translateY(10px); /* تأثير التكبير شوية إضافي عند الوقوف بالماوس */
+  transform: translateY(15%) scale(1.03); /* تكبير خفيف جداً عند الوقوف بالماوس */
 }
 
 .card-body{padding:20px;display:flex;flex-direction:column;flex:1;position:relative;background:var(--card);z-index:3}
