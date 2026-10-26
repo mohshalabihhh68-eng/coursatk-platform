@@ -9,8 +9,7 @@ const PORT = process.env.PORT || 3000;
 // التوكن الجديد
 const STUDENT_TOKEN =
   process.env.COURSATK_TOKEN ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDk1NTUsInJvbGUiOiJzdHVkZW50IiwidXVpZCI6IjU3OGIxNjBjMjgxZWVkY2Y1ZTY4MjViNDZmMWExNTY0In0.x9vV-N_13KcrGbx-y9owTgGdirKpKh_X0JXDpolYegs";
-
+  "
 const API = "https://api.coursatk.online";
 const SW = "https://api.stream-weave.com";
 
