@@ -1,6 +1,6 @@
 /**
  * Thanawya World API — Protected Backend
- * VERSION v1.7.2 — Full Analytics (Visits + Grouped Watch History + Student Tracker)
+ * VERSION v1.7.5 — CORS allowlist (durosakplus.com) + New Firebase DB + Video play limit (1 video/min per token)
  */
 import express from "express";
 import cors from "cors";
@@ -46,7 +46,7 @@ const DATA_DIR = path.join(__dirname, "data");
 const MEDIA_DIR = path.join(DATA_DIR, "media");
 const TEMP_DIR = path.join(DATA_DIR, "temp_files");
 try { fs.mkdirSync(MEDIA_DIR, { recursive: true }); fs.mkdirSync(TEMP_DIR, { recursive: true }); } catch {}
-const APP_VERSION = "v1.7.2";
+const APP_VERSION = "v1.7.5";
 
 process.on("unhandledRejection", (r) => console.error("[unhandledRejection]", (r && r.stack) || r));
 process.on("uncaughtException", (e) => console.error("[uncaughtException]", (e && e.stack) || e));
@@ -71,7 +71,22 @@ for (const m of ["get", "post", "put", "patch", "delete", "use"]) {
   };
 }
 app.set("trust proxy", 1);
-app.use(cors({ origin: true, credentials: true }));
+// الدومينات المسموح لها تتصل بالسيرفر (تقدر تضيف غيرها من ALLOWED_ORIGINS مفصولة بفاصلة)
+const ALLOWED_ORIGINS = new Set([
+  "https://www.durosakplus.com",
+  "https://durosakplus.com",
+  ...String(process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean)
+]);
+// CORS_STRICT=1 → يسمح للدومينات اللي فوق بس. غير كده (الافتراضي) كل الدومينات القديمة تفضل شغالة.
+const CORS_STRICT = process.env.CORS_STRICT === "1";
+app.use(cors({
+  credentials: true,
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+    return cb(null, !CORS_STRICT);
+  }
+}));
 app.use(express.json({ limit: "20mb" }));
 // طلب Client Hints من المتصفح (موديل الجهاز وغيره)
 app.use((req, res, next) => {
@@ -104,7 +119,13 @@ app.use(express.static(path.join(__dirname, "public"), {
   etag: true,
   lastModified: true,
   setHeaders(res, filePath) {
-    if (/\.(?:js|css|png|jpg|jpeg|webp|svg|woff2?|ico)$/i.test(filePath)) {
+    const base = String(filePath || "").replace(/\\/g, "/").toLowerCase();
+    // track-visit لازم يتحدث فورًا — ممنوع كاش 30 يوم
+    if (base.endsWith("/track-visit.js") || base.endsWith("track-visit.js")) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    } else if (/\.(?:js|css|png|jpg|jpeg|webp|svg|woff2?|ico)$/i.test(filePath)) {
       res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
     } else if (/\.html?$/i.test(filePath)) {
       res.setHeader("Cache-Control", "public, max-age=120, must-revalidate");
@@ -341,6 +362,7 @@ function rateLimit(options = {}) {
   const banMs = options.banMs || 5 * 60_000;
   const skip = options.skip;
   const keyFn = options.keyFn;
+  const limitMessage = options.message || "طلبات كثيرة — حاول بعد قليل";
   return (req, res, next) => {
     if (skip && skip(req)) return next();
     const ip = keyFn ? keyFn(req) : clientIp(req);
@@ -367,7 +389,7 @@ function rateLimit(options = {}) {
       if (banAfter > 0 && b.hits429 >= banAfter) banBuckets.set(banKey, Date.now() + banMs);
       const sec = Math.ceil((b.resetAt - t) / 1000);
       res.setHeader("Retry-After", String(Math.max(1, sec)));
-      return res.status(429).json({ success: false, message: "طلبات كثيرة — حاول بعد قليل" });
+      return res.status(429).json({ success: false, message: limitMessage });
     }
     next();
   };
@@ -455,7 +477,7 @@ const CONFIG = {
   STREAM_X_REQUESTED_WITH: "com.mycompany.app.soulbrowser",
   STREAM_UA: "Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 Chrome/153.0.0.0 Mobile Safari/537.36",
   PLAYER_JS: "https://player.stream-weave.com/assets/player.js?v=1.1.1",
-  FIREBASE: process.env.FIREBASE_URL || "",
+  FIREBASE: process.env.FIREBASE_URL || "https://plus-f09b5-default-rtdb.firebaseio.com",
   BOOTSTRAP_ADMIN: {
     username: process.env.ADMIN_USER || "admin",
     passwordHash: "",
@@ -1385,12 +1407,13 @@ function parseDeviceInfo(ua) {
     os = "أندرويد";
     const m = s.match(/Android\s+([\d.]+)/i);
     if (m) osVersion = m[1];
-    deviceType = /tablet|nexus\s?(7|9|10)|sm-t|pad/i.test(s) && !/mobile/i.test(s) ? "تابلت" : (/mobile/i.test(s) ? "موبايل" : "تابلت");
+    deviceType = /tablet|nexus\s?(7|9|10)|sm-t|sm-x|pad/i.test(s) && !/mobile/i.test(s) ? "تابلت" : (/mobile/i.test(s) ? "موبايل" : "تابلت");
     // محاولات متعددة لاستخراج الموديل من الـ UA
     const patterns = [
       /Android\s[\d.]+;\s*([^);]+?)(?:\s+Build|[);])/i,
       /;\s*((?:SM|GT|SC|SGH|SCH|SHV|LG|Lenovo|HTC|Pixel|Redmi|Mi|POCO|RMX|CPH|V\d{4}|Infinix|TECNO|ITE|Nokia|Moto)[^);/]{0,40})/i,
-      /\b((?:SM|RMX|CPH|V\d{4})-[A-Z0-9]+)\b/i
+      /\b((?:SM|RMX|CPH|V\d{4})-[A-Z0-9]+)\b/i,
+      /\b(SM-[A-Z0-9]+)\b/i
     ];
     for (const re of patterns) {
       const modelMatch = s.match(re);
@@ -1404,6 +1427,8 @@ function parseDeviceInfo(ua) {
         }
       }
     }
+    // تابلت Samsung غالبًا SM-X / SM-T
+    if (deviceModel && /^SM-[XT]/i.test(deviceModel)) deviceType = "تابلت";
   } else if (/iphone/i.test(s)) {
     os = "iOS";
     const m = s.match(/OS\s+([\d_]+)/i);
@@ -1496,6 +1521,139 @@ function parseDeviceInfo(ua) {
 
   const isMobile = deviceType === "موبايل" || deviceType === "تابلت";
   return { os, osVersion, deviceType, deviceBrand, deviceModel, browser, browserVersion, isMobile };
+}
+
+/** كشف بوت / زاحف من الـ UA والهيدرز وشكل الـ payload */
+function detectBot(ua, req, body) {
+  const s = String(ua || "");
+  const rules = [
+    [/googlebot|adsbot-google|mediapartners-google|google-inspectiontool/i, "Googlebot"],
+    [/bingbot|bingpreview|msnbot/i, "Bingbot"],
+    [/yandex(bot|images|accessibility)/i, "Yandex"],
+    [/baiduspider/i, "Baidu"],
+    [/duckduckbot/i, "DuckDuckBot"],
+    [/facebookexternalhit|facebot|meta-externalagent/i, "Facebook"],
+    [/twitterbot|xbot/i, "Twitter/X"],
+    [/linkedinbot/i, "LinkedIn"],
+    [/slackbot|slack-img/i, "Slack"],
+    [/discordbot/i, "Discord"],
+    [/telegrambot/i, "Telegram"],
+    [/whatsapp/i, "WhatsApp"],
+    [/applebot/i, "Applebot"],
+    [/semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|gptbot|chatgpt|claudebot|anthropic|ccbot|dataforseo|screaming frog|siteaudit|serpstat|majestic/i, "SEO/Crawler"],
+    [/curl\/|wget\/|python-requests|python-urllib|go-http-client|java\/|scrapy|httpclient|okhttp|libwww|php\//i, "Script/Client"],
+    [/headlesschrome|phantomjs|slimerjs|selenium|puppeteer|playwright/i, "Headless"],
+    [/\bbot\b|\bcrawl\b|\bspider\b|\bslurp\b/i, "Bot"]
+  ];
+  for (const [re, name] of rules) {
+    if (re.test(s)) return { isBot: true, botName: name, confidence: "high" };
+  }
+
+  let score = 0;
+  const reasons = [];
+  if (!s || s === "Unknown" || s.length < 12) { score += 3; reasons.push("ua-empty"); }
+  if (!req?.headers?.["accept-language"] && !(body && body.language)) { score += 1; reasons.push("no-lang"); }
+  const hasClientSignals = Boolean(
+    body && (body.screen || body.timezone || body.guestId || body.model || body.gpu || body.cores != null)
+  );
+  if (!hasClientSignals) { score += 1; reasons.push("no-client-signals"); }
+  if (/chrome\//i.test(s) && !req?.headers?.["sec-ch-ua"] && !hasClientSignals) { score += 1; reasons.push("no-ch"); }
+
+  if (score >= 3) return { isBot: true, botName: "Suspected bot", confidence: "medium", reasons };
+  if (score >= 2) return { isBot: false, botName: null, confidence: "low-suspect", reasons };
+  return { isBot: false, botName: null, confidence: "human", reasons };
+}
+
+/** اسم ودي للموديل (Samsung / Xiaomi / …) عشان يظهر في لوحة الأدمن بوضوح */
+function friendlyDeviceName(brand, model) {
+  const b = String(brand || "").trim();
+  const m = String(model || "").trim();
+  if (!m && !b) return null;
+  const up = m.toUpperCase().replace(/\s+/g, " ");
+  const sam = {
+    "SM-S918": "Galaxy S23 Ultra", "SM-S916": "Galaxy S23+", "SM-S911": "Galaxy S23",
+    "SM-S928": "Galaxy S24 Ultra", "SM-S926": "Galaxy S24+", "SM-S921": "Galaxy S24",
+    "SM-S938": "Galaxy S25 Ultra", "SM-S936": "Galaxy S25+", "SM-S931": "Galaxy S25",
+    "SM-A556": "Galaxy A55", "SM-A546": "Galaxy A54", "SM-A536": "Galaxy A53",
+    "SM-A356": "Galaxy A35", "SM-A346": "Galaxy A34", "SM-A256": "Galaxy A25",
+    "SM-A156": "Galaxy A15", "SM-A055": "Galaxy A05", "SM-A065": "Galaxy A06",
+    "SM-A145": "Galaxy A14", "SM-A135": "Galaxy A13", "SM-A127": "Galaxy A12",
+    "SM-M556": "Galaxy M55", "SM-M346": "Galaxy M34", "SM-M156": "Galaxy M15",
+    "SM-G991": "Galaxy S21", "SM-G996": "Galaxy S21+", "SM-G998": "Galaxy S21 Ultra",
+    "SM-G990": "Galaxy S21 FE", "SM-S901": "Galaxy S22", "SM-S906": "Galaxy S22+",
+    "SM-S908": "Galaxy S22 Ultra", "SM-F731": "Galaxy Z Flip5", "SM-F741": "Galaxy Z Flip6",
+    "SM-F946": "Galaxy Z Fold5", "SM-F956": "Galaxy Z Fold6", "SM-N986": "Galaxy Note20 Ultra",
+    "SM-A525": "Galaxy A52", "SM-A515": "Galaxy A51", "SM-A325": "Galaxy A32",
+    "SM-A225": "Galaxy A22", "SM-A042": "Galaxy A04e", "SM-A032": "Galaxy A03 Core",
+    // تابلت Galaxy Tab
+    "SM-X216": "Galaxy Tab A9", "SM-X210": "Galaxy Tab A9", "SM-X215": "Galaxy Tab A9",
+    "SM-X110": "Galaxy Tab A9 Kids", "SM-X115": "Galaxy Tab A9 Kids",
+    "SM-X200": "Galaxy Tab A8", "SM-X205": "Galaxy Tab A8",
+    "SM-X700": "Galaxy Tab S7 FE", "SM-X706": "Galaxy Tab S7 FE",
+    "SM-X800": "Galaxy Tab S8+", "SM-X806": "Galaxy Tab S8+",
+    "SM-X900": "Galaxy Tab S8 Ultra", "SM-X906": "Galaxy Tab S8 Ultra",
+    "SM-X710": "Galaxy Tab S9", "SM-X716": "Galaxy Tab S9",
+    "SM-X810": "Galaxy Tab S9+", "SM-X816": "Galaxy Tab S9+",
+    "SM-X910": "Galaxy Tab S9 Ultra", "SM-X916": "Galaxy Tab S9 Ultra",
+    "SM-X510": "Galaxy Tab S9 FE", "SM-X516": "Galaxy Tab S9 FE",
+    "SM-X610": "Galaxy Tab S9 FE+", "SM-X616": "Galaxy Tab S9 FE+",
+    "SM-T225": "Galaxy Tab A7 Lite", "SM-T220": "Galaxy Tab A7 Lite",
+    "SM-T509": "Galaxy Tab A7", "SM-T500": "Galaxy Tab A7",
+    "SM-A057": "Galaxy A05s", "SM-A155": "Galaxy A15", "SM-A165": "Galaxy A16",
+    "SM-A266": "Galaxy A26", "SM-A366": "Galaxy A36", "SM-A566": "Galaxy A56",
+    "SM-S721": "Galaxy S24 FE", "SM-A146": "Galaxy A14 5G"
+  };
+  for (const [code, name] of Object.entries(sam)) {
+    if (up.startsWith(code) || up.includes(code)) return (b || "Samsung") + " " + name + " (" + m + ")";
+  }
+  if (/^SM-/i.test(m)) return (b || "Samsung") + " " + m;
+  if (/^RMX/i.test(m)) return (b || "Realme") + " " + m;
+  if (/^CPH/i.test(m)) return (b || "OPPO") + " " + m;
+  if (/REDMI|POCO|MI\s/i.test(m) || /xiaomi/i.test(b)) return (b || "Xiaomi") + " " + m;
+  if (/iphone/i.test(m)) return "Apple " + m;
+  if (/ipad/i.test(m)) return "Apple " + m;
+  if (/pixel/i.test(m)) return "Google " + m;
+  if (b && m) return b + " " + m;
+  return m || b || null;
+}
+
+/** عكس إحداثيات GPS → حي/مدينة أدق (Nominatim) */
+const revGeoCache = new Map();
+async function reverseGeocode(lat, lon) {
+  try {
+    const key = Number(lat).toFixed(4) + "," + Number(lon).toFixed(4);
+    const hit = revGeoCache.get(key);
+    if (hit && Date.now() < hit.exp) return hit.data;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&accept-language=ar&zoom=16&addressdetails=1`;
+    const r = await fetchT(url, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "ThanawyaClub-VisitTracker/1.0 (admin analytics)"
+      }
+    }, { timeout: 3500, retries: 0 });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j || !j.address) return null;
+    const a = j.address;
+    const data = {
+      district: a.suburb || a.neighbourhood || a.quarter || a.city_district || a.village || a.town || "",
+      city: a.city || a.town || a.municipality || a.county || "",
+      region: a.state || a.region || a.province || "",
+      country: a.country || "",
+      countryCode: (a.country_code || "").toUpperCase(),
+      postal: a.postcode || "",
+      road: a.road || a.pedestrian || "",
+      display: j.display_name || ""
+    };
+    if (revGeoCache.size > 2000) {
+      let n = 200;
+      for (const k of revGeoCache.keys()) { revGeoCache.delete(k); if (--n <= 0) break; }
+    }
+    revGeoCache.set(key, { data, exp: Date.now() + 6 * 3600_000 });
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 // ==================== Geo cache + lookup (صاروخي) ====================
@@ -1733,8 +1891,8 @@ async function flushVisitQueue() {
 }
 function scheduleVisitFlush(ms = VISIT_FLUSH_MS) {
   if (visitFlushTimer) return;
+  // لا تستخدم unref — كان بيسمح للعملية تتقفل قبل ما الزيارات تتكتب
   visitFlushTimer = setTimeout(() => { flushVisitQueue().catch(() => {}); }, ms);
-  if (visitFlushTimer.unref) visitFlushTimer.unref();
 }
 function enqueueVisit(key, record) {
   visitWriteQueue.push({ key, record });
@@ -1746,14 +1904,14 @@ function enqueueVisit(key, record) {
 }
 
 app.post("/api/track-visit", async (req, res) => {
-  // رد فوري — الشغل الثقيل في الخلفية عشان الموقع يبقى زي الصاروخ
-  res.json({ success: true });
-
+  // مهم: لازم نكمّل الكتابة قبل الرد — الرد المبكر + طابور unref كان بيضيع الزيارات
+  // (خصوصًا على serverless أو لو العملية اتقفلت قبل الـ flush)
   try {
     const ip = clientIp(req);
-    const ua = req.headers["user-agent"] || "Unknown";
-    const nowTime = now();
     const body = req.body || {};
+    // لو العميل بعت ua من المتصفح استخدمه (أدق من هيدر مخفف أحيانًا)
+    const ua = String(body.ua || req.headers["user-agent"] || "Unknown").slice(0, 500);
+    const nowTime = now();
 
     const device = parseDeviceInfo(ua);
 
@@ -1844,6 +2002,26 @@ app.post("/api/track-visit", async (req, res) => {
           studentEmail = st.email || st.mail || st.gmail || null;
           studentSection = st.section || null;
           studentGov = st.governorate || st.gov || null;
+          // لو مفيش موديل من المتصفح — خده من أجهزة الطالب المسجّلة (لو الاسم فيه كود موديل)
+          if (!deviceModel && st.devices && typeof st.devices === "object") {
+            const devs = Object.values(st.devices);
+            const prefer = studentLink.deviceId && st.devices[studentLink.deviceId]
+              ? [st.devices[studentLink.deviceId], ...devs]
+              : devs;
+            for (const d of prefer) {
+              const nm = String((d && (d.name || d.model || d.deviceModel)) || "");
+              if (/\b(SM-[A-Z0-9]+|RMX[0-9]+|CPH[0-9]+|Pixel\s?\d+|iPhone|iPad|Redmi|POCO|Infinix|TECNO)\b/i.test(nm)) {
+                deviceModel = nm.replace(/^.*?\b((?:SM-[A-Z0-9]+|RMX[0-9]+|CPH[0-9]+))\b.*$/i, "$1") || nm;
+                if (!deviceBrand) {
+                  if (/SM-/i.test(nm)) deviceBrand = "Samsung";
+                  else if (/RMX|CPH|OPPO|Realme/i.test(nm)) deviceBrand = "OPPO/Realme";
+                  else if (/Redmi|POCO|Xiaomi|Mi\s/i.test(nm)) deviceBrand = "Xiaomi";
+                  else if (/iPhone|iPad/i.test(nm)) deviceBrand = "Apple";
+                }
+                break;
+              }
+            }
+          }
         }
       } catch (e) {}
     }
@@ -1866,6 +2044,45 @@ app.post("/api/track-visit", async (req, res) => {
       }
     } catch (e) {}
 
+    // لو فيه GPS → عكس الإحداثيات لحي/شارع أدق
+    let road = null;
+    let placeDisplay = null;
+    if (preciseLat != null && preciseLon != null) {
+      try {
+        const rev = await reverseGeocode(preciseLat, preciseLon);
+        if (rev) {
+          if (rev.district) { if (geo) geo.district = rev.district; else geo = Object.assign({}, geo || {}, { district: rev.district }); }
+          if (rev.city) { if (geo) geo.city = rev.city; else geo = Object.assign({}, geo || {}, { city: rev.city }); }
+          if (rev.region) { if (geo) geo.region = rev.region; else geo = Object.assign({}, geo || {}, { region: rev.region }); }
+          if (rev.country && geo) geo.country = rev.country;
+          if (rev.countryCode && geo) geo.countryCode = rev.countryCode;
+          if (rev.postal && geo) geo.postal = rev.postal;
+          road = rev.road || null;
+          placeDisplay = rev.display || null;
+        }
+      } catch (e) {}
+    }
+
+    const deviceLabel = friendlyDeviceName(deviceBrand, deviceModel) ||
+      [deviceBrand, deviceModel].filter(Boolean).join(" ") ||
+      // لو مفيش موديل من المتصفح — نخزن وصف مفيد بدل فاضي
+      [device.deviceType || (device.isMobile ? "موبايل" : "كمبيوتر"), device.os, device.osVersion || platformVersion || "", device.browser, device.browserVersion]
+        .filter(Boolean).join(" · ") || null;
+
+    // بصمة مختصرة تساعد على تمييز نفس الجهاز حتى بدون تسجيل
+    const deviceFingerprint = [
+      deviceLabel || deviceModel || "",
+      screen || "",
+      (gpu || "").slice(0, 40),
+      timezoneBody || "",
+      (cores != null ? cores + "c" : ""),
+      (body.deviceMemory != null ? body.deviceMemory + "GB" : "")
+    ].filter(Boolean).join("|").slice(0, 180) || null;
+
+    const botInfo = detectBot(ua, req, body);
+    const isStudentVisit = Boolean(studentLink && studentLink.studentCode);
+    const visitorKind = botInfo.isBot ? "bot" : (isStudentVisit ? "student" : "human");
+
     const record = {
       ip,
       os: device.os,
@@ -1873,9 +2090,14 @@ app.post("/api/track-visit", async (req, res) => {
       deviceType: device.deviceType,
       deviceBrand: deviceBrand || null,
       deviceModel: deviceModel || null,
+      deviceLabel: deviceLabel,
       browser: device.browser,
       browserVersion: device.browserVersion || null,
       isMobile: device.isMobile,
+      isBot: Boolean(botInfo.isBot),
+      botName: botInfo.botName || null,
+      botConfidence: botInfo.confidence || null,
+      visitorKind,
       language: language || null,
       referer: referer || null,
       screen: screen || null,
@@ -1893,6 +2115,8 @@ app.post("/api/track-visit", async (req, res) => {
       city: (geo && geo.city) || null,
       region: (geo && geo.region) || null,
       district: (geo && geo.district) || null,
+      road: road || null,
+      placeDisplay: placeDisplay || null,
       postal: (geo && geo.postal) || null,
       isp: (geo && geo.isp) || null,
       as: (geo && geo.as) || null,
@@ -1905,7 +2129,10 @@ app.post("/api/track-visit", async (req, res) => {
       proxy: geo ? geo.proxy : null,
       hosting: geo ? geo.hosting : null,
       mobileNet: geo ? geo.mobile : null,
+      // زائر غير مسجّل يتسجل برضه — isStudent=false و guestId موجود
       isStudent: Boolean(studentLink && studentLink.studentCode),
+      guestId: body.guestId ? String(body.guestId).replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 64) || null : null,
+      deviceFingerprint: deviceFingerprint,
       studentCode: (studentLink && studentLink.studentCode) || null,
       studentName: (studentLink && studentLink.studentName) || null,
       studentDeviceId: (studentLink && studentLink.deviceId) || null,
@@ -1924,16 +2151,40 @@ app.post("/api/track-visit", async (req, res) => {
       colorDepth: body.colorDepth != null ? Number(body.colorDepth) || null : null,
       orientation: body.orientation ? String(body.orientation).slice(0, 20) : null,
       userAgent: ua,
-      time: nowTime,
-      timeISO: new Date(nowTime).toISOString(),
-      timeCairo: new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Cairo", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }).format(new Date(nowTime))
+      // time دايمًا مللي ثانية Unix (رقم) — العرض في الأدمن بيتحسب من هنا بتوقيت القاهرة
+      time: Number(nowTime) || Date.now(),
+      timeISO: new Date(Number(nowTime) || Date.now()).toISOString(),
+      timeCairo: (() => {
+        try {
+          const t = Number(nowTime) || Date.now();
+          // صيغة واضحة: YYYY-MM-DD HH:mm:ss (توقيت مصر)
+          const parts = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Africa/Cairo",
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit", second: "2-digit",
+            hour12: false
+          }).formatToParts(new Date(t));
+          const get = (type) => (parts.find(p => p.type === type) || {}).value || "";
+          return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}:${get("second")}`;
+        } catch {
+          return new Date(Number(nowTime) || Date.now()).toISOString();
+        }
+      })()
     };
 
     const visitKey = "visits/" + nowTime + "_" + Math.random().toString(36).slice(2, 8);
-    enqueueVisit(visitKey, record);
+    // كتابة مباشرة ومتزامنة — مفيش تأخير setTimeout يضيع الزيارة
+    try {
+      await fbSet(visitKey, record);
+      try { fbInvalidate("visits"); } catch {}
+    } catch (writeErr) {
+      console.warn("[track-visit] write:", writeErr && writeErr.message);
+      try { enqueueVisit(visitKey, record); } catch {}
+    }
   } catch (e) {
     console.warn("[track-visit]", e && e.message);
   }
+  if (!res.headersSent) res.json({ success: true });
 });
 
 app.get("/api/admin/visits/summary", requireAdmin("students_view"), async (_req, res) => {
@@ -1941,7 +2192,7 @@ app.get("/api/admin/visits/summary", requireAdmin("students_view"), async (_req,
     const visits = (await fbGetCached("visits", 15_000)) || {};
     const d0 = new Date(); d0.setHours(0, 0, 0, 0);
     const dayStart = d0.getTime();
-    let today = 0, mobileToday = 0, studentsToday = 0;
+    let today = 0, mobileToday = 0, studentsToday = 0, guestsToday = 0;
     const ips = new Set();
     const ipsToday = new Set();
     for (const v of Object.values(visits)) {
@@ -1953,6 +2204,7 @@ app.get("/api/admin/visits/summary", requireAdmin("students_view"), async (_req,
         if (v.ip) ipsToday.add(v.ip);
         if (v.isMobile) mobileToday++;
         if (v.isStudent || v.studentCode) studentsToday++;
+        else guestsToday++;
       }
     }
     res.json({
@@ -1963,7 +2215,8 @@ app.get("/api/admin/visits/summary", requireAdmin("students_view"), async (_req,
         today,
         uniqueToday: ipsToday.size,
         mobileToday,
-        studentsToday
+        studentsToday,
+        guestsToday
       }
     });
   } catch (e) {
@@ -2347,7 +2600,7 @@ app.get("/api/config", requireStudent, async (req, res) => {
   res.json({ success: true, yearId, subjectIds, cryptoReady: Boolean(decryptPlaybackKeyFn), decryptSegments: true });
 });
 
-const THANAWICA_ALLOWED_SECTIONS = new Set(["scientific_sciences", "scientific_math"]);
+const THANAWICA_ALLOWED_SECTIONS = new Set(["scientific_sciences", "scientific_math", "azhari"]);
 function studentAllowsThanawica(student) { const sec = normalizeSection(student && student.section); return THANAWICA_ALLOWED_SECTIONS.has(sec || ""); }
 
 app.get("/api/subjects/:id", requireStudent, async (req, res) => {
@@ -2795,7 +3048,16 @@ async function getStreamSession(id, touch = true) {
   return s;
 }
 
-app.post("/api/play/:videoId", requireStudent, async (req, res) => {
+// ليميت الفيديوهات: كل توكن طالب = فيديو واحد فقط في الدقيقة
+const playLimiter = rateLimit({
+  max: 1,
+  windowMs: 60_000,
+  scope: "video-play",
+  keyFn: (req) => "tok:" + (req.sessionToken || getBearer(req) || clientIp(req)),
+  message: "وصلت للحد الأقصى: فيديو واحد فقط في الدقيقة — استنى شوية وجرّب تاني"
+});
+
+app.post("/api/play/:videoId", requireStudent, playLimiter, async (req, res) => {
   try {
     let videoId = String(req.params.videoId);
     if (CONFIG.THANAWICA_ENABLED && /^thv_\d+$/i.test(videoId)) {
@@ -2833,7 +3095,9 @@ app.post("/api/play/:videoId", requireStudent, async (req, res) => {
     const sessionRow = { id, src, videoId: src.videoId, ownerCode: req.session.code, ownerToken: req.sessionToken, ownerDeviceId: deviceId, streamKey, createdAt: now(), lastUsed: now() };
     streamSessions.set(id, sessionRow);
     persistStreamSession(sessionRow).catch(() => {});
-    res.json({ success: true, data: { play_url: `/api/hls/${id}/master.m3u8?sk=${streamKey}` } });
+    const hlsPath = `/api/hls/${id}/master.m3u8?sk=${streamKey}`;
+    // play_url + manifest_url للتوافق مع كل نسخ الفرونت
+    res.json({ success: true, data: { play_url: hlsPath, manifest_url: hlsPath } });
   } catch (e) {
     try { const yt = await tryResolveYoutube(String(req.params.videoId || "")); if (yt) return res.json({ success: true, data: { type: "youtube", youtube_url: yt, url: yt } }); } catch {}
     console.error("[play]", e.message);
