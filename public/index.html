@@ -1,2454 +1,713 @@
-<!doctype html>
-<!-- دروسك بلس+ | دروسك بلس+ · المشغل | V4: نافذة تحميل (حجم/متبقي/سرعة/إيقاف/استكمال) + قايمة فيديوهات داخل المشغل -->
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar-EG" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080d18">
-<title>دروسك بلس+ | مشغل المحاضرات</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b16">
+<title>Dorosak Plus — كل محاضراتك في مكان واحد</title>
+<meta property="og:title" content="Dorosak Plus"><meta property="og:image" content="https://h.top4top.io/p_393491swv0.png"><meta property="og:type" content="website">
+<meta name="description" content="Dorosak Plus — محتوى المدرسين والشعب في مكان واحد، باقات اشتراك بأسعار واضحة.">
+<link rel="icon" href="https://h.top4top.io/p_393491swv0.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#080d18;--panel:#111a2a;--panel2:#172338;--line:#26344b;
-  --text:#f3f6ff;--muted:#91a0ba;--blue:#5b8cff;--blue2:#8ab4ff;--green:#34d399;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{margin:0;background:radial-gradient(900px 380px at 50% -180px,#173b76 0,transparent 70%),var(--bg);color:var(--text);font-family:Cairo,system-ui,sans-serif;overflow-x:hidden}
-button,select,input{font:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none}
-img{display:block;max-width:100%}
+:root{--bg:#070b16;--bg2:#0c1426;--card:#111b30;--line:#ffffff1c;--text:#f3f6fd;--muted:#9fb0cb;--blue:#4c91ff;--blue2:#8db9ff;--mint:#59e0b3;--gold:#ffcf6b;--red:#ff8d8d;--r:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--disp);font-weight:500;overflow-x:hidden;line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}button,input{font:inherit;color:inherit}button{cursor:pointer}
+h1,h2,h3,p{margin:0}svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.container{width:min(1120px,calc(100% - 36px));margin:auto}
+:focus-visible{outline:2px solid var(--blue2);outline-offset:3px}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 40% at 85% 0,#2455b333,transparent),radial-gradient(40% 30% at 0 55%,#1fb89a14,transparent)}
 
-/* ============ TOP BAR ============ */
-.top{position:sticky;top:0;z-index:100;background:#080d18ef;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff12}
-.topin{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
-.brand{font-weight:900;display:flex;align-items:center;gap:10px;min-width:0}
-.logo{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,#60a5fa,#1d4ed8);box-shadow:0 8px 24px #2563eb40;position:relative;overflow:hidden}
-.logo:after{content:"";position:absolute;inset:-60%;background:linear-gradient(110deg,transparent 38%,#ffffff80 50%,transparent 62%);transform:translateX(-100%);animation:logoSweep 5s ease-in-out infinite}
-@keyframes logoSweep{0%,65%{transform:translateX(-100%)}85%,100%{transform:translateX(100%)}}
-.brand-txt{min-width:0;overflow:hidden}
-.brand-txt b{display:block;font-size:14px;font-weight:900;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand-txt span{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
-.grow{flex:1;min-width:0}
-.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:background .18s,transform .18s;white-space:nowrap}
-.btn:hover{background:#ffffff12}
-.btn:active{transform:scale(.96)}
-.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+/* nav */
+.nav{position:sticky;top:0;z-index:30;background:#070b16f5;border-bottom:1px solid var(--line)}
+.navin{height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;min-width:0}
+.logo{width:42px;height:42px;border-radius:13px;overflow:hidden;display:grid;place-items:center;flex-shrink:0}
+.logo img{width:100%;height:100%;object-fit:contain}.logo.fb{background:linear-gradient(145deg,#5ba0ff,#2454d8);font-weight:900;color:#fff}
+.navlinks{display:flex;gap:26px;font-size:14px;font-weight:700;color:#c6d2e8}.navlinks a{transition:color .2s}.navlinks a:hover{color:var(--blue2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:13px;padding:11px 20px;font-weight:800;font-size:14px;background:none;white-space:nowrap;transition:transform .2s,box-shadow .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:none}
+.btn-p{background:linear-gradient(135deg,#4f94ff,#2757de);color:#fff;box-shadow:0 10px 26px #2563eb3d}.btn-p:hover{box-shadow:0 14px 34px #2563eb66}
+.btn-s{border-color:var(--line);background:#ffffff08}.btn-s:hover{border-color:#6aa2ff80}
+.btn-lg{padding:15px 26px;font-size:15px;border-radius:15px}
 
-/* ============ LAYOUT ============ */
-.wrap{max-width:1180px;margin:auto;padding:16px 14px 60px}
-.crumb{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
-.main{min-width:0}
+/* hero */
+.hero{padding:64px 0 36px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(34px,5.2vw,60px);line-height:1.3;font-weight:900;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--mint);display:inline-block}
+.hero p.lead{margin-top:18px;color:#b3c1d8;font-size:17px;max-width:520px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.checks{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;color:var(--muted);font-size:13px;font-weight:700}
+.checks span{display:flex;align-items:center;gap:7px}.checks svg{width:16px;height:16px;color:var(--mint)}
+.hero-copy>*{animation:up .7s cubic-bezier(.2,.8,.2,1) both}.hero-copy>:nth-child(2){animation-delay:.08s}.hero-copy>:nth-child(3){animation-delay:.16s}.hero-copy>:nth-child(4){animation-delay:.24s}
+@keyframes up{from{opacity:0;transform:translateY(20px)}}
 
-/* ============ PLAYER ============ */
-.player-card{background:linear-gradient(180deg,#131d30,#0f1726);border:1px solid #ffffff16;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px #0004}
-.screen{position:relative;background:#000;aspect-ratio:16/9;overflow:hidden;isolation:isolate;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;outline:none}
-.screen:fullscreen,.screen:-webkit-full-screen{aspect-ratio:auto;width:100%;height:100%;border-radius:0}
-.screen:not(.show-ui):not(.paused){cursor:none}
-.screen video,.screen .youtube-frame{position:absolute;inset:0;width:100%;height:100%;background:#000;z-index:1;border:0}.screen video{object-fit:contain;transition:transform .25s cubic-bezier(.2,.8,.2,1)}.screen .youtube-frame{display:none}.screen.youtube-mode video,.screen.youtube-mode .ptap,.screen.youtube-mode .fx,.screen.youtube-mode .holdb,.screen.youtube-mode .ptop,.screen.youtube-mode .pcenter,.screen.youtube-mode .pctrl{display:none!important}.screen.youtube-mode .youtube-frame{display:block}
+/* player mock (the one memorable piece) */
+.stage{position:relative;padding:18px 0}
+.player{border:1px solid #a8c5ff2e;border-radius:26px;background:linear-gradient(160deg,#18284a,#0d1629);box-shadow:0 40px 90px #0009;overflow:hidden;animation:up .9s .2s cubic-bezier(.2,.8,.2,1) both}
+.screen{position:relative;aspect-ratio:16/9;background:radial-gradient(70% 90% at 70% 20%,#3a7bff55,transparent),linear-gradient(135deg,#142a55,#0a1224);display:grid;place-items:center}
+.screen:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff06 0 1px,transparent 1px 38px)}
+.play{position:relative;width:70px;height:70px;border-radius:50%;background:#fff;color:#1b44b8;display:grid;place-items:center;box-shadow:0 0 0 0 #ffffff66;animation:ping 2.4s infinite}
+.play svg{width:28px;height:28px;fill:currentColor;stroke:none;margin-right:-3px}
+@keyframes ping{70%{box-shadow:0 0 0 22px #ffffff00}100%{box-shadow:0 0 0 0 #ffffff00}}
+.screen small{position:absolute;top:14px;right:16px;background:#00000066;padding:3px 11px;border-radius:99px;font-size:11px;font-weight:700}
+.pbody{padding:18px 20px 20px}.pbody b{display:block;font-size:16px}.pbody span{font-size:12px;color:var(--muted)}
+.bar{height:7px;border-radius:9px;background:#ffffff14;margin:14px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--blue),var(--mint));animation:fill 1.6s .9s cubic-bezier(.3,.8,.2,1) forwards}
+@keyframes fill{to{width:68%}}
+.prow{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:700}.prow strong{color:var(--mint)}
+.chip{position:absolute;z-index:2;display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:14px;background:#16233bf2;border:1px solid #a9c5ff30;box-shadow:0 18px 40px #0007;font-size:13px;font-weight:700}
+.chip small{display:block;color:var(--muted);font-weight:600;font-size:11px;line-height:1.4}
+.chip.a{top:0;left:-12px}.chip.b{bottom:-16px;right:-10px}.chip .e{font-size:20px}
+@keyframes bob{50%{transform:translateY(-9px)}}
 
-/* طبقة اللمس */
-.ptap{position:absolute;inset:0;z-index:2;background:transparent;-webkit-touch-callout:none;touch-action:none}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin:36px 0 0;border:1px solid var(--line);border-radius:var(--r);background:#ffffff05}
+.stat{padding:20px 14px;text-align:center}.stat+.stat{border-right:1px solid var(--line)}
+.stat b{display:block;font-size:24px;font-weight:900;color:var(--blue2)}.stat span{font-size:12px;color:var(--muted);font-weight:700}
 
-/* إظهار / إخفاء الواجهة (الحاويات نفسها مش بتاخد لمس، الأزرار بس) */
-.ptop,.pcenter,.pctrl{position:absolute;opacity:0;transition:opacity .22s;pointer-events:none}
-.screen.show-ui .ptop,.screen.show-ui .pcenter,.screen.show-ui .pctrl{opacity:1}
-.screen.show-ui .ptop>*,.screen.show-ui .pcenter>*,.screen.show-ui .pctrl>*{pointer-events:auto}
-.screen.holding .ptop,.screen.holding .pcenter,.screen.holding .pctrl{opacity:0!important}
+/* sections */
+.section{padding:74px 0}.head{max-width:640px;margin:0 0 34px}.head h2{font-size:clamp(26px,3.6vw,40px);line-height:1.4;font-weight:900}.head p{margin-top:10px;color:var(--muted)}
+.head.c{text-align:center;margin-inline:auto}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:s}
+.step{position:relative;padding:0 26px 0 0}.step:before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#4c91ff22;border:1px solid #4c91ff66;color:var(--blue2);font-weight:900;font-size:19px;margin-bottom:16px;position:relative;z-index:1;background-color:var(--bg)}
+.step:not(:last-child):after{content:"";position:absolute;top:22px;right:46px;left:-26px;border-top:2px dashed #4c91ff40}
+.step h3{font-size:18px;font-weight:800}.step p{color:var(--muted);font-size:14px;margin-top:5px}
 
-/* شريط علوي */
-.ptop{top:0;left:0;right:0;z-index:7;display:flex;align-items:center;gap:10px;padding:10px 12px 30px;background:linear-gradient(#000b,transparent)}
-.ptitle{flex:1;min-width:0;color:#fff;font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
-.plive{font-size:10px;font-weight:900;background:#3b82f633;color:#93c5fd;border-radius:99px;padding:4px 9px;flex:none}
+.prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.price-card{position:relative;padding:26px 24px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,#121e34,#0d1627);transition:transform .25s,border-color .25s}
+.price-card:hover{transform:translateY(-6px);border-color:#5793ff77}
+.price-card.featured{border-color:#59e0b388;background:linear-gradient(155deg,#12373b,#101a2e)}
+.popular{position:absolute;top:18px;left:18px;background:var(--mint);color:#06241f;padding:3px 11px;border-radius:99px;font-size:11px;font-weight:900}
+.price-card h3{font-size:19px;font-weight:900}.price-card .desc{color:var(--muted);font-size:13px;margin:2px 0 16px}
+.price{font-size:42px;font-weight:900;line-height:1.2}.price small{font-size:14px;color:var(--muted);font-weight:700}
+.price-note{font-size:12px;color:var(--gold);font-weight:700;min-height:22px}
+.price-card ul{list-style:none;padding:0;margin:20px 0;display:grid;gap:10px}
+.price-card li{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:700;color:#d6e0f1}.price-card li svg{width:17px;height:17px;color:var(--mint)}
+.price-card .btn{width:100%}
+.note{text-align:center;color:var(--muted);font-size:13px;margin-top:16px;grid-column:1/-1}.note a{color:var(--blue2);font-weight:800}
 
-/* الأزرار الدائرية - مقاس موحّد */
-.ib{--ibs:40px;width:var(--ibs);height:var(--ibs);flex:none;border:0;border-radius:50%;background:#ffffff1f;color:#fff;display:grid;place-items:center;position:relative;transition:transform .15s,background .15s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.ib:hover{background:#ffffff2e}
-.ib:active{transform:scale(.92)}
-.ib:disabled{opacity:.35;pointer-events:none}
-.ib svg,.bigplay svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
-.ib svg.f,.bigplay svg.f{fill:currentColor}
-.ib.active{background:var(--blue)}
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.why div{padding:22px;border:1px solid var(--line);border-radius:var(--r);background:#ffffff05}
+.why svg{width:26px;height:26px;color:var(--blue2);margin-bottom:12px}.why h3{font-size:16px;font-weight:800}.why p{color:var(--muted);font-size:13px;margin-top:4px}
 
-/* المنتصف */
-.pcenter{inset:0;z-index:6;display:flex;align-items:center;justify-content:center;gap:clamp(20px,7vw,60px);direction:ltr}
-.bigplay{width:66px;height:66px;border-radius:50%;background:linear-gradient(145deg,#5b8cff,#2563eb);color:#fff;display:grid;place-items:center;box-shadow:0 10px 34px #3b82f670,inset 0 1px 0 #ffffff40;transition:transform .18s}
-.bigplay:active{transform:scale(.92)}
-.bigplay svg{width:30px;height:30px}
+.trial{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;padding:clamp(24px,4vw,40px);border-radius:26px;border:1px solid #59e0b33d;background:linear-gradient(120deg,#123a39,#11263d)}
+.trial h2{font-size:clamp(22px,3vw,32px);font-weight:900}.trial p{color:#c3d8dc;margin-top:6px;max-width:620px}
+.trial .btn{background:var(--mint);color:#06241f;box-shadow:0 10px 26px #59e0b333}
+.admins{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:20px}
+.admin-card{display:flex;align-items:center;gap:12px;padding:16px;border:1px dashed #8da8ce55;border-radius:16px;transition:transform .2s,border-color .2s,background .2s}
+a.admin-card:hover{transform:translateY(-3px);border-color:var(--blue);background:#4c91ff12}
+.admin-card .av{width:42px;height:42px;border-radius:13px;background:#1b2f4d;color:#9ec2ff;display:grid;place-items:center}.admin-card b{display:block;font-size:14px}.admin-card small{color:var(--muted);font-size:11px}
+
+.faq{max-width:780px;margin:auto;display:grid;gap:10px}
+.faq details{border:1px solid var(--line);border-radius:15px;background:#ffffff05;padding:0 20px;transition:border-color .2s}.faq details[open]{border-color:#4c91ff66}
+.faq summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:800;font-size:15px;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";color:var(--blue2);font-size:22px;line-height:1;transition:transform .25s}.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{color:var(--muted);font-size:14px;padding:0 0 16px}
+.footer{border-top:1px solid var(--line);padding:26px 0 34px;color:var(--muted);font-size:12px}.footer .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}.footer b{color:var(--text)}
+
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
+
+/* ===== LOGIN v2: one light card, saved sessions ===== */
+body.auth-open>:not(#auth):not(.toast){visibility:hidden}
+#auth{display:none;position:fixed;inset:0;z-index:100;overflow-y:auto;padding:20px;background:radial-gradient(70% 45% at 50% 0,#1f4a9a2e,transparent),#070b16;font-weight:500;line-height:1.7}
+#auth.open{display:flex;animation:a-fade .2s}
+@keyframes a-fade{from{opacity:0}}
+#auth [hidden]{display:none!important}
+#auth .auth-card{position:relative;width:min(100%,440px);margin:auto;padding:34px 28px 24px;border:1px solid var(--line);border-radius:24px;background:#0d1628;box-shadow:0 24px 60px #0009;animation:a-in .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes a-in{from{opacity:0;transform:translateY(12px)}}
+#auth .auth-back{position:absolute;top:14px;inset-inline-start:14px;display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:11px;background:none;color:var(--muted);font-size:14px;font-weight:600;transition:color .2s,border-color .2s}
+#auth .auth-back:hover{color:#fff;border-color:#6aa2ff80}
+#auth .auth-back svg{width:15px;height:15px}
+#auth .logo{width:52px;height:52px;margin:6px auto 16px;border-radius:15px}
+#auth h3{text-align:center;font-size:25px;font-weight:700;line-height:1.5}
+#auth .auth-sub{text-align:center;color:var(--muted);font-size:15px;margin:2px 0 22px}
+#auth .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#auth .btn{font-weight:700}
+/* code cells: 3 + 3 + 3 */
+#auth .code-wrap{position:relative;direction:ltr}
+#auth .cells{display:flex;gap:12px}
+#auth .grp{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#auth .cell{height:56px;display:grid;place-items:center;border-radius:12px;border:1.5px solid var(--line);background:#09111f;color:var(--text);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;transition:border-color .15s,background-color .15s,box-shadow .15s}
+#auth .cell.on{border-color:var(--blue);box-shadow:0 0 0 4px #4c91ff22}
+#auth .cell.on:not(.f):after{content:"";width:2px;height:24px;border-radius:2px;background:var(--blue2);animation:a-blink 1s steps(1) infinite}
+#auth .cell.f{border-color:#4c91ff66;background:#4c91ff14;animation:a-pop .14s}
+@keyframes a-blink{50%{opacity:0}}@keyframes a-pop{from{transform:scale(.88)}}
+#auth #code{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;cursor:text}
+#auth .cells.verify .cell{border-color:#4c91ff99;animation:a-pulse 1s ease-in-out infinite;animation-delay:calc(var(--i)*70ms)}
+@keyframes a-pulse{50%{opacity:.4}}
+#auth .cells.ok .cell{border-color:var(--mint);background:#59e0b31f;color:var(--mint)}
+#auth .cells.err{animation:a-shake .4s}
+#auth .cells.err .cell{border-color:var(--red);background:#ff8d8d12;color:var(--red)}
+@keyframes a-shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+#auth .hint{margin:12px 0 18px;text-align:center;color:var(--muted);font-size:14px}
+#auth .go{width:100%;min-height:52px;font-size:17px}
+#auth .go:disabled{cursor:wait;transform:none;opacity:.9}
+#auth .go.busy #btn-txt:before{content:"";display:inline-block;width:15px;height:15px;margin-inline-end:9px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:a-spin .7s linear infinite}
+@keyframes a-spin{to{transform:rotate(360deg)}}
+/* saved sessions */
+#auth .sess-list{display:grid;gap:10px}
+#auth .sess{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:16px;background:#ffffff07;transition:border-color .2s,background-color .2s}
+#auth .sess:hover{border-color:#4c91ff88;background:#4c91ff10}
+#auth .sess.busy{pointer-events:none;border-color:#4c91ff88}
+#auth .sess-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;background:none;border-radius:16px;color:var(--text);text-align:start}
+#auth .sess-av{width:46px;height:46px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#5ba0ff,#2757de);color:#fff;font-size:19px;font-weight:700}
+#auth .sess-av svg{width:22px;height:22px}
+#auth .sess-txt{flex:1;min-width:0}
+#auth .sess-txt b{display:block;font-size:17px;font-weight:700;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#auth .sess-txt small{display:block;color:var(--muted);font-size:13.5px}
+#auth .sess-go{display:grid;place-items:center;color:var(--blue2)}
+#auth .sess-go .sp{display:none;width:18px;height:18px;border:2px solid #8db9ff55;border-top-color:var(--blue2);border-radius:50%;animation:a-spin .7s linear infinite}
+#auth .sess.busy .sp{display:block}#auth .sess.busy .sess-go svg{display:none}
+#auth .sess-x{width:46px;display:grid;place-items:center;border:0;border-inline-start:1px solid var(--line);background:none;color:var(--muted);border-radius:0 16px 16px 0;transition:color .2s,background-color .2s}
+#auth .sess-x:hover{color:var(--red);background:#ff8d8d12}
+#auth .sess-x svg{width:18px;height:18px}
+#auth .alt{width:100%;min-height:50px;margin-top:12px;font-size:16px}
+#auth .linkbtn{display:block;margin:14px auto 0;padding:6px 10px;border:0;background:none;color:var(--blue2);font-size:15px;font-weight:600}
+#auth .linkbtn:hover{text-decoration:underline}
+#auth .status{min-height:24px;margin-top:14px;text-align:center;font-size:15px;font-weight:600;color:var(--muted)}
+#auth .status.error{color:var(--red)}#auth .status.success{color:var(--mint)}
+#auth .legal{margin-top:12px;text-align:center;font-size:13px;color:#7486a3}
+@media(max-width:480px){#auth{padding:12px}#auth .auth-card{padding:28px 16px 20px;border-radius:20px}#auth .cells{gap:9px}#auth .grp{gap:4px}#auth .cell{height:50px;font-size:21px;border-radius:10px}#auth h3{font-size:23px}}
+
+.toast{position:fixed;z-index:200;bottom:22px;left:50%;transform:translate(-50%,160%);opacity:0;pointer-events:none;padding:12px 18px;border-radius:13px;background:#16273f;border:1px solid var(--line);box-shadow:0 18px 40px #000a;font-size:13px;font-weight:800;transition:transform .3s;max-width:90vw;text-align:center}.toast.show{transform:translate(-50%,0);opacity:1}
+
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:30px}.hero-copy{text-align:center}.hero p.lead{margin-inline:auto}.hero-actions,.checks{justify-content:center}.chip.a{left:0}.chip.b{right:0}.why{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.navlinks,.nav .btn-s{display:none}.navin{height:62px}.hero{padding:40px 0 20px}.section{padding:52px 0}.steps{grid-template-columns:1fr;gap:26px}.step{padding:0 62px 0 0}.step:before{position:absolute;right:0;top:0}.step:not(:last-child):after{top:46px;bottom:-26px;right:22px;left:auto;border-top:0;border-right:2px dashed #4c91ff40}.why{grid-template-columns:1fr}.trial{grid-template-columns:1fr;text-align:center}.trial .btn{width:100%}.stat b{font-size:18px}.stat span{font-size:11px}.footer .container{justify-content:center;text-align:center}}
 
 
-/* شريط سفلي */
-.pctrl{left:0;right:0;bottom:0;z-index:7;padding:36px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:linear-gradient(transparent,#000d);direction:ltr}
+/* ===== v3: mobile + journey ===== */
+html,body{overflow-x:clip;max-width:100%}.hero{overflow:clip}
+.prog{position:absolute;left:0;right:0;bottom:-1px;height:2px}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--mint));transform-origin:right;transform:scaleX(var(--p,0))}
+.brand span:last-child{white-space:nowrap}
+.fx span svg{width:30px;height:30px}
+.chip .ce{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex-shrink:0}.chip .ce.g{background:#ffcf6b22;color:var(--gold)}.chip .ce.m{background:#59e0b322;color:var(--mint)}.chip .ce svg{width:20px;height:20px}
+.sb{display:inline-flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:99px;background:#4c91ff1c;border:1px solid #4c91ff44;font-weight:800;font-size:13px;color:#b9d4ff;margin-bottom:12px}
+.sb i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:13px}
+.section.alt{background:linear-gradient(180deg,transparent,#ffffff06 20%,#ffffff06 80%,transparent)}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;position:relative}
+.road:before{content:"";position:absolute;top:34px;right:16.6%;left:16.6%;height:2px;background:linear-gradient(90deg,var(--mint),var(--blue));opacity:.55;transform-origin:right;transform:scaleX(0);transition:transform 1.4s .35s cubic-bezier(.3,.8,.2,1)}
+.road.in:before{transform:scaleX(1)}
+.rs{position:relative;text-align:center;padding:0 8px}
+.rs .ri{width:68px;height:68px;margin:0 auto 14px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,#1c3a72,#112245);border:1px solid #6aa2ff55;color:var(--blue2);position:relative;z-index:1;box-shadow:0 14px 30px #0006}
+.rs .ri svg{width:30px;height:30px}.rs small{color:var(--mint);font-weight:800;font-size:12px}.rs h3{font-size:18px;font-weight:900}.rs p{color:var(--muted);font-size:14px;margin-top:3px}
+.trial{margin-top:22px;grid-template-columns:auto 1fr auto}.trial .ti{width:54px;height:54px;border-radius:17px;background:#59e0b322;color:var(--mint);display:grid;place-items:center}.trial .ti svg{width:28px;height:28px}
+.contact-grid{margin-top:0}
+.enter{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:clamp(24px,4vw,46px);border:1px solid #4c91ff44;border-radius:28px;background:linear-gradient(135deg,#14284d,#0d1629);position:relative;overflow:hidden}
+.enter h2{font-size:clamp(26px,3.6vw,38px);font-weight:900;line-height:1.4}.enter p{color:var(--muted);margin-top:8px}.enter .hero-actions{margin-top:22px}
+.demo{direction:ltr;padding:22px;border-radius:20px;background:#070d1b;border:1px solid var(--line)}
+.dm-cells{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+.dm{aspect-ratio:3/4;display:grid;place-items:center;border-radius:9px;border:1.5px solid #4c91ff77;background:#4c91ff12;font-weight:900;font-size:17px;animation:typ 6s infinite both;animation-delay:calc(var(--i)*.25s)}
+@keyframes typ{0%,6%{opacity:.15;transform:scale(.8);border-color:var(--line)}12%,78%{opacity:1;transform:none}90%,100%{opacity:.15;transform:scale(.8)}}
+.dm-ok{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:var(--mint);font-weight:800;font-size:14px;direction:rtl;animation:okin 6s infinite both}
+.dm-ok svg{width:20px;height:20px;stroke-width:3}
+@keyframes okin{0%,40%{opacity:0;transform:translateY(8px)}55%,80%{opacity:1;transform:none}92%,100%{opacity:0}}
+.rail{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:20;display:none;flex-direction:column;gap:8px}
+.rail a{display:flex;align-items:center;gap:9px;flex-direction:row-reverse;color:var(--muted);font-size:12px;font-weight:700}
+.rail i{width:11px;height:11px;border-radius:50%;border:2px solid #ffffff44;transition:.3s}.rail span{opacity:0;transform:translateX(6px);transition:.3s}
+.rail a:hover span,.rail a.on span{opacity:1;transform:none}.rail a.on i{background:var(--mint);border-color:var(--mint);box-shadow:0 0 0 5px #59e0b322}
+.tabbar{display:none}
+@media(min-width:1320px){.rail{display:flex}}
+@media(max-width:900px){.enter{grid-template-columns:1fr;text-align:center}.enter .hero-actions{justify-content:center}.trial{grid-template-columns:auto 1fr}.trial .btn{grid-column:1/-1}}
+@media(max-width:650px){
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.container{width:calc(100% - 32px)}
+.orb{width:220px!important;height:220px!important}.fx{display:none}.fab{display:none!important}
+.brand{font-size:16px;gap:8px}.logo{width:38px;height:38px}.nav .btn-p{padding:9px 14px;font-size:13px}.nav .btn-p svg{display:none}
+.hero h1{font-size:clamp(29px,8.6vw,38px);line-height:1.4}.hero p.lead{font-size:15px;margin-top:12px}
+.hero-actions{gap:10px}.hero-actions .btn{flex:1 1 100%}.checks{gap:6px 16px;font-size:12px;margin-top:20px}
+.stage{padding:20px 0 14px}.chip{padding:8px 11px;font-size:12px;gap:8px}.chip .ce{width:30px;height:30px}.chip.a{top:0;left:4px}.chip.b{bottom:0;right:4px}
+.pbody{padding:14px 16px 16px}.play{width:56px;height:56px}
+.stats{margin-top:26px}.stat{padding:14px 6px}.stat b{font-size:16px}.stat span{font-size:10.5px;line-height:1.5;display:block}
+.head{margin-bottom:24px}.head h2{font-size:25px}
+.road{grid-template-columns:1fr;gap:0}.road:before{display:none}
+.rs{display:grid;grid-template-columns:62px 1fr;gap:14px;text-align:right;padding:0 0 26px;align-items:start}
+.rs .ri{width:62px;height:62px;margin:0;border-radius:19px}
+.rs:not(:last-child):after{content:"";position:absolute;right:30px;top:66px;bottom:2px;border-right:2px dashed #4c91ff55}
+.prices{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:6px 16px 18px;margin:0 -16px;scrollbar-width:none}.prices::-webkit-scrollbar{display:none}
+.prices .price-card{flex:0 0 84%;scroll-snap-align:center}.prices .note{flex:0 0 100%}
+.price-card{padding:22px 20px}.price{font-size:38px}
+.contact-opt{padding:16px}.trial{text-align:right;gap:14px}
+.enter{padding:24px 18px;border-radius:22px}.dm{font-size:14px;border-radius:7px}.demo{padding:16px}
+.section{padding:44px 0}.faq summary{font-size:14px}
+.footer{padding-bottom:20px}.toast{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;z-index:80;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:7px;border-radius:22px;background:#0f1a30f7;border:1px solid #a9c5ff30;box-shadow:0 18px 40px #000a}
+.tabbar a,.tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border:0;background:none;border-radius:16px;color:var(--muted);font-size:11px;font-weight:800;transition:color .25s,background .25s}
+.tabbar svg{width:22px;height:22px}.tabbar .on{color:#fff;background:#4c91ff2e}
+.tabbar .tb-main{background:linear-gradient(135deg,#4f94ff,#2757de);color:#fff;box-shadow:0 8px 20px #2563eb55}
 
-/* شريط التقدم */
-.seekwrap{position:relative;height:30px;cursor:pointer;display:flex;align-items:center;touch-action:none;outline:none}
-.rail{position:relative;width:100%;height:4px;border-radius:99px;background:#ffffff2e;transition:height .15s}
-.seekwrap:hover .rail,.seekwrap.drag .rail,.seekwrap:focus-visible .rail{height:7px}
-.rail i{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:99px}
-#pbuf{background:#ffffff4d}
-#pplayed{background:linear-gradient(90deg,#38bdf8,#5b8cff 55%,#a78bfa)}
-#pknob{position:absolute;top:50%;left:0;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #5b8cff44,0 2px 10px #0009;transform:scale(0);transition:transform .15s}
-.seekwrap:hover #pknob,.seekwrap.drag #pknob,.seekwrap:focus-visible #pknob{transform:scale(1)}
-@media (pointer:coarse){#pknob{transform:scale(.85)}.seekwrap.drag #pknob{transform:scale(1.3)}}
-.ptip{position:absolute;bottom:30px;left:0;transform:translateX(-50%);background:#0b1220f5;border:1px solid #ffffff26;padding:4px 9px;border-radius:8px;font-size:11px;font-weight:800;color:#fff;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .12s;font-variant-numeric:tabular-nums}
-.seekwrap:hover .ptip,.seekwrap.drag .ptip{opacity:1}
 
-/* صف الأزرار السفلي */
-.prow{display:flex;align-items:center;gap:2px;flex-wrap:nowrap}
-.prow .ib{--ibs:38px;background:transparent}
-.prow .ib:hover{background:#ffffff1f}
-.prow .ib.active{background:var(--blue)}
-.ptime{font-size:12px;color:#fff;padding:0 8px;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:800;flex:none}
-.sp{flex:1;min-width:4px}
-
-/* الصوت */
-.vol{display:flex;align-items:center;flex:none}
-.vr{-webkit-appearance:none;appearance:none;width:0;opacity:0;height:4px;border-radius:99px;margin:0;padding:0;border:0;background:linear-gradient(to right,#fff var(--v,100%),#ffffff40 var(--v,100%));transition:width .2s,opacity .2s,margin .2s;cursor:pointer;outline:none}
-.vr::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;border:0}
-.vr::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:0}
-@media (hover:hover) and (pointer:fine){.vol:hover .vr,.vol:focus-within .vr{width:68px;opacity:1;margin:0 10px 0 4px}}
-
-/* القائمة العائمة */
-.pmenu{position:absolute;right:12px;bottom:72px;z-index:20;width:250px;max-width:calc(100% - 24px);max-height:calc(100% - 92px);overflow:auto;background:#0d1424f8;border:1px solid #ffffff22;border-radius:16px;padding:8px;display:none;direction:rtl;color:#fff;box-shadow:0 20px 55px #0009;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);scrollbar-width:thin}
-.pmenu.open{display:block;animation:menuIn .18s cubic-bezier(.2,.8,.2,1)}
-@keyframes menuIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
-.mrow{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border-radius:10px;font-weight:800;font-size:13px;text-align:right;transition:background .15s}
-.mrow:hover{background:#ffffff14}
-.mrow .lbl{flex:1}
-.mrow .val{color:var(--muted);font-size:12px;font-weight:700}
-.mrow .chev{color:var(--muted);font-size:16px;line-height:1}
-.mrow.on .val{color:var(--blue2)}
-.mhead{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px 10px;margin-bottom:6px;border-bottom:1px solid #ffffff14;font-weight:900;font-size:13px;text-align:right}
-.mhead svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.sw{width:34px;height:20px;border-radius:99px;background:#ffffff33;position:relative;flex:none;transition:background .2s}
-.sw:after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
-.sw.on{background:var(--blue)}
-.sw.on:after{transform:translateX(-14px)}
-.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;padding:2px;direction:ltr}
-.opts button{border:1px solid #ffffff20;background:#ffffff0d;color:#fff;border-radius:10px;padding:8px 4px;font-size:12px;font-weight:800;transition:background .15s}
-.opts button:hover{background:#ffffff1c}
-.opts button.on{background:var(--blue);border-color:var(--blue)}
-
-/* تأثيرات الضغط المزدوج */
-@keyframes fxa{0%{opacity:0;transform:translateY(-50%) scale(.75)}25%{opacity:1;transform:translateY(-50%) scale(1)}100%{opacity:0;transform:translateY(-50%) scale(1.1)}}
-
-/* شارة الضغط المطوّل 2× */
-
-/* توست داخل المشغّل (بيظهر حتى في ملء الشاشة) */
-.toast{position:absolute;top:16%;left:50%;transform:translate(-50%,-10px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;background:#0b1220ee;border:1px solid #ffffff22;color:#fff;padding:7px 14px;border-radius:99px;z-index:25;font-size:12px;font-weight:800;box-shadow:0 8px 28px #0008;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-/* loading + error */
-.loading{position:absolute;inset:0;z-index:15;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#000a;font-weight:800;font-size:13px;color:#fff}
-.loading.show{display:flex}
-.loading.buf{background:transparent;pointer-events:none}
-.loading.buf span{display:none}
-.spin{width:38px;height:38px;border:3px solid #ffffff30;border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.error{display:none;position:absolute;inset:0;background:linear-gradient(#080d18f7,#0a1222fa);z-index:16;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;padding:14px 18px;overflow:auto}
-.error.show{display:flex}
-.eic{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;background:#ef444422;color:#fca5a5;border:1px solid #ef444455}
-.eic svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.error b{font-size:14.5px;font-weight:900;line-height:1.4}
-.error p{color:var(--muted);margin:0;font-size:12px;line-height:1.7;max-width:330px}
-.eact{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center}
-.ctrl{border:1px solid #ffffff14;background:#ffffff08;color:#fff;border-radius:12px;padding:9px 14px;font-weight:800;transition:background .18s,transform .18s}
-.ctrl.sm{padding:7px 14px;font-size:12.5px;border-radius:10px}
-.ctrl.primary{background:var(--blue);border-color:var(--blue)}
-.ctrl:hover{background:#ffffff18}
-.ctrl.primary:hover{background:#4a7ff0}
-.ctrl:active{transform:scale(.96)}
-.ctrl:disabled{opacity:.4;pointer-events:none}
-
-/* معلومات الفيديو */
-.titlebox{padding:16px 2px 0;animation:fadeUp .45s both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
-.eyebrow{font-size:11px;color:var(--blue2);font-weight:900;letter-spacing:.2px}
-.titlebox h1{font-size:clamp(18px,3vw,25px);line-height:1.45;margin:4px 0 10px;font-weight:900}
-.subline{color:var(--muted);font-size:12px;display:flex;gap:8px;flex-wrap:wrap}
-.subline span{background:#ffffff08;border:1px solid #ffffff0c;padding:4px 9px;border-radius:9px;font-weight:700}
-.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.stat{border:1px solid #ffffff10;background:#ffffff06;border-radius:14px;padding:12px;text-align:center}
-.stat b{display:block;font-size:18px;font-weight:900}
-.stat span{font-size:10px;color:var(--muted);font-weight:800}
-.controls-under{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 0 0}
-
-/* ============ LIST PANEL ============ */
-.panel{background:linear-gradient(155deg,#15233aee,#0d1524f5);border:1px solid #8ab4ff20;border-radius:20px;overflow:hidden;box-shadow:0 22px 70px #0003;position:sticky;top:78px}
-.panel-head{padding:16px 16px 12px;background:linear-gradient(120deg,#1d3559aa,transparent);border-bottom:1px solid #ffffff0c}
-.panel-heading{display:flex;align-items:center;gap:10px}
-.panel-icon{width:38px;height:38px;flex:none;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#477ff5,#234ab1);color:white;box-shadow:0 7px 22px #2563eb40}
-.panel-head h2{font-size:14px;margin:0;font-weight:900}
-.panel-head p{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.6}
-.playlist-tools{padding:12px 12px 4px}
-.searchbox{display:flex;align-items:center;gap:8px;padding:0 11px;height:40px;border-radius:12px;background:#050b16a8;border:1px solid #ffffff13;color:var(--muted);transition:border-color .2s,box-shadow .2s}
-.searchbox:focus-within{border-color:#5b8cff99;box-shadow:0 0 0 3px #5b8cff19}
-.searchbox svg{flex:none}
-.searchbox input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:var(--text);font:700 12px Cairo,sans-serif}
-.searchbox input::placeholder{color:#71819c}
-.listfilters{display:flex;gap:5px;padding:9px 12px 3px}
-.filter-btn{flex:1;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:10px;padding:7px 5px;font:800 10px Cairo,sans-serif;transition:all .2s}
-.filter-btn:hover{background:#ffffff08;color:#fff}
-.filter-btn.active{background:#477ff51c;border-color:#5b8cff40;color:#a9c6ff}
-.list{padding:10px 10px 14px;display:flex;flex-direction:column;gap:9px;max-height:min(62vh,680px);overflow:auto;scrollbar-width:thin;scrollbar-color:#324766 transparent}
-.list::-webkit-scrollbar{width:6px}
-.list::-webkit-scrollbar-thumb{background:#324766;border-radius:99px}
-.empty{padding:28px 18px;text-align:center;color:var(--muted);font-size:13px}
-.skeleton{padding:30px;text-align:center;color:var(--muted)}
-
-/* ============ RESPONSIVE ============ */
-@media(max-width:900px){
-  .layout{grid-template-columns:1fr;gap:16px}
-  .panel{position:relative;top:auto;order:2}
-  .list{max-height:440px}
-}
-@media(max-width:640px){
-  .wrap{padding:12px 10px 40px}
-  .player-card,.panel{border-radius:16px}
-  .topin{padding:9px 12px}
-  .brand-txt b{font-size:13px}
-  .btn{padding:7px 10px;font-size:12px}
-  .btn span{display:none}
-  .logo{width:34px;height:34px}
-  .stat b{font-size:16px}
-  .stat{padding:10px 6px}
-  /* المشغّل */
-  .ptop{padding:8px 10px 22px;gap:8px}
-  .ptitle{font-size:12px}
-  .ib{--ibs:36px}
-  .prow .ib{--ibs:34px}
-  .prow .ib svg{width:19px;height:19px}
-  .ptime{font-size:11px;padding:0 5px}
-  .bigplay{width:58px;height:58px}
-  .bigplay svg{width:26px;height:26px}
-  .pctrl{padding-top:28px}
-  .pmenu{left:8px;right:8px;width:auto;max-width:none;bottom:62px;max-height:calc(100% - 72px)}
-}
-@media(max-width:420px){
-  #ppip,#pnx{display:none}
-  .plive{display:none}
-}
-
-@media(prefers-reduced-motion:reduce){
-  *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
-}
-
-/* ============ v3 : تطوير المشغّل ============ */
-.player-card{border-color:#5b8cff26;box-shadow:0 30px 90px #0006,0 0 0 1px #ffffff08}
-.bigplay{position:relative}
-.screen.paused .bigplay:after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid #5b8cff99;animation:ring 1.9s ease-out infinite;pointer-events:none}
-@keyframes ring{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.4);opacity:0}}
-.pctrl{background:linear-gradient(transparent,#000a 45%,#000e)}
-.rail{height:5px}
-#pknob{width:15px;height:15px;margin:-7.5px 0 0 -7.5px}
-.ptime{background:#ffffff12;border-radius:8px;padding:4px 9px;margin:0 6px}
-
-/* أزرار التقديم/التأخير في منتصف الشاشة (موبايل/تابلت) */
-.pcenter .sk{width:64px;height:64px;flex:none;border-radius:50%;background:#0009;border:1px solid #ffffff30;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 8px 26px #0006;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:transform .15s,background .15s}
-.pcenter .sk:active{transform:scale(.9);background:#5b8cff66}
-.pcenter .sk svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.3;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.pcenter .sk b,.skchip,.fx span{direction:ltr;unicode-bidi:isolate}
-.pcenter .sk b{font-size:13px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
-/* نفس الوظيفة في الشريط السفلي للكمبيوتر */
-.skchip{display:none;height:30px;min-width:48px;padding:0 10px;margin:0 2px;border-radius:9px;background:#ffffff14;border:1px solid #ffffff22;color:#fff;font-weight:900;font-size:12.5px;font-variant-numeric:tabular-nums;align-items:center;justify-content:center;flex:none;transition:background .15s,transform .15s}
-.skchip:hover{background:#ffffff2e}
-.skchip:active{transform:scale(.94)}
-@media (hover:hover) and (pointer:fine){
-  .pcenter .sk{display:none}
-  .screen:not(.paused) .bigplay{display:none}
-  .skchip{display:inline-flex}
 }
 
-/* زرار السرعة */
-.spd{height:34px;padding:0 12px 0 10px;margin:0 4px;flex:none;display:inline-flex;align-items:center;gap:6px;border-radius:10px;background:#ffffff14;border:1px solid #ffffff26;color:#fff;font-weight:900;font-size:12.5px;font-variant-numeric:tabular-nums;transition:background .18s,border-color .18s,transform .15s}
-.spd span{direction:ltr;unicode-bidi:isolate}
-.spd svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
-.spd:hover{background:#ffffff26}
-.spd:active{transform:scale(.95)}
-.spd.on{background:#5b8cff33;border-color:#5b8cffa0;color:#c3d6ff}
+/* ===== motion pack ===== */
+@property --ang{syntax:"<angle>";initial-value:0deg;inherits:false}
+.hero{position:relative}
+.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:-1}
+.orb.o1{width:480px;height:480px;background:radial-gradient(circle,#2f6dff40,transparent 68%);top:-120px;right:-100px}.orb.o2{width:400px;height:400px;background:radial-gradient(circle,#1fd1a030,transparent 68%);bottom:-80px;left:-120px}
+@keyframes orbm{to{transform:translate(50px,40px) scale(1.2)}}
+.fx span{position:absolute;font-size:26px;opacity:.4;pointer-events:none}
+@keyframes drift{from{transform:translate(0,0) rotate(-8deg)}to{transform:translate(14px,-26px) rotate(10deg)}}
+.stage{transition:transform .25s ease-out;transform-style:preserve-3d}
+@keyframes glow{50%{box-shadow:0 10px 42px #2563ebb0,0 0 0 9px #2563eb18}}
+.btn-p{position:relative;overflow:hidden}
+.btn-p:before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#ffffff45,transparent 70%);transform:translateX(100%);transition:transform .6s}
+.btn-p:hover:before{transform:translateX(-100%)}
+.rv.stag{transform:none;transition:transform .28s ease,border-color .25s,background .25s,box-shadow .25s}
+.stag.in{animation:cardin .75s var(--d,0s) cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes cardin{from{opacity:0;transform:translateY(34px) scale(.95) rotate(-1deg)}}
+.stag:nth-child(2){--d:.1s}.stag:nth-child(3){--d:.2s}.stag:nth-child(4){--d:.3s}.stag:nth-child(5){--d:.4s}.stag:nth-child(6){--d:.5s}
+.price-card.in:hover{transform:translateY(-8px) scale(1.015)}
+.why>div.in:hover{transform:translateY(-6px)}
+a.admin-card.in:hover{transform:translateY(-4px)}
+.price-card,.why>div,.admin-card,.contact-opt,.stat{--mx:50%;--my:50%;position:relative;overflow:hidden}
+.price-card:before,.why>div:before,.contact-opt:before,.admin-card:before,.stat:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(220px circle at var(--mx) var(--my),#4c91ff33,transparent 70%)}
+.price-card:hover:before,.why>div:hover:before,.contact-opt:hover:before,.admin-card:hover:before,.stat:hover:before{opacity:1}
+.price-card>*:not(.popular),.contact-opt>*{position:relative}
+.price-card.featured:after,.contact-opt.main:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;background:conic-gradient(from var(--ang),transparent 0 62%,var(--mint),var(--blue),transparent);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+@keyframes rot{to{--ang:360deg}}
+.price-card svg:first-child{transition:transform .4s cubic-bezier(.3,1.6,.5,1)}.price-card:hover svg:first-child{transform:rotate(-10deg) scale(1.2)}
+.why svg{transition:transform .4s cubic-bezier(.3,1.6,.5,1)}.why>div:hover svg{transform:scale(1.25) rotate(-8deg)}
+@keyframes ring{0%{box-shadow:0 0 0 0 #4c91ff66}70%,100%{box-shadow:0 0 0 14px #4c91ff00}}
+.price-card .acts{display:grid;gap:8px}
+/* contact options */
+.contact{margin-top:30px}.contact h3{text-align:center;font-size:20px;font-weight:900;margin-bottom:16px}
+.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:760px;margin:auto}
+.contact-opt{display:flex;align-items:center;gap:14px;padding:20px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(160deg,#121e34,#0d1627);transition:transform .25s,border-color .25s}
+.contact-opt:hover{transform:translateY(-5px);border-color:#5793ff88}
+.contact-opt.main{background:linear-gradient(150deg,#14325a,#0f1c33);border-color:#4c91ff66}
+.contact-opt b{display:block;font-size:16px}.contact-opt small{color:var(--muted);font-size:12px;line-height:1.6;display:block}
+.ci{position:relative;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#4c91ff22;color:var(--blue2);flex-shrink:0}.ci svg{width:24px;height:24px}
+.contact-opt.main .ci{background:var(--blue);color:#fff}
+.contact-opt .tag{margin-right:auto;background:var(--mint);color:#06241f;font-size:11px;font-weight:900;padding:3px 11px;border-radius:99px}
+/* floating chat button */
+.fab{position:fixed;z-index:90;left:18px;bottom:18px;display:flex;align-items:center;gap:9px;padding:13px 18px;border-radius:99px;background:linear-gradient(135deg,#4f94ff,#2757de);color:#fff;font-weight:800;font-size:14px;box-shadow:0 14px 34px #2563eb77;animation:fabin .7s 1.6s cubic-bezier(.3,1.5,.5,1) backwards;transition:transform .2s}
+.fab:hover{transform:translateY(-3px) scale(1.04)}.fab svg{width:22px;height:22px}
+@keyframes fabin{from{transform:translateY(90px);opacity:0}}
+@media(max-width:650px){.contact-grid{grid-template-columns:1fr}.fab span{display:none}.fab{padding:14px}.fx span{font-size:20px}}
 
-/* قائمة السرعة */
-.pmenu{width:272px}
-.spdbox{padding:4px 6px 12px;text-align:center}
-.spdval{direction:ltr;unicode-bidi:isolate;font-size:32px;font-weight:900;line-height:1.15;font-variant-numeric:tabular-nums}
-.spdrow{display:flex;align-items:center;gap:10px;direction:ltr;margin-top:10px}
-.stp{width:36px;height:36px;flex:none;border-radius:50%;background:#ffffff1a;border:1px solid #ffffff26;color:#fff;font-size:21px;font-weight:900;line-height:1;display:grid;place-items:center;transition:background .15s,transform .15s}
-.stp:hover{background:#ffffff2e}
-.stp:active{transform:scale(.9)}
-.spdlbl{font-size:11px;font-weight:800;color:var(--muted);margin-top:2px}
-.spdr{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:6px;border-radius:99px;margin:0;outline:none;cursor:pointer;background:linear-gradient(to right,var(--blue) var(--v,40%),#ffffff2e var(--v,40%))}
-.spdr::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 4px #5b8cff55}
-.spdr::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 4px #5b8cff55}
-
-/* تأثير الضغطتين (تقديم/رجوع) */
-.fx{position:absolute;top:50%;z-index:5;min-width:88px;display:flex;flex-direction:column;align-items:center;gap:2px;background:#0009;border:1px solid #ffffff2a;color:#fff;padding:14px 18px;border-radius:28px;font-weight:900;font-size:14px;opacity:0;pointer-events:none;direction:rtl;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.fx svg{width:26px;height:26px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.fx.l{left:8%}
-.fx.r{right:8%}
-.fx.go{animation:fxa .6s ease}
-
-/* شارة الضغط المطوّل 2× */
-.holdb{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:9;background:#000c;border:1px solid #5b8cff80;color:#fff;border-radius:99px;padding:7px 16px;font-weight:900;font-size:13px;display:none;align-items:center;gap:7px;pointer-events:none;box-shadow:0 8px 28px #0008;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.holdb.show{display:inline-flex}
-.holdb svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;animation:nudge .8s ease-in-out infinite}
-@keyframes nudge{50%{transform:translateX(3px)}}
-
-/* السابق / التالي + الإحصائيات */
-.stat{position:relative;overflow:hidden;background:linear-gradient(160deg,#ffffff0b,#ffffff04)}
-.stat:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--blue2),transparent);opacity:.65}
-.controls-under{gap:10px}
-.controls-under .ctrl{flex:1;justify-content:center}
-.ctrl.nav{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;font-size:13px}
-.ctrl.nav svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-
-/* قائمة أجزاء المحاضرة */
-.lprog{height:5px;border-radius:99px;background:#ffffff14;margin-top:13px;overflow:hidden}
-.lprog i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#38bdf8,#5b8cff,#a78bfa);transition:width .6s ease}
-.listfilters{gap:4px;padding:10px 12px 4px}
-.filter-btn{font-size:10.5px;display:flex;align-items:center;justify-content:center;gap:5px}
-.filter-btn em{font-style:normal;min-width:18px;padding:0 5px;border-radius:99px;background:#ffffff14;font-size:9.5px;line-height:17px}
-.filter-btn.active em{background:#5b8cff40}
-.item{position:relative;display:flex;align-items:center;gap:11px;padding:8px;border:1px solid #ffffff0f;border-radius:16px;background:#ffffff06;cursor:pointer;min-width:0;outline:none;transition:transform .2s,background .2s,border-color .2s,box-shadow .2s}
-.item:hover{background:#ffffff0e;border-color:#5b8cff45;transform:translateY(-2px)}
-.item:active{transform:scale(.99)}
-.item:focus-visible{border-color:var(--blue2);box-shadow:0 0 0 3px #5b8cff40}
-.item.active{background:linear-gradient(120deg,#477ff52b,#a78bfa14);border-color:#5b8cff80;box-shadow:0 12px 32px #2563eb26}
-.thumb{position:relative;width:116px;aspect-ratio:16/9;flex:none;border-radius:11px;overflow:hidden;background:linear-gradient(135deg,#183e76,#111a2a);display:grid;place-items:center}
-.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .45s}
-.item:hover .thumb img{transform:scale(1.08)}
-.pl2{position:relative;width:30px;height:30px;border-radius:50%;background:#000a;display:grid;place-items:center;transition:background .2s,transform .2s}
-.pl2 svg{width:13px;height:13px;fill:#fff}
-.item:hover .pl2{background:var(--blue);transform:scale(1.12)}
-.eq{position:absolute;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;gap:3px}
-.eq i{width:4px;height:18px;border-radius:3px;background:#8ab4ff;animation:eq 1s ease-in-out infinite}
-.eq i:nth-child(2){animation-delay:.2s}
-.eq i:nth-child(3){animation-delay:.4s}
-@keyframes eq{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}
-body.vpaused .eq i{animation-play-state:paused}
-.thumb .num{position:absolute;top:5px;right:5px;min-width:21px;height:21px;padding:0 6px;border-radius:99px;background:#000c;color:#fff;font-size:10.5px;font-weight:900;display:grid;place-items:center}
-.item.active .num{background:var(--blue)}
-.item.done .num{background:var(--green);color:#052e1f}
-.thumb .duration{position:absolute;bottom:6px;left:5px;background:#000c;border-radius:5px;font-size:9.5px;padding:1px 5px;color:#fff;font-weight:800;direction:ltr}
-.mini{position:absolute;left:0;right:0;bottom:0;height:3px;background:#ffffff26}
-.mini i{display:block;height:100%;background:var(--blue2);transition:width .4s ease}
-.item.done .mini i{background:var(--green)}
-.itemtxt{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;gap:7px}
-.itemtitle{font-size:12.5px;font-weight:800;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.itemmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.st{font-size:10px;font-weight:800;padding:2px 9px;border-radius:99px;background:#ffffff0f;color:var(--muted);border:1px solid #ffffff10}
-.st.g{background:#34d3991f;color:#6ee7b7;border-color:#34d39938}
-.st.o{background:#facc1517;color:#fcd34d;border-color:#facc1530}
-.st.now{background:#5b8cff2e;color:#b6cfff;border-color:#5b8cff55}
-
-@media(max-width:900px){
-  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));max-height:540px}
-  .list .empty,.list .skeleton{grid-column:1/-1}
-}
-@media(max-width:640px){
-  .thumb{width:100px}
-  .itemtitle{font-size:12px}
-  .pcenter .sk{width:58px;height:58px}
-  .pcenter .sk svg{width:20px;height:20px}
-  .spd{height:32px;padding:0 9px;margin:0 2px}
-  .list{grid-template-columns:1fr}
-}
-@media(max-width:420px){
-  .spd svg{display:none}
-  .spd{padding:0 10px}
-}
-
-/* ============ PLAYER V3: بدون ضباب / بدون blur / ضغطتين نضيفة / كارت سرعة جديد / زرار تحميل ============ */
-.screen *{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-.ib,.pcenter .sk,.fx,.holdb,.toast,.pmenu{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-/* شيل الضباب: مفيش تدرّج أسود فوق الفيديو */
-.ptop{background:none;padding-bottom:12px}
-.pctrl{background:none;padding-top:14px}
-.ptop .ib,.pcenter .sk{background:rgba(16,24,42,.62)}
-.ptop .ib:hover{background:rgba(16,24,42,.82)}
-.ptitle,.plive{text-shadow:0 1px 5px #000d}
-.ptime{background:rgba(16,24,42,.58);text-shadow:0 1px 4px #000b}
-.skchip,.spd{background:rgba(16,24,42,.62)}
-.prow .ib svg{filter:drop-shadow(0 1px 3px #000c)}
-.rail{background:#ffffff66;box-shadow:0 1px 5px #0008}
-#pbuf{background:#ffffff99}
-/* أماكن اللمس: الصفوف الفاضية متبلعش الضغطتين */
-.screen.show-ui .pctrl>.prow{pointer-events:none}
-.screen.show-ui .pctrl>.prow>*{pointer-events:auto}
-.screen.show-ui .pctrl>.prow>.sp{pointer-events:none}
-.screen.show-ui .ptop>.ptitle{pointer-events:none}
-/* تأثير الضغطتين: توهّج أبيض خفيف بدل المربع الأسود */
-.fx{width:104px;height:104px;min-width:0;padding:0;border:0;border-radius:50%;justify-content:center;background:radial-gradient(circle,rgba(255,255,255,.30) 0,rgba(255,255,255,.12) 62%,rgba(255,255,255,0) 72%);text-shadow:0 1px 6px #000d}
-.fx svg{filter:drop-shadow(0 1px 4px #000b)}
-.fx.l{left:5%}
-.fx.r{right:5%}
-.holdb,.toast{background:rgba(16,24,42,.88)}
-/* كارت السرعة */
-.pmenu{width:304px;background:#0e1628;border-color:#ffffff26}
-.spdcard{padding:2px 4px 6px}
-.spdhero{text-align:center;padding:14px 8px 12px;margin:2px 0 12px;border-radius:16px;background:radial-gradient(120% 140% at 50% 0,#5b8cff38,transparent 70%),#ffffff08;border:1px solid #ffffff14}
-.spdval{font-size:40px;font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff,#9ec0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.spdlbl{font-size:11.5px;font-weight:800;color:#b6cfff;margin-top:4px}
-.spdrow{margin-top:0}
-.spdticks{display:flex;justify-content:space-between;direction:ltr;font-size:10px;color:var(--muted);font-weight:800;padding:6px 48px 0}
-.spdcard .opts{grid-template-columns:repeat(5,1fr);margin-top:12px;padding:0}
-.spdcard .opts button{padding:9px 2px}
-.spdcard .opts button.on{background:linear-gradient(145deg,#5b8cff,#2f5fe0);box-shadow:0 5px 16px #5b8cff66}
-.spdreset{width:100%;margin-top:12px;padding:10px;border-radius:12px;border:1px solid #5b8cff55;background:#5b8cff22;color:#c3d6ff;font-weight:800;font-size:12.5px;transition:background .15s,opacity .15s}
-.spdreset:hover{background:#5b8cff38}
-.spdreset.on{opacity:.4;pointer-events:none}
-/* زرار التحميل */
-.ib.dl{display:inline-flex;align-items:center;justify-content:center;gap:5px}
-.ib.dl.busy{width:auto;min-width:var(--ibs);padding:0 11px;border-radius:99px;background:var(--blue)}
-.dlp{display:none;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
-.ib.busy .dlp{display:inline}
-.ver{text-align:center;color:var(--muted);font-size:11px;font-weight:700;opacity:.7;margin-top:18px}
-
-/* ============ PLAYER V3: كارت السرعة قايمة رأسية ============ */
-.pmenu{width:230px}
-.spdlist{display:flex;flex-direction:column;gap:2px;padding:2px}
-.spdopt{padding:9px 12px;border-radius:10px}
-.spdopt .val{min-width:62px;text-align:left;font-size:11px}
-.spdopt.on{background:#5b8cff2e}
-.spdopt.on .lbl{color:#c3d6ff}
-.spdopt.on .val{color:var(--blue2);font-size:14px;font-weight:900}
-
-/* ============ دروسك بلس+ · المشغل: قايمة الفيديوهات داخل المشغّل + نافذة التحميل ============ */
-.ib.dl.paused{background:#f59e0b;color:#241600}
-.screen.drawer-open{cursor:auto!important}
-
-/* درج الفيديوهات */
-.pdrawer{position:absolute;top:0;right:0;bottom:0;width:min(350px,90%);z-index:22;background:#0b1322;border-left:1px solid #ffffff22;display:flex;flex-direction:column;direction:rtl;color:#fff;box-shadow:-16px 0 44px #000a;transform:translateX(105%);visibility:hidden;transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s .26s}
-.pdrawer.open{transform:none;visibility:visible;transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s}
-.pdh{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #ffffff14;flex:none}
-.pdt{flex:1;min-width:0}
-.pdt b{display:block;font-size:13px;font-weight:900}
-.pdt span{display:block;font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
-.pdh .ib{--ibs:34px}
-.pds{padding:8px 10px 4px;flex:none}
-.pds .sb{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:11px;background:#050b16b8;border:1px solid #ffffff18;color:var(--muted)}
-.pds .sb svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;flex:none}
-.pds input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:#fff;font:700 12px Cairo,sans-serif;-webkit-user-select:text;user-select:text}
-.pdl{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:8px 10px 12px;display:flex;flex-direction:column;gap:7px;scrollbar-width:thin;scrollbar-color:#324766 transparent}
-.pdl .item{padding:6px;gap:9px;border-radius:13px}
-.pdl .item:hover{transform:none}
-.pdl .thumb{width:92px;border-radius:9px}
-.pdl .itemtitle{font-size:12px}
-.pdl .itemtxt{gap:5px}
-
-/* نافذة التحميل */
-.dlm{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:14px}
-.dlm.open{display:flex}
-.dlm-bg{position:absolute;inset:0;background:rgba(3,7,15,.76)}
-.dlm-card{position:relative;width:min(470px,100%);max-height:90vh;max-height:92dvh;overflow:auto;background:linear-gradient(180deg,#15223d,#0d1526);border:1px solid #8ab4ff30;border-radius:22px;box-shadow:0 30px 90px #000b;animation:menuIn .22s cubic-bezier(.2,.8,.2,1);scrollbar-width:thin}
-.dlm-head{display:flex;align-items:center;gap:11px;padding:15px 16px 12px;border-bottom:1px solid #ffffff10;position:sticky;top:0;background:#15223df5;z-index:2}
-.dlm-ic{width:40px;height:40px;flex:none;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#477ff5,#234ab1);box-shadow:0 7px 22px #2563eb40}
-.dlm-ic svg{width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.dlm-ht{flex:1;min-width:0}
-.dlm-ht h3{margin:0;font-size:15px;font-weight:900}
-.dlm-ht p{margin:3px 0 0;font-size:11px;color:var(--muted);font-weight:700}
-.dlm-x{width:36px;height:36px;flex:none;border-radius:50%;background:#ffffff14;display:grid;place-items:center;color:#fff;transition:background .15s}
-.dlm-x:hover{background:#ffffff26}
-.dlm-x svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
-.dlm-body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
-.dlm-ver{text-align:center;color:var(--muted);font-size:10px;font-weight:700;opacity:.6;padding:0 0 12px}
-.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
-.dl-vid{display:flex;gap:11px;align-items:center;padding:9px;border-radius:15px;background:#ffffff08;border:1px solid #ffffff12}
-.dl-th{width:96px;aspect-ratio:16/9;border-radius:10px;background:linear-gradient(135deg,#183e76,#111a2a);flex:none;overflow:hidden}
-.dl-th img{width:100%;height:100%;object-fit:cover}
-.dl-vt{min-width:0;flex:1}
-.dl-vt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.55;font-weight:800}
-.dl-vt span{display:block;margin-top:4px;font-size:11px;color:var(--muted);font-weight:700}
-.dl-sec{font-size:12px;font-weight:900;color:var(--blue2)}
-.dl-q{display:flex;flex-direction:column;gap:7px}
-.dl-q button{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:13px;border:1px solid #ffffff18;background:#ffffff08;text-align:right;transition:background .15s,border-color .15s}
-.dl-q button:hover{background:#ffffff10}
-.dl-q button .r{width:16px;height:16px;border-radius:50%;border:2px solid #ffffff55;flex:none}
-.dl-q button.on{border-color:#5b8cffaa;background:#5b8cff22}
-.dl-q button.on .r{border-color:var(--blue);background:radial-gradient(circle,var(--blue) 45%,transparent 50%)}
-.dl-q button b{flex:1;font-size:13px;font-weight:900}
-.dl-q button em{font-style:normal;font-size:11.5px;color:var(--muted);font-weight:800;unicode-bidi:plaintext}
-.dl-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.dl-pct{font-size:40px;font-weight:900;line-height:1;direction:ltr;font-variant-numeric:tabular-nums}
-.dl-badge{font-size:11px;font-weight:900;padding:5px 12px;border-radius:99px;white-space:nowrap}
-.dl-badge.b{background:#5b8cff2e;color:#b6cfff}
-.dl-badge.o{background:#facc1520;color:#fcd34d}
-.dl-badge.r{background:#ef444424;color:#fca5a5}
-.dl-badge.g{background:#34d3991f;color:#6ee7b7}
-.dl-bar{height:10px;border-radius:99px;background:#ffffff16;overflow:hidden}
-.dl-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#38bdf8,#5b8cff 55%,#a78bfa);transition:width .45s ease}
-.dlm-body[data-st=paused] .dl-bar i,.dlm-body[data-st=pausing] .dl-bar i{background:#f59e0b}
-.dlm-body[data-st=error] .dl-bar i{background:#ef4444}
-.dlm-body[data-st=done] .dl-bar i{background:linear-gradient(90deg,#34d399,#10b981)}
-.dl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.dl-c{padding:10px 11px;border-radius:13px;background:#ffffff08;border:1px solid #ffffff10;min-width:0}
-.dl-c span{display:block;font-size:10.5px;color:var(--muted);font-weight:800}
-.dl-c b{display:block;margin-top:3px;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dl-note{font-size:11.5px;line-height:1.75;color:var(--muted);font-weight:700;padding:9px 12px;border-radius:12px;background:#ffffff08;border:1px solid #ffffff10}
-.dl-note.err{color:#fca5a5;background:#ef44441a;border-color:#ef444440}
-.dl-act{display:flex;gap:9px}
-.dl-act .ctrl{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px}
-.ctrl.danger{background:#ef444418;border-color:#ef444455;color:#fca5a5}
-.ctrl.danger:hover{background:#ef444430}
-.dl-act .ctrl svg,.dl-o .ctrl svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.dl-act .ctrl svg.f{fill:currentColor;stroke:none}
-.dl-load{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);font-weight:800;padding:8px}
-.spin.sm{width:20px;height:20px;border-width:2px}
-.dl-empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px;font-weight:700}
-.dl-others{display:flex;flex-direction:column;gap:7px}
-.dl-o{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:13px;background:#ffffff08;border:1px solid #ffffff10}
-.dl-ot{flex:1;min-width:0}
-.dl-ot b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dl-ot span{font-size:10.5px;color:var(--muted);font-weight:700}
-@media(max-width:640px){
-  .dlm{align-items:flex-end;padding:0}
-  .dlm-card{width:100%;border-radius:22px 22px 0 0;max-height:92vh;max-height:94dvh}
-  .dl-pct{font-size:34px}
-}
+/* ===== type: IBM Plex Sans Arabic, lighter weights ===== */
+:root{--disp:'IBM Plex Sans Arabic','Segoe UI',Tahoma,system-ui,sans-serif}
+button,input,summary{font-family:inherit}
+.hero h1,.head h2,.enter h2,.trial h2,.contact h3,.rs h3,.why h3,.price-card h3,.contact-opt b,.head h3,.admin-card b,.pbody b{font-weight:700;letter-spacing:0}
+.hero h1,.head h2,.enter h2,.trial h2{line-height:1.5}
+.hero h1 em{text-shadow:0 0 38px #59e0b344}
+.navlinks a{font-size:15px}.btn{font-size:15px}.btn-lg{font-size:16px}
+@media(max-width:650px){.hero h1{line-height:1.55}.tabbar a,.tabbar button{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.fx,.orb{display:none}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}.bar i{width:68%}}
 </style>
 </head>
 <body>
+<header class="nav"><div class="container navin">
+<a class="brand" href="#home" aria-label="Dorosak Plus"><span class="logo"><img src="https://h.top4top.io/p_393491swv0.png" alt="" width="42" height="42" onerror="this.parentNode.classList.add('fb');this.parentNode.textContent='D'"></span><span dir="ltr">Dorosak Plus</span></a>
+<nav class="navlinks"><a href="#how">ابدأ إزاي</a><a href="#plans">الأسعار</a><a href="#contact">التواصل</a><a href="#faq">الأسئلة</a></nav>
+<div style="display:flex;gap:10px"><a class="btn btn-s" href="#plans">الأسعار</a><button class="btn btn-p" type="button" data-open-login>تسجيل الدخول <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button></div>
+</div><div class="prog"><i></i></div></header>
 
-<!-- ============ HEADER ============ -->
-<header class="top">
-  <div class="topin">
-    <div class="brand">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 11 7-11 7z"/></svg>
-      </div>
-      <div class="brand-txt">
-        <b>دروسك بلس+</b>
-        <span>مشغل المحاضرات</span>
-      </div>
-    </div>
-    <div class="grow"></div>
-    <button class="btn" id="backBtn">
-      <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
-      <span>رجوع للمحتوى</span>
-    </button>
-  </div>
-</header>
+<main id="home">
+<section class="hero" data-spy="home"><div class="orb o1"></div><div class="orb o2"></div><div class="fx" aria-hidden="true"><span style="top:12%;right:48%;color:#8db9ff"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14ZM20 17v4H6.5A2.5 2.5 0 0 1 4 18.5"/></svg></span><span style="top:64%;right:51%;color:#ffcf6b;animation-delay:-2s"><svg viewBox="0 0 24 24"><path d="m3 21 3-1 12-12-2-2L4 18l-1 3ZM14 6l4 4"/></svg></span><span style="top:8%;left:4%;color:#ffcf6b;animation-delay:-4s"><svg viewBox="0 0 24 24"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8l-5.8 3.1 1.1-6.5L2.6 9.8l6.5-.9L12 3Z"/></svg></span><span style="bottom:10%;left:8%;color:#59e0b3;animation-delay:-1s"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span></div><div class="container">
+<div class="hero-grid">
+<div class="hero-copy">
+<h1>ادخل بكودك،<br>وكمّل مذاكرتك <em>من حيث وقفت.</em></h1>
+<p class="lead">كل المواد والمحاضرات بتاعتك في مكان واحد منظّم، من أي جهاز. من غير لف ولا تشتت بين منصات.</p>
+<div class="hero-actions"><button class="btn btn-p btn-lg" type="button" data-open-login>سجّل دخولك دلوقتي</button><a class="btn btn-s btn-lg" href="#plans">شوف الأسعار</a></div>
+<div class="checks"><span><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>سعر واضح</span><span><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>تجربة مجانية</span><span><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>دعم مباشر من الأدمن</span></div>
+</div>
+<div class="stage" aria-hidden="true">
+<div class="chip a"><span class="ce g"><svg viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4 .5 1.5 1 2 2 2 0-3-1-5 1-8Z"/></svg></span><span>٥ أيام مذاكرة ورا بعض<small>كمّل السلسلة</small></span></div>
+<div class="player">
+<div class="screen"><small>محاضرة ٣ · الباب الأول</small><div class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></div></div>
+<div class="pbody"><b>مراجعة الباب الأول</b><span>كمّل من الدقيقة ٢٤</span><div class="bar"><i></i></div><div class="prow"><span>تقدّمك في المادة</span><strong>٦٨٪</strong></div></div>
+</div>
+<div class="chip b"><span class="ce m"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg></span><span>٩ أرقام وتدخل<small>من غير باسورد</small></span></div>
+</div>
+</div>
+<div class="stats rv"><div class="stat"><b><span data-from>—</span> جنيه</b><span>سعر أقل باقة</span></div><div class="stat"><b data-count>—</b><span>اختار اللي يناسبك</span></div><div class="stat"><b>دعم مباشر</b><span>تواصل مع فريق الإدارة</span></div></div>
+</div></section>
+<section class="section" id="how"><div class="container">
+<div class="head c rv"><h2>٣ خطوات وتبدأ تذاكر</h2><p>من أول زيارة لحد أول محاضرة، في دقايق.</p></div>
+<div class="road rv">
+<div class="rs rv stag"><div class="ri"><svg viewBox="0 0 24 24"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Z"/><path d="M8 8h.01"/></svg></div><div><small>الخطوة ١</small><h3>اختار باقتك</h3><p>شوف الأسعار واختار المدة اللي تناسبك.</p></div></div>
+<div class="rs rv stag"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.400 8.400 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.400 8.400 0 0 1-3.8-.9L3 21l1.9-5.7a8.400 8.400 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.400 8.400 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></div><div><small>الخطوة ٢</small><h3>كلّم الأدمن</h3><p>من الشات داخل الموقع أو على تيليجرام، وهيبعتلك كودك.</p></div></div>
+<div class="rs rv stag"><div class="ri"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/></svg></div><div><small>الخطوة ٣</small><h3>اكتب كودك وذاكر</h3><p>٩ أرقام وتدخل على موادك من أي جهاز.</p></div></div>
+</div></div></section>
 
-<!-- ============ MAIN ============ -->
-<main class="wrap">
-  <div class="crumb" id="crumb">المحاضرات / جاري تجهيز المشغل…</div>
+<section class="section alt" id="plans" data-spy="plans"><div class="container">
+<div class="head c rv"><span class="sb"><i>1</i>الخطوة الأولى</span><h2>اختار باقتك من غير حيرة.</h2><p>الأسعار بتتحدّث تلقائيًا من الإدارة.</p></div>
+<div class="prices grp" id="prices"><p class="note" id="prices-msg">جاري تحميل الأسعار…</p></div>
+<p class="note">عندك كود اشتراك؟ <a href="#" data-login-link>سجّل دخولك من هنا</a></p>
+</div></section>
 
-  <div class="layout">
-    <!-- PLAYER -->
-    <section class="main">
-      <article class="player-card">
-        <div class="screen paused" id="screen">
-          <video id="video" playsinline webkit-playsinline preload="metadata" controlslist="nodownload noplaybackrate" oncontextmenu="return false"></video>
-          <iframe id="youtubeFrame" class="youtube-frame" title="مشغل يوتيوب" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<section class="section" id="contact" data-spy="contact"><div class="container">
+<div class="head c rv"><span class="sb"><i>2</i>الخطوة التانية</span><h2>كلّم الأدمن واستلم كودك.</h2><p>اختار الطريقة اللي تريحك، والرد بيوصلك على طول.</p></div>
+<div class="contact-grid rv"><a class="contact-opt main" href="chat.html"><span class="ci"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.400 8.400 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.400 8.400 0 0 1-3.8-.9L3 21l1.9-5.7a8.400 8.400 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.400 8.400 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></span><div><b>شات مباشر من الموقع</b><small>ابعت رسالتك للأدمن هنا من غير ما تفتح أي تطبيق</small></div><span class="tag">الأسهل</span></a><a class="contact-opt" href="#admins"><span class="ci"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><div><b>تليجرام</b><small>اختار أدمن وكلّمه على طول</small></div></a></div>
+<div class="trial rv" id="trial"><div class="ti"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></div><div><h2>طب وأنا إيش ضمني إنكم مش نصابين؟</h2><p>من حقك تطمّن قبل ما تشترك. فيه تجربة مجانية للموقع، اطلبها من الأدمن وجرّب براحتك.</p></div><a class="btn btn-lg" href="chat.html">اطلب التجربة</a></div>
+<div id="admins"><div class="head rv" style="margin:34px 0 14px"><h3 style="font-size:20px;font-weight:900">الأدمنز المتاحين</h3></div>
+<div class="admins" id="admins-list"><p class="note" id="admins-msg">جاري تحميل الأدمنز…</p></div></div>
+</div></section>
 
-          <!-- طبقة اللمس -->
-          <div class="ptap" id="ptap"></div>
+<section class="section alt" id="enter" data-spy="enter"><div class="container"><div class="enter rv">
+<div><span class="sb"><i>3</i>الخطوة التالتة</span><h2>اكتب كودك وادخل.</h2><p>٩ أرقام بس. من غير باسورد ولا بيانات كتير.</p><div class="hero-actions"><button class="btn btn-p btn-lg" type="button" data-open-login>سجّل دخولك <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button></div></div>
+<div class="demo" aria-hidden="true"><div class="dm-cells"><span class="dm" style="--i:0">4</span><span class="dm" style="--i:1">8</span><span class="dm" style="--i:2">2</span><span class="dm" style="--i:3">9</span><span class="dm" style="--i:4">1</span><span class="dm" style="--i:5">7</span><span class="dm" style="--i:6">0</span><span class="dm" style="--i:7">3</span><span class="dm" style="--i:8">6</span></div><div class="dm-ok"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>تم التحقق</span></div></div>
+</div></div></section>
 
-          <!-- تأثيرات -->
-          <div class="fx l" id="fxl"></div>
-          <div class="fx r" id="fxr"></div>
-          <div class="holdb" id="holdb"><svg viewBox="0 0 24 24"><path d="m5 6 6 6-6 6M13 6l6 6-6 6"/></svg><span>سرعة 2×</span></div>
+<section class="section" id="why"><div class="container">
+<div class="head rv"><h2>اللي هتلاقيه جوه</h2></div>
+<div class="why">
+<div class="rv stag"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14ZM20 17v4H6.5A2.5 2.5 0 0 1 4 18.5"/></svg><h3>كل مادة في مكانها</h3><p>مواد وفصول ومحاضرات مترتبة توصلها بسهولة.</p></div>
+<div class="rv stag"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3V9Z"/></svg><h3>كمّل من حيث وقفت</h3><p>افتح المحاضرة من حسابك وكمّل على طول.</p></div>
+<div class="rv stag"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><h3>دخول بكود واحد</h3><p>مفيش باسورد تنساه. كودك بس وتدخل.</p></div>
+</div></div></section>
 
-          <!-- الشريط العلوي -->
-          <div class="ptop">
-            <button class="ib" id="pback" type="button" aria-label="رجوع">
-              <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-            <div class="ptitle" id="ptitle"></div>
-            <span class="plive">دروسك بلس+</span>
-          </div>
-
-          <!-- أزرار المنتصف (للموبايل) -->
-          <div class="pcenter">
-            <button class="sk" id="pb" type="button" aria-label="رجوع 10 ثواني" title="رجوع 10 ثواني"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><b>−10</b></button>
-            <button class="bigplay" id="pc" type="button" aria-label="تشغيل"><svg class="f" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></button>
-            <button class="sk" id="pf" type="button" aria-label="تقديم 10 ثواني" title="تقديم 10 ثواني"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><b>+10</b></button>
-          </div>
-
-          <!-- الشريط السفلي -->
-          <div class="pctrl">
-            <div class="seekwrap" id="pseek" tabindex="0" role="slider" aria-label="تقدم الفيديو" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
-              <div class="rail"><i id="pbuf"></i><i id="pplayed"></i></div>
-              <b id="pknob"></b>
-              <span class="ptip" id="ptip">0:00</span>
-            </div>
-            <div class="prow">
-              <button class="skchip" id="pb2" type="button" aria-label="رجوع 10 ثواني" title="رجوع 10 ثواني (J)">−10</button>
-              <button class="ib" id="pplay" type="button" aria-label="تشغيل" title="تشغيل / إيقاف (Space)"><svg class="f" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></button>
-              <button class="skchip" id="pf2" type="button" aria-label="تقديم 10 ثواني" title="تقديم 10 ثواني (L)">+10</button>
-              <button class="ib" id="pnx" type="button" aria-label="الفيديو التالي" title="الفيديو التالي (Shift+N)"><svg class="f" viewBox="0 0 24 24"><path d="M6 6.5v11l8-5.5z"/><rect x="16" y="6" width="2.4" height="12" rx="1"/></svg></button>
-              <div class="vol">
-                <button class="ib" id="pmute" type="button" aria-label="كتم الصوت" title="كتم (M)"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M18.5 6.5a9 9 0 0 1 0 11"/></svg></button>
-                <input class="vr" id="pvol" type="range" min="0" max="1" step="0.05" value="1" aria-label="مستوى الصوت">
-              </div>
-              <span class="ptime" id="ptime">0:00 / 0:00</span>
-              <span class="sp"></span>
-              <button class="spd" id="pspeed" type="button" aria-label="سرعة التشغيل" title="سرعة التشغيل"><svg viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/></svg><span id="pspeedv">1×</span></button>
-              <button class="ib" id="plist" type="button" aria-label="قايمة فيديوهات المحاضرة" title="قايمة الفيديوهات (Q)"><svg viewBox="0 0 24 24"><path d="M4 6h11M4 12h11M4 18h7"/><path d="m17 13.5 4 2.5-4 2.5z" fill="currentColor"/></svg></button>
-              <button class="ib" id="pset" type="button" aria-label="الإعدادات" title="الإعدادات"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
-              <button class="ib" id="ppip" type="button" aria-label="نافذة عائمة" title="نافذة عائمة (P)"><svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><rect x="12" y="11" width="7" height="5.5" rx="1" fill="currentColor" stroke="none"/></svg></button>
-              <button class="ib" id="pfs" type="button" aria-label="ملء الشاشة" title="ملء الشاشة (F)"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
-            </div>
-          </div>
-
-          <!-- القائمة العائمة -->
-          <div class="pmenu" id="pmenu"></div>
-
-          <!-- درج فيديوهات المحاضرة (الفيديو يفضل شغال) -->
-          <div class="pdrawer" id="pdrawer" aria-hidden="true">
-            <div class="pdh">
-              <div class="pdt"><b>فيديوهات المحاضرة</b><span id="pdSub"></span></div>
-              <button class="ib" id="pdClose" type="button" aria-label="إغلاق القايمة"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-            </div>
-            <div class="pds"><label class="sb"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="drawSearch" type="search" placeholder="ابحث عن فيديو..." autocomplete="off" aria-label="ابحث"></label></div>
-            <div class="pdl" id="pdrawList"></div>
-          </div>
-
-          <!-- توست -->
-          <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-          <!-- Loading -->
-          <div class="loading show" id="loading">
-            <div class="spin"></div>
-            <span id="loadText">جاري تحميل المحاضرة…</span>
-          </div>
-
-          <!-- Error -->
-          <div class="error" id="error">
-            <div class="eic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.2v.1"/></svg></div>
-            <b id="errorTitle">مش قادر أشغّل الفيديو</b>
-            <p id="errorText">تأكد من الاتصال وحاول مرة تانية.</p>
-            <div class="eact">
-              <button class="ctrl primary sm" id="retryBtn" type="button">إعادة المحاولة</button>
-              <button class="ctrl sm" id="skipBtn" type="button" style="display:none">تخطّي للتالي</button>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- Info -->
-      <div class="titlebox">
-        <div class="eyebrow" id="lectureName">محتوى المحاضرة</div>
-        <h1 id="videoTitle">جاري تجهيز الفيديو…</h1>
-        <div class="subline">
-          <span id="videoCount">— فيديو</span>
-          <span id="watchedCount">0 تمت مشاهدته</span>
-          <span id="remainingCount">— متبقي</span>
-        </div>
-        <div class="statrow">
-          <div class="stat"><b id="statDone">0</b><span>فيديو مكتمل</span></div>
-          <div class="stat"><b id="statRemain">0</b><span>فيديو متبقي</span></div>
-          <div class="stat"><b id="statPercent">0%</b><span>إنجاز المحاضرة</span></div>
-        </div>
-        <div class="controls-under">
-          <button class="ctrl nav" id="prevBtn" type="button"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><span>الفيديو السابق</span></button>
-          <button class="ctrl nav primary" id="nextBtn" type="button"><span>الفيديو التالي</span><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
-        </div>
-      </div>
-      <div class="ver">دروسك بلس+ · المشغل · دروسك بلس+ · المشغل</div>
-    </section>
-
-    <!-- PLAYLIST -->
-    <aside class="panel">
-      <div class="panel-head">
-        <div class="panel-heading">
-          <div class="panel-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/>
-              <rect x="3" y="15" width="7" height="6" rx="2"/><path d="M14 17h7M14 20h7"/>
-            </svg>
-          </div>
-          <div>
-            <h2>محتوى المحاضرة</h2>
-            <p id="listSub">الفيديو الحالي وما تبقّى</p>
-          </div>
-        </div>
-        <div class="lprog"><i id="lprogI"></i></div>
-      </div>
-      <div class="playlist-tools">
-        <label class="searchbox">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
-          <input id="videoSearch" type="search" placeholder="ابحث عن فيديو..." autocomplete="off" aria-label="ابحث">
-        </label>
-      </div>
-      <div class="listfilters" role="group">
-        <button class="filter-btn active" data-filter="all">الكل <em id="cAll">0</em></button>
-        <button class="filter-btn" data-filter="progress">قيد المشاهدة <em id="cProg">0</em></button>
-        <button class="filter-btn" data-filter="done">مكتمل <em id="cDone">0</em></button>
-      </div>
-      <div class="list" id="videoList"><div class="skeleton">جاري تحميل قائمة الفيديوهات…</div></div>
-    </aside>
-  </div>
+<section class="section" id="faq"><div class="container">
+<div class="head c rv"><h2>أسئلة بتتكرر</h2></div>
+<div class="faq rv">
+<details><summary>إزاي أسجّل الدخول؟</summary><p>اضغط تسجيل الدخول واكتب كود الاشتراك المكوّن من 9 أرقام. لو الكود صحيح هتنتقل لصفحة المواد.</p></details>
+<details><summary>إزاي أحصل على كود الاشتراك؟</summary><p>اختار باقتك وكلّم أحد الأدمنز من الشات داخل الموقع أو على تيليجرام، وهيبعتلك الكود بعد الاشتراك.</p></details>
+<details><summary>هل فيه تجربة مجانية؟</summary><p>أيوه، التجربة المجانية متاحة حسب ترتيبات الإدارة. اطلبها من الأدمن.</p></details>
+<details><summary>أسعار الاشتراك كام؟</summary><p id="faq-prices">جاري تحميل الأسعار…</p></details>
+<details><summary>هل كل المواد بتظهر بعد تسجيل الدخول؟</summary><p>المواد اللي بتظهر مرتبطة بالصلاحيات والمحتوى المفعّل لحسابك من الإدارة.</p></details>
+</div></div></section>
 </main>
 
+<footer class="footer"><div class="container"><div><b>Dorosak Plus</b> — خلّي مذاكرتك في مكان واحد.</div><div>الأسعار بالجنيه المصري · © <span id="year"></span> Dorosak Plus</div><a href="#home">الرجوع لفوق ↑</a></div></footer>
 
-<!-- ============ نافذة التحميل (V4) ============ -->
-<div class="dlm" id="dlm" aria-hidden="true">
-  <div class="dlm-bg" id="dlmBg"></div>
-  <div class="dlm-card" role="dialog" aria-modal="true" aria-labelledby="dlmTitle">
-    <div class="dlm-head">
-      <div class="dlm-ic"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 19.5h15"/></svg></div>
-      <div class="dlm-ht"><h3 id="dlmTitle">تحميل الفيديو</h3><p>تقدر توقّف وتكمّل بعدين من نفس المكان</p></div>
-      <button class="dlm-x" id="dlmX" type="button" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="dlm-body" id="dlBody"></div>
-    <div class="dlm-ver">دروسك بلس+ · المشغل</div>
-  </div>
+<!-- ===== LOGIN ===== -->
+<section id="auth" aria-label="تسجيل الدخول" role="dialog" aria-modal="true">
+<div class="auth-card" data-view="code">
+<button class="auth-back" type="button" data-home-link aria-label="رجوع للرئيسية"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>رجوع</button>
+<div class="logo"><img src="https://h.top4top.io/p_393491swv0.png" alt="" width="52" height="52" onerror="this.parentNode.classList.add('fb');this.parentNode.textContent='D'"></div>
+<h3>أهلاً بيك تاني</h3>
+<p class="auth-sub" id="auth-sub">اكتب كود الاشتراك وادخل على موادك.</p>
+<div id="pane-saved" hidden>
+<div class="sess-list" id="sess-list"></div>
+<button class="btn btn-s alt" type="button" id="use-code">ادخل بكود تاني</button>
 </div>
+<div id="pane-code">
+<form id="code-form" autocomplete="off" novalidate>
+<label for="code" class="vh">كود الدخول (9 أرقام)</label>
+<div class="code-wrap">
+<div class="cells" id="cells" aria-hidden="true"></div>
+<input id="code" inputmode="numeric" autocomplete="one-time-code" enterkeyhint="go" maxlength="9" pattern="[0-9]{9}" required aria-label="كود الدخول 9 أرقام">
+</div>
+<div class="hint">9 أرقام. تقدر تلصق الكود مرة واحدة.</div>
+<button class="btn btn-p btn-lg go" id="submit-btn" type="submit"><span id="btn-txt">تسجيل الدخول</span></button>
+</form>
+<button class="linkbtn" type="button" id="back-saved" hidden>رجوع للجلسات المحفوظة</button>
+</div>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+<p class="legal">ما تشاركش كودك مع أي حد. الجلسة بتتحفظ على جهازك بس، وتقدر تشيلها في أي وقت.</p>
+</div>
+</section>
+<aside class="rail" aria-label="مراحل الصفحة"><a href="#home" data-to="home"><i></i><span>الرئيسية</span></a><a href="#plans" data-to="plans"><i></i><span>الباقات</span></a><a href="#contact" data-to="contact"><i></i><span>التواصل</span></a><a href="#enter" data-to="enter"><i></i><span>الدخول</span></a></aside>
+<nav class="tabbar" aria-label="تنقل سريع"><a href="#home" data-to="home"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg><span>الرئيسية</span></a><a href="#plans" data-to="plans"><svg viewBox="0 0 24 24"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9Z"/><path d="M8 8h.01"/></svg><span>الباقات</span></a><a href="chat.html"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.400 8.400 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.400 8.400 0 0 1-3.8-.9L3 21l1.9-5.7a8.400 8.400 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.400 8.400 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg><span>الشات</span></a><button type="button" class="tb-main" data-open-login><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>دخول</span></button></nav>
+<a class="fab" href="chat.html" aria-label="كلّم الأدمن"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg><span>كلّم الأدمن</span></a>
+<div class="toast" id="toast" role="status"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
 (function(){
 'use strict';
-
-/* ============ CONFIG ============ */
-const API=(window.DOROSAK_API_BASE||'https://coursatk-platform-mo7a.up.railway.app').replace(/\/$/,'');
-const WORKER_PROXY='https://gentle-unit-a724.ahmedholim42.workers.dev/?url=';
-
-// السيرفر يجهّز جلسة التشغيل والـ playlists/المفتاح؛ الـ Worker يُستخدم لقطع الفيديو فقط.
-function createWorkerLoader(){
-  const BaseLoader = Hls.DefaultConfig.loader;
-  return class WorkerHlsLoader extends BaseLoader {
-    load(context, config, callbacks){
-      const originalUrl = context && context.url ? String(context.url) : '';
-      let isCdnSegment = false;
-      try {
-        const u = new URL(originalUrl, location.href);
-        isCdnSegment = /(^|\.)c-cdn\.online$/i.test(u.hostname) &&
-          /\/seg-[^/]+\.(?:woff2|ts|m4s|mp4)$/i.test(u.pathname);
-      } catch(e) {}
-      // لا نحوّل الـ manifest أو الـ playlist أو طلب المفتاح إلى Worker.
-      if(isCdnSegment && originalUrl.indexOf(WORKER_PROXY)!==0){
-        context.url = WORKER_PROXY + encodeURIComponent(originalUrl);
-      }
-      const cfg = Object.assign({}, config, {
-        xhrSetup: (xhr, url) => {
-          // التوكن مطلوب لطلبات الـAPI فقط، وليس لطلب القطعة من Worker.
-          if(token && url && url.indexOf(WORKER_PROXY)!==0 && url.indexOf(API)===0) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-          }
-          if(typeof config.xhrSetup === 'function') config.xhrSetup(xhr, url);
-        }
-      });
-      return super.load(context, cfg, callbacks);
-    }
-  };
-}
-const isMediaSegment=u=>/floravon\.(online|shop)|c-cdn\.online|cloudfrount\.(online|shop)|seg-[^.]+\.(woff2|ts)|\.(woff2|ts)($|\?)/i.test(u);
-const token=localStorage.getItem('cstk_tok')||'';
-const qs=new URLSearchParams(location.search);
-const lectureId=qs.get('lectureId');
-const initialVideoId=qs.get('videoId');
-
-const $=id=>document.getElementById(id);
-const video=$('video');
-const youtubeFrame=$('youtubeFrame');
-const screenEl=$('screen');
-
-/* تفضيلات المشغّل (بتتحفظ على الجهاز) */
-const PREF_KEY='cstk_player_pref';
-function readPref(){try{return JSON.parse(localStorage.getItem(PREF_KEY)||'{}')||{}}catch(e){return {}}}
-let prefs=Object.assign({rate:1,autonext:true,volume:1,muted:false},readPref());
-function savePref(){try{localStorage.setItem(PREF_KEY,JSON.stringify(prefs))}catch(e){}}
-
-let videos=[],current=-1,hls=null,lastSaved=0,toastTimer=0,ready=false;
-let lectureTitle='المحاضرة',listFilter='all',listQuery='',pendingRestore=-1;
-
-/* ============ HELPERS ============ */
-const storeKey=id=>'cstk_w_'+String(id);
-function readProgress(id){try{return JSON.parse(localStorage.getItem(storeKey(id))||'null')}catch(e){return null}}
-function saveProgress(){
-  if(current<0||!ready)return;
-  const v=videos[current];if(!v)return;
-  const dur=Number(video.duration)||Number(v.duration)||0;
-  const t=Number(video.currentTime)||0;
-  const p=dur?Math.min(100,t/dur*100):0;
-  try{localStorage.setItem(storeKey(v.id),JSON.stringify({
-    videoId:String(v.id),title:v.title,currentTime:t,duration:dur,
-    percent:Math.round(p),watched:p>=90,updatedAt:Date.now()
-  }))}catch(e){}
-  lastSaved=t;
-  updateCurrentItemUI();
-  renderStats();
-}
-function updateCurrentItemUI(){
-  if(current<0)return;
-  const v=videos[current];if(!v)return;
-  const s=statusOf(readProgress(v.id)||{});
-  document.querySelectorAll(`[data-i="${current}"]`).forEach(el=>{
-    el.classList.toggle('done',s.done);
-    const num=el.querySelector('.num');if(num)num.textContent=s.done?'✓':current+1;
-    const st=el.querySelector('.st:not(.now)');if(st){st.textContent=s.label;st.className='st '+s.cls}
-    const mini=el.querySelector('.mini i');if(mini)mini.style.width=(s.done?100:s.pct)+'%';
-  });
-}
-function statusOf(p){
-  const pct=Math.min(100,+p.percent||0),done=!!p.watched||pct>=90;
-  return{pct,done,label:done?'تمت المشاهدة ✓':pct?'وقفت عند '+Math.round(pct)+'%':'جديد',cls:done?'g':pct?'o':''};
-}
-function fmt(s){
-  s=Math.max(0,Math.floor(Number(s)||0));
-  const h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
-  return h?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${m}:${String(sec).padStart(2,'0')}`;
-}
-function showToast(t){
-  const el=$('toast');
-  el.textContent=t;el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),1900);
-}
-function setLoading(on,text,buf){
-  const l=$('loading');
-  l.classList.toggle('show',!!on);
-  l.classList.toggle('buf',!!buf);
-  if(text)$('loadText').textContent=text;
-}
-let errAction='retry';
-function showError(t,title,action){
-  // لا تعرض لوحة الخطأ الحمراء؛ اعرض مؤشر التحميل بدلًا منها أثناء محاولة تجهيز الفيديو.
-  // يظل سلوك إعادة المحاولة الداخلي كما هو، لكن لا تظهر رسالة الخطأ للمستخدم.
-  errAction=action||'retry';
-  hideError();
-  setLoading(true,'جاري تحميل الفيديو…',false);
-}
-function hideError(){$('error').classList.remove('show')}
-// لا نعرض خطأ HLS فورًا لو الفيديو ما زال يعمل؛ بعض الطلبات المسبقة قد تفشل
-// بينما المقطع الحالي شغال. ننتظر لحظات ونتأكد أن التشغيل توقف فعلًا.
-function showHlsError(message,title,action){
-  // HLS puede reportar fallos de peticiones anticipadas mientras el vídeo aún carga.
-  // No mostramos el panel rojo durante la carga: damos tiempo al reproductor a recuperarse.
-  const startTime=Number(video.currentTime)||0;
-  const wasPlayable=video.readyState>=2 && startTime>0;
-  if(wasPlayable){
-    setTimeout(()=>{
-      const stillProgressing=!video.paused && video.readyState>=2 && (Number(video.currentTime)||0)>startTime+0.5;
-      if(stillProgressing){hideError();return;}
-      if(video.readyState<2 || video.error){showError(message,title,action)}
-    },3500);
-    return;
+var API=(window.DOROSAK_API_BASE||'https://coursatk-platform-mo7a.up.railway.app').replace(/\/$/,'');
+var $=function(s){return document.querySelector(s)};
+var memDev=null;
+function get(k){try{return localStorage.getItem(k)}catch(_){return null}}
+function put(k,v){
+  try{localStorage.setItem(k,v)}catch(e){
+    ['cstk_subjects','cstk_me','cstk_year','cstk_site'].forEach(function(x){try{localStorage.removeItem(x)}catch(_){}});
+    try{localStorage.setItem(k,v)}catch(e2){throw new Error('مساحة التخزين في المتصفح ممتلئة. امسح بيانات الموقع وجرّب تاني.')}
   }
-  hideError();
-  setLoading(true,'جاري تحميل الفيديو…',true);
-  const expectedToken=playToken;
-  setTimeout(()=>{
-    if(expectedToken!==playToken)return;
-    if(video.readyState>=2 || (!video.paused && (Number(video.currentTime)||0)>0)){hideError();setLoading(false);return;}
-    showError(message,title,action);
-  },10000);
 }
-async function api(path,opts={}){
-  const headers={Accept:'application/json',...(opts.headers||{})};
-  if(token)headers.Authorization='Bearer '+token;
-  let r;
-  try{r=await fetch(API+path,{method:opts.method||'GET',headers,body:opts.body,cache:'no-store'})}
-  catch(e){const er=new Error('مفيش اتصال بالسيرفر. اتأكد من النت وجرّب تاني.');er.kind='network';throw er}
-  let d={};try{d=await r.json()}catch(e){}
-  if(!r.ok){
-    const er=new Error(d.message||`السيرفر رجّع خطأ (${r.status})`);
-    er.status=r.status;
-    if(r.status===401||r.status===403){er.kind='auth';er.message='جلسة الدخول انتهت أو مفيش صلاحية لمشاهدة الفيديو ده.'}
-    throw er;
+function drop(){['cstk_tok','cstk_me','cstk_year','cstk_subjects','cstk_subject_ids'].forEach(function(k){try{localStorage.removeItem(k)}catch(_){}})}
+function toast(m){var t=$('#toast');if(!t)return;t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4500)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function api(path,opt,ms){
+  var c=new AbortController(),t=setTimeout(function(){c.abort()},ms||15000);
+  opt=opt||{};opt.signal=c.signal;
+  return fetch(API+path,opt).then(function(r){
+    return r.json().catch(function(){return{}}).then(function(d){return{ok:r.ok,status:r.status,data:d}});
+  }).finally(function(){clearTimeout(t)});
+}
+function deviceId(){
+  if(memDev)return memDev;
+  var d=get('cstk_device');
+  if(!d||d.length<8){
+    d='dev_'+(window.crypto&&crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36));
+    try{localStorage.setItem('cstk_device',d)}catch(_){}
   }
-  return d;
+  return memDev=d;
 }
-function esc(s){
-  return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function deviceName(){
+  var u=navigator.userAgent||'';
+  var b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Chrome\//.test(u)?'Chrome':/Firefox\//.test(u)?'Firefox':/Safari\//.test(u)?'Safari':'Web';
+  var o=/Android/.test(u)?'Android':/iPhone|iPad/.test(u)?'iOS':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'';
+  return (b+(o?' · '+o:'')).slice(0,80);
 }
+function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
 
-// Allow only web-safe thumbnail URLs; reject javascript:, data:, file:, and other schemes.
-function safeThumbUrl(value){
-  const raw=String(value??'').trim();
-  if(!raw)return '';
-  if(raw.startsWith('/')&&!raw.startsWith('//'))return raw;
-  try{
-    const url=new URL(raw,location.href);
-    return url.protocol==='https:'||url.protocol==='http:'?url.href:'';
-  }catch{return ''}
+/* ===== reveal + year ===== */
+var yr=$('#year');if(yr)yr.textContent=new Date().getFullYear();
+var io=null,still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+if('IntersectionObserver' in window)io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){if(e.target.id==='prices')grp(e.target);else e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});
+function grp(b){b._seen=1;b.querySelectorAll('.rv').forEach(function(n){n.classList.add('in')})}
+function watch(){
+  document.querySelectorAll('.rv:not(.in)').forEach(function(n){if(n.closest('.prices'))return;io?io.observe(n):n.classList.add('in')});
+  var pb=$('#prices');if(pb&&!pb._o){pb._o=1;io?io.observe(pb):grp(pb)}
 }
-
-/* ============ ICONS ============ */
-const SVG_PLAY='<svg class="f" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>';
-const SVG_PAUSE='<svg class="f" viewBox="0 0 24 24"><rect x="6.5" y="5" width="3.8" height="14" rx="1"/><rect x="13.7" y="5" width="3.8" height="14" rx="1"/></svg>';
-const SVG_REPLAY='<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-const SVG_VOL_ON='<svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M18.5 6.5a9 9 0 0 1 0 11"/></svg>';
-const SVG_VOL_LOW='<svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg>';
-const SVG_VOL_OFF='<svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="m17 9.5 4 5m0-5-4 5"/></svg>';
-const SVG_RW='<svg viewBox="0 0 24 24"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg>';
-const SVG_FF='<svg viewBox="0 0 24 24"><path d="m13 17 5-5-5-5M6 17l5-5-5-5"/></svg>';
-const SVG_FS_ON='<svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg>';
-const SVG_FS_OFF='<svg viewBox="0 0 24 24"><path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"/></svg>';
-
-/* ============ RENDER STATS ============ */
-function renderStats(){
-  const done=videos.filter(v=>{const p=readProgress(v.id);return p&&(p.watched||p.percent>=90)}).length;
-  const total=videos.length,remaining=total-done;
-  $('videoCount').textContent=total+' فيديو';
-  $('watchedCount').textContent=done+' تمت مشاهدته';
-  $('remainingCount').textContent=remaining+' متبقي';
-  $('statDone').textContent=done;
-  $('statRemain').textContent=remaining;
-  $('statPercent').textContent=(total?Math.round(done/total*100):0)+'%';
-  $('listSub').textContent=`${total} فيديو · ${done} مكتمل · ${remaining} متبقي`;
-  let prog=0;videos.forEach(v=>{const p=readProgress(v.id);if(p&&!(p.watched||p.percent>=90)&&p.percent>0)prog++});
-  $('cAll').textContent=total;$('cProg').textContent=prog;$('cDone').textContent=done;
-  $('lprogI').style.width=(total?Math.round(done/total*100):0)+'%';
+watch();
+function countTo(el,to){
+  if(still){el.textContent=fmt(to);return}
+  var t0=null;(function f(t){t0=t0||t;var k=Math.min((t-t0)/1000,1);el.textContent=fmt(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(performance.now());
 }
+/* scroll progress + step spy */
+var prog=document.querySelector('.prog'),tk=false;
+addEventListener('scroll',function(){if(tk)return;tk=true;requestAnimationFrame(function(){var h=document.documentElement,m=h.scrollHeight-innerHeight;if(prog)prog.style.setProperty('--p',m>0?Math.min(scrollY/m,1):0);tk=false})},{passive:true});
+if('IntersectionObserver' in window){
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var id=e.target.getAttribute('data-spy');
+    document.querySelectorAll('[data-to]').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-to')===id)})})},{rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('[data-spy]').forEach(function(n){spy.observe(n)});
+}
+/* spotlight that follows the pointer on cards */
+document.addEventListener('pointermove',function(e){
+  var c=e.target.closest&&e.target.closest('.price-card,.why>div,.admin-card,.contact-opt,.stat');if(!c)return;
+  var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');
+});
+/* hero 3D tilt */
+(function(){
+  var h=document.querySelector('.hero'),st=document.querySelector('.stage');
+  if(!h||!st||still||!matchMedia('(hover:hover)').matches)return;
+  h.addEventListener('pointermove',function(e){var r=h.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;st.style.transform='perspective(1000px) rotateY('+(-x*12)+'deg) rotateX('+(y*9)+'deg)'});
+  h.addEventListener('pointerleave',function(){st.style.transform=''});
+})();
 
-/* ============ RENDER LIST ============ */
-function renderList(){
-  const list=$('videoList');
-  if(!videos.length){
-    list.innerHTML='<div class="empty">لا توجد فيديوهات في المحاضرة دي.</div>';
-    return;
+/* ===== الأسعار والأدمنز من السيرفر ===== */
+var CAL='<svg viewBox="0 0 24 24" style="width:30px;height:30px;color:#90b9ff;margin-bottom:12px"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>';
+var CHK='<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>';
+var TG='<svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>';
+function fmt(n){return Number(n||0).toLocaleString('en-US')}
+function dur(p){
+  var d=+p.days||0,h=+p.hours||0,t='';
+  if(d>=360&&d<=370)t='سنة كاملة';
+  else if(d>=28&&d%30===0){var m=d/30;t=m===1?'شهر':m===2?'شهرين':m+' شهور'}
+  else if(d)t=d===1?'يوم':d===2?'يومين':d<=10?d+' أيام':d+' يوم';
+  if(h)t+=(t?' و':'')+h+' ساعة';
+  return t||'—';
+}
+function tgUser(a){
+  var t=String(a.telegram||'').trim().replace(/^https?:\/\/t\.me\//i,'').replace(/^@/,'');
+  return /^[A-Za-z0-9_]{3,64}$/.test(t)?t:'';
+}
+function renderSite(s){
+  var pk=(s.packages||[]).filter(function(p){return p&&p.active!==false});
+  var ag=(s.agents||[]).filter(function(a){return a&&a.active!==false&&a.name});
+  var min=pk.length?Math.min.apply(null,pk.map(function(p){return +p.price||0})):null;
+  document.querySelectorAll('[data-from]').forEach(function(e){if(min==null){e.textContent='—';e._v=null}else if(e._v!==min){e._v=min;countTo(e,min)}});
+  document.querySelectorAll('[data-count]').forEach(function(e){var n=pk.length;e.textContent=n===0?'—':n===1?'باقة واحدة':n===2?'باقتين':n+' باقات'});
+  var best=-1;
+  if(pk.length>1){var bv=1e9;pk.forEach(function(p,i){var d=+p.days||0;if(d>0&&p.price>0&&p.price/d<bv){bv=p.price/d;best=i}})}
+  var box=$('#prices');
+  if(box){
+    box.innerHTML=pk.length?pk.map(function(p,i){
+      var d=+p.days||0,pd=d>=30&&p.price>0?'≈ '+(p.price/d).toFixed(1)+' جنيه في اليوم':'';
+      var f=i===best||pk.length===1;
+      return '<article class="price-card rv stag'+(f?' featured':'')+'" style="--d:'+(i*.1)+'s">'+(i===best?'<span class="popular">الأوفر</span>':'')+
+        CAL+'<h3>'+esc(p.name)+'</h3><p class="desc">مدة الاشتراك: '+dur(p)+'</p>'+
+        '<div class="price">'+(p.price>0?fmt(p.price)+' <small>جنيه</small>':'مجانًا')+'</div><div class="price-note">'+pd+'</div>'+
+        '<ul><li>'+CHK+'الوصول للمحتوى المفعّل لحسابك</li><li>'+CHK+'تواصل مع الإدارة عند الحاجة</li></ul>'+
+        '<div class="acts"><a class="btn btn-p" href="chat.html">اطلب من الموقع مباشرة</a><a class="btn btn-s" href="#admins">أو على تيليجرام</a></div></article>';
+    }).join(''):'<p class="note">مفيش باقات متاحة دلوقتي — تواصل مع الإدارة.</p>';
   }
-  const query=listQuery.trim().toLocaleLowerCase();
-  const filtered=videos.map((v,i)=>({v,i,p:readProgress(v.id)||{}})).filter(({v,p})=>{
-    const done=!!p.watched||(+p.percent||0)>=90;
-    const matchQ=!query||String(v.title).toLocaleLowerCase().includes(query);
-    const matchF=listFilter==='all'||(listFilter==='done'?done:(!done&&(+p.percent||0)>0));
-    return matchQ&&matchF;
-  });
-  if(!filtered.length){
-    list.innerHTML='<div class="empty">مفيش فيديوهات مطابقة للبحث أو التصفية.</div>';
-    return;
+  var fq=$('#faq-prices');
+  if(fq)fq.textContent=pk.length?'الباقات المتاحة: '+pk.map(function(p){return p.name+' — '+(p.price>0?fmt(p.price)+' جنيه':'مجانًا')}).join(' · ')+'.':'الأسعار بتحددها الإدارة، تواصل مع أحد الأدمنز.';
+  var al=$('#admins-list');
+  if(al){
+    al.innerHTML=ag.length?ag.map(function(a){
+      var t=tgUser(a),inner='<div class="av">'+TG+'</div><div><b>'+esc(a.name)+'</b><small>'+(t?'@'+esc(t)+' · تيليجرام ↗':'تواصل عن طريق الإدارة')+'</small></div>';
+      return t?'<a class="admin-card rv stag" href="https://t.me/'+t+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>':'<div class="admin-card rv stag">'+inner+'</div>';
+    }).join(''):'<p class="note">لسه مفيش أدمنز متاحين للتواصل.</p>';
   }
-  list.innerHTML=filtered.map(({v,i,p})=>{
-    const s=statusOf(p),active=i===current;
-    const th=v.thumbnail?`<img src="${esc(safeThumbUrl(v.thumbnail))}" alt="" loading="lazy" onerror="this.remove()">`:'';
-    const art=active?'<span class="eq"><i></i><i></i><i></i></span>':'<span class="pl2"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>';
-    return `<div class="item${active?' active':''}${s.done?' done':''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(v.title)}">
-      <div class="thumb">${th}${art}<span class="num">${s.done?'✓':i+1}</span><span class="duration">${fmt(v.duration)}</span><div class="mini"><i style="width:${s.done?100:s.pct}%"></i></div></div>
-      <div class="itemtxt">
-        <div class="itemtitle">${esc(v.title)}</div>
-        <div class="itemmeta">${active?'<span class="st now">يتم التشغيل</span>':''}<span class="st ${s.cls}">${s.label}</span></div>
-      </div>
-    </div>`;
+  watch();if(box&&box._seen)grp(box);
+}
+function failSite(){
+  var r='تعذّر التحميل من السيرفر. <button type="button" class="btn btn-s" data-retry style="margin-top:8px">إعادة المحاولة</button>';
+  var p=$('#prices'),a=$('#admins-list');
+  if(p)p.innerHTML='<p class="note">'+r+'</p>';
+  if(a)a.innerHTML='<p class="note">'+r+'</p>';
+  var fq=$('#faq-prices');if(fq)fq.textContent='تعذّر تحميل الأسعار حاليًا، جرّب تاني بعد شوية.';
+}
+function loadSite(){
+  var cached=null;
+  try{cached=JSON.parse(get('cstk_site')||'null')}catch(_){}
+  if(cached&&cached.d)renderSite(cached.d);
+  api('/api/public/site',{headers:{Accept:'application/json'}},12000).then(function(r){
+    if(!r.ok||!r.data||!r.data.success||!r.data.data)throw new Error('bad');
+    renderSite(r.data.data);
+    try{localStorage.setItem('cstk_site',JSON.stringify({t:Date.now(),d:r.data.data}))}catch(_){}
+  }).catch(function(){if(!cached)failSite()});
+}
+document.addEventListener('click',function(e){
+  if(e.target.closest&&e.target.closest('[data-retry]')){
+    ['#prices','#admins-list'].forEach(function(s){var n=$(s);if(n)n.innerHTML='<p class="note">جاري التحميل…</p>'});
+    loadSite();
+  }
+});
+loadSite();
+
+/* ===== الجلسات المحفوظة (على الجهاز بس، من غير الكود) ===== */
+var SKEY='cstk_sessions',SMAX=4;
+function readSess(){try{var a=JSON.parse(get(SKEY)||'[]');return Array.isArray(a)?a.filter(function(s){return s&&s.token}):[]}catch(_){return[]}}
+function writeSess(a){try{localStorage.setItem(SKEY,JSON.stringify(a.slice(0,SMAX)))}catch(_){}}
+function saveSess(token,me,year,subs){
+  me=me||{};var k=String(me.id||me._id||me.name||token);
+  var a=readSess().filter(function(s){return s.token!==token&&s.k!==k});
+  a.unshift({k:k,token:token,name:me.name||'',me:me,year:year||4,subs:subs||[],t:Date.now()});
+  writeSess(a);
+}
+function dropSess(token){writeSess(readSess().filter(function(s){return s.token!==token}))}
+function keepCurrent(t){try{var me=JSON.parse(get('cstk_me')||'{}');if(me&&me.name)saveSess(t,me,+get('cstk_year')||4,JSON.parse(get('cstk_subject_ids')||'[]'))}catch(_){}}
+
+/* ===== الجلسة الحالية ===== */
+var tok=get('cstk_tok');
+if(tok){
+  api('/api/auth/me',{headers:{Authorization:'Bearer '+tok,Accept:'application/json'}},8000).then(function(r){
+    if(r.status===401||r.status===403){dropSess(tok);drop();toast(r.data.message||'انتهت جلسة الدخول، سجّل دخولك من جديد.')}
+    else{keepCurrent(tok);location.replace('subjects.html')}
+  }).catch(function(){location.replace('subjects.html')});
+}
+
+/* ===== نافذة الدخول ===== */
+var auth=$('#auth'),card=$('.auth-card'),form=$('#code-form'),code=$('#code'),cells=$('#cells'),box=$('#status'),btn=$('#submit-btn'),btxt=$('#btn-txt'),sub=$('#auth-sub'),pSaved=$('#pane-saved'),pCode=$('#pane-code'),backSaved=$('#back-saved'),list=$('#sess-list'),busy=false,sess=[];
+for(var g=0;g<3;g++){var gr=document.createElement('div');gr.className='grp';for(var j=0;j<3;j++){var c=document.createElement('div');c.className='cell';c.style.setProperty('--i',g*3+j);gr.appendChild(c)}cells.appendChild(gr)}
+var cl=cells.querySelectorAll('.cell');
+function paint(){
+  var v=code.value,focus=document.activeElement===code;
+  for(var i=0;i<9;i++){cl[i].textContent=v[i]||'';cl[i].classList.toggle('f',!!v[i]);cl[i].classList.toggle('on',focus&&i===Math.min(v.length,8))}
+}
+function norm(v){
+  return v.replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632}).replace(/[۰-۹]/g,function(d){return d.charCodeAt(0)-1776}).replace(/\D/g,'').slice(0,9);
+}
+function show(t,m){box.className='status '+t;box.textContent=m}
+function fail(m){cells.className='cells';void cells.offsetWidth;cells.className='cells err';show('error',m)}
+function resetUi(){cells.className='cells';btn.disabled=false;btn.classList.remove('busy');btxt.textContent='تسجيل الدخول'}
+var USER='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+    CHEV='<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+    XI='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+function ago(t){
+  var n=new Date(),s0=new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime(),a=new Date(t),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime(),d=Math.round((s0-b)/864e5);
+  if(d<=0)return'آخر دخول النهارده';if(d===1)return'آخر دخول امبارح';if(d===2)return'آخر دخول من يومين';
+  return'آخر دخول من '+d+(d<=10?' أيام':' يوم');
+}
+function renderSess(){
+  sess=readSess();
+  list.innerHTML=sess.map(function(s,i){
+    var nm=s.name||'طالب',ch=(s.name||'').trim().charAt(0);
+    return '<div class="sess"><button type="button" class="sess-main" data-use="'+i+'"><span class="sess-av" aria-hidden="true">'+(ch?esc(ch):USER)+'</span><span class="sess-txt"><b>'+esc(nm)+'</b><small>'+ago(s.t)+'</small></span><span class="sess-go" aria-hidden="true">'+CHEV+'<i class="sp"></i></span></button>'+
+      '<button type="button" class="sess-x" data-del="'+i+'" aria-label="إزالة جلسة '+esc(nm)+'">'+XI+'</button></div>';
   }).join('');
-  list.querySelectorAll('[data-i]').forEach(el=>{
-    el.addEventListener('click',()=>playIndex(+el.dataset.i,true));
-    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();playIndex(+el.dataset.i,true)}});
-  });
 }
-
-/* ============ PLAYER STATE ============ */
-const RATES=[.25,.5,.75,1,1.25,1.5,1.75,2,2.5,3];
-let rate=RATES.includes(+prefs.rate)?+prefs.rate:1;
-const rateLabel=x=>x+'×';
-const rateName=x=>x===1?'السرعة العادية':x<1?'أبطأ من العادي':x<=1.5?'أسرع شوية':x<=2?'سريعة':'سريعة جداً';
-let qualityIdx=-1,menuView='',menuClosedAt=0;
-let uiTimer=0,raf=0,scrub=null,playToken=0,hlsRetry={net:0,media:0},lastPtype='mouse',wakeLock=null;
-const hold={timer:0,active:false,x:0,y:0,endedAt:0};
-const tap={t:0,side:'',timer:0,seekUntil:0};
-const seek=$('pseek');
-const isOpen=()=>$('pmenu').classList.contains('open');
-
-/* ============ PLAYER UI ============ */
-function showUI(pin){
-  if(!screenEl.classList.contains('show-ui')){screenEl.classList.add('show-ui');paintProgress()}
-  clearTimeout(uiTimer);
-  if(pin||video.paused||isOpen()||drawerOpen()||scrub||hold.active)return;
-  uiTimer=setTimeout(()=>{if(!video.paused&&!isOpen()&&!drawerOpen()&&!scrub)hideUI()},3000);
+var SUBS={saved:'دوس على جلستك وادخل على طول.',code:'اكتب كود الاشتراك وادخل على موادك.'};
+function setView(v){
+  card.setAttribute('data-view',v);
+  pSaved.hidden=v!=='saved';pCode.hidden=v!=='code';
+  backSaved.hidden=!(v==='code'&&sess.length);
+  sub.textContent=SUBS[v];show('','');
 }
-function hideUI(){
-  screenEl.classList.remove('show-ui');
-  clearTimeout(uiTimer);
+function openLogin(){
+  auth.classList.add('open');document.body.classList.add('auth-open');document.body.style.overflow='hidden';
+  renderSess();setView(sess.length?'saved':'code');
+  setTimeout(function(){
+    if(sess.length){var f=$('.sess-main');if(f)f.focus({preventScroll:true})}
+    else{code.focus({preventScroll:true});paint()}
+  },120);
 }
-function toggleUI(){
-  if(screenEl.classList.contains('show-ui'))hideUI();else showUI();
+function closeLogin(){if(busy)return;auth.classList.remove('open');document.body.classList.remove('auth-open');document.body.style.overflow='';resetUi();show('','')}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLogin()});
+if(location.hash==='#login'&&!get('cstk_tok'))openLogin();
+document.addEventListener('click',function(e){
+  var h=e.target.closest&&e.target.closest('[data-home-link]');
+  if(h){e.preventDefault();closeLogin();return}
+  var b=e.target.closest&&e.target.closest('[data-login-link],[data-open-login]');
+  if(!b)return;e.preventDefault();
+  if(get('cstk_tok')){location.href='subjects.html';return}
+  openLogin();
+});
+cells.addEventListener('click',function(){code.focus()});
+['focus','blur','input','keyup'].forEach(function(ev){code.addEventListener(ev,paint)});
+code.addEventListener('input',function(){
+  code.value=norm(code.value);paint();
+  if(cells.classList.contains('err')||box.classList.contains('error')){cells.className='cells';show('','')}
+});
+$('#use-code').addEventListener('click',function(){if(busy)return;setView('code');code.focus({preventScroll:true});paint()});
+backSaved.addEventListener('click',function(){if(busy)return;renderSess();setView(sess.length?'saved':'code')});
+list.addEventListener('click',function(e){
+  var d=e.target.closest('[data-del]'),u=e.target.closest('[data-use]');
+  if(d){
+    if(busy)return;var s=sess[+d.getAttribute('data-del')];if(!s)return;
+    dropSess(s.token);renderSess();if(!sess.length)setView('code');else show('','');return;
+  }
+  if(u)useSess(sess[+u.getAttribute('data-use')],u.parentNode);
+});
+function errMsg(err){
+  return err.name==='AbortError'?'السيرفر اتأخر في الرد. جرّب تاني بعد لحظات.'
+    :err instanceof TypeError?'مفيش اتصال بالسيرفر. اتأكد من النت وجرّب تاني.'
+    :(err.message||'حصلت مشكلة. جرّب تاني.');
 }
-function togglePlay(){
-  if(video.paused){
-    const p=video.play();
-    if(p&&p.catch)p.catch(err=>{if(err&&err.name==='NotAllowedError')showToast('اضغط تشغيل تاني لو سمحت')});
-  }else video.pause();
-  showUI();
-}
-function seekBy(d){
-  if(!(Number.isFinite(video.duration)&&video.duration>0)){showToast('الفيديو لسه بيجهز');return false}
-  video.currentTime=Math.max(0,Math.min(video.duration,(video.currentTime||0)+d));
-  return true;
-}
-
-/* ---- رسم التقدم ---- */
-function paintProgress(){
-  const d=Number(video.duration)||0;
-  const t=scrub?scrub.t:(Number(video.currentTime)||0);
-  const p=d?Math.max(0,Math.min(100,t/d*100)):0;
-  $('pplayed').style.width=p+'%';
-  $('pknob').style.left=p+'%';
-  $('ptime').textContent=fmt(t)+' / '+fmt(d||videos[current]?.duration||0);
-}
-function paintBuffered(){
+/* دخول بجلسة محفوظة: بنتأكد من التوكن وندخل من غير كود */
+async function useSess(s,row){
+  if(busy||!s)return;
+  busy=true;row.classList.add('busy');show('','بنتحقق من الجلسة…');
   try{
-    const b=video.buffered,d=video.duration,t=video.currentTime||0;
-    if(!d||!b.length){$('pbuf').style.width='0%';return}
-    let end=t;
-    for(let i=0;i<b.length;i++){if(t>=b.start(i)-.3&&t<=b.end(i)+.3){end=b.end(i);break}}
-    $('pbuf').style.width=Math.min(100,end/d*100)+'%';
-  }catch(e){}
-}
-function syncAria(){
-  const d=Number(video.duration)||0,t=Number(video.currentTime)||0;
-  seek.setAttribute('aria-valuemax',String(Math.round(d)));
-  seek.setAttribute('aria-valuenow',String(Math.round(t)));
-  seek.setAttribute('aria-valuetext',fmt(t)+' من '+fmt(d));
-}
-function loop(){
-  if(screenEl.classList.contains('show-ui'))paintProgress();
-  raf=video.paused?0:requestAnimationFrame(loop);
-}
-function syncPlayState(){
-  const icon=video.ended?SVG_REPLAY:video.paused?SVG_PLAY:SVG_PAUSE;
-  $('pplay').innerHTML=icon;$('pc').innerHTML=icon;
-  const lbl=video.paused?'تشغيل':'إيقاف مؤقت';
-  $('pplay').setAttribute('aria-label',lbl);$('pc').setAttribute('aria-label',lbl);
-  screenEl.classList.toggle('paused',video.paused);
-  document.body.classList.toggle('vpaused',video.paused);
-  if(video.paused){cancelAnimationFrame(raf);raf=0;paintProgress()}
-  else if(!raf)raf=requestAnimationFrame(loop);
-  updateWakeLock();
-}
-async function updateWakeLock(){
-  try{
-    if(!video.paused&&!video.ended&&!wakeLock&&navigator.wakeLock&&document.visibilityState==='visible'){
-      wakeLock=await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release',()=>{wakeLock=null});
-    }else if(video.paused&&wakeLock){await wakeLock.release();wakeLock=null}
-  }catch(e){wakeLock=null}
-}
-document.addEventListener('visibilitychange',updateWakeLock);
-
-/* ---- الصوت ---- */
-function syncVolume(){
-  const off=video.muted||video.volume===0;
-  $('pmute').innerHTML=off?SVG_VOL_OFF:(video.volume<.5?SVG_VOL_LOW:SVG_VOL_ON);
-  $('pmute').setAttribute('aria-label',off?'تشغيل الصوت':'كتم الصوت');
-  const v=off?0:video.volume;
-  $('pvol').value=v;
-  $('pvol').style.setProperty('--v',(v*100)+'%');
-}
-video.volume=Math.max(0,Math.min(1,+prefs.volume>=0?+prefs.volume:1));
-video.muted=!!prefs.muted;
-video.addEventListener('volumechange',()=>{
-  syncVolume();
-  prefs.volume=video.volume;prefs.muted=video.muted;savePref();
-});
-$('pvol').addEventListener('input',e=>{
-  e.stopPropagation();
-  video.muted=false;
-  video.volume=+e.target.value;
-});
-$('pmute').onclick=e=>{
-  e.stopPropagation();
-  if(video.muted||video.volume===0){video.muted=false;if(video.volume===0)video.volume=.5}
-  else video.muted=true;
-  showUI();
-};
-
-/* ---- السرعة ---- */
-function applyRate(){video.defaultPlaybackRate=rate;video.playbackRate=rate}
-function setRate(x,quiet){
-  rate=x;applyRate();
-  prefs.rate=x;savePref();
-  $('pspeedv').textContent=rateLabel(x);
-  $('pspeed').classList.toggle('on',x!==1);
-  if(!quiet)showToast('سرعة التشغيل '+rateLabel(x));
-}
-function stepRate(dir){
-  let i=RATES.indexOf(rate);if(i<0)i=RATES.indexOf(1);
-  i=Math.max(0,Math.min(RATES.length-1,i+dir));
-  setRate(RATES[i]);
-}
-
-/* ---- القوائم (السرعة / الجودة / الإعدادات) ---- */
-function qualityLevels(){
-  if(!hls||!hls.levels||hls.levels.length<2)return null;
-  return hls.levels.map((l,i)=>({i,h:l.height||0,b:l.bitrate||0})).sort((a,b)=>(b.h-a.h)||(b.b-a.b));
-}
-function levelLabel(l){return l.h?l.h+'p':Math.round(l.b/1000)+' kbps'}
-function qualityText(){
-  const ls=qualityLevels();if(!ls)return '';
-  if(qualityIdx>=0){const l=ls.find(x=>x.i===qualityIdx);return l?levelLabel(l):'تلقائي'}
-  const cur=ls.find(x=>x.i===hls.currentLevel);
-  return cur?'تلقائي ('+levelLabel(cur)+')':'تلقائي';
-}
-function realQualityText(){
-  let h=0;
-  if(hls&&hls.levels&&hls.levels.length){
-    const i=hls.currentLevel>=0?hls.currentLevel:(hls.loadLevel>=0?hls.loadLevel:0);
-    const l=hls.levels[i]||hls.levels[0];
-    h=(l&&l.height)||0;
-  }
-  if(!h)h=video.videoHeight||0;
-  return h?h+'p':'جاري التحديد…';
-}
-function setQuality(i){
-  if(!hls)return;
-  qualityIdx=i;
-  hls.currentLevel=i;
-  showToast(i<0?'الجودة: تلقائي':'الجودة: '+levelLabel(qualityLevels().find(x=>x.i===i)));
-}
-function renderMenu(){
-  const m=$('pmenu');
-  const head=t=>`<button type="button" class="mhead" data-go="main"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg><span>${t}</span></button>`;
-  let h='';
-  if(menuView==='speed'){
-    h=head('سرعة التشغيل')+'<div class="spdlist">'+RATES.map(x=>
-      `<button type="button" class="mrow spdopt ${x===rate?'on':''}" data-sp="${x}"><span class="lbl">${x===1?'عادية':rateLabel(x)}</span><span class="val">${x===rate?'✓':rateName(x)}</span></button>`).join('')+'</div>';
-  }else if(menuView==='quality'){
-    const ls=qualityLevels()||[];
-    h=head('الجودة')+`<button type="button" class="mrow ${qualityIdx<0?'on':''}" data-q="-1"><span class="lbl">تلقائي</span><span class="val">${qualityIdx<0?'✓':''}</span></button>`+
-      ls.map(l=>`<button type="button" class="mrow ${qualityIdx===l.i?'on':''}" data-q="${l.i}"><span class="lbl">${levelLabel(l)}</span><span class="val">${qualityIdx===l.i?'✓':''}</span></button>`).join('');
-  }else{
-    h=`<button type="button" class="mrow" data-go="speed"><span class="lbl">سرعة التشغيل</span><span class="val">${rate===1?'عادية':rateLabel(rate)}</span><span class="chev">‹</span></button>`+
-      (qualityLevels()?`<button type="button" class="mrow" data-go="quality"><span class="lbl">الجودة</span><span class="val">${qualityText()}</span><span class="chev">‹</span></button>`:`<div class="mrow"><span class="lbl">الجودة</span><span class="val">${realQualityText()}</span></div>`)+
-      `<button type="button" class="mrow" data-tg="autonext"><span class="lbl">تشغيل الفيديو التالي تلقائي</span><span class="sw ${prefs.autonext?'on':''}"></span></button>`;
-  }
-  m.innerHTML=h;
-}
-function openMenu(view){
-  if(isOpen()&&menuView===view){closeMenu();return}
-  menuView=view;renderMenu();
-  $('pmenu').classList.add('open');
-  showUI(true);
-}
-function closeMenu(silent){
-  const m=$('pmenu');
-  if(!m.classList.contains('open'))return;
-  m.classList.remove('open');menuView='';menuClosedAt=Date.now();
-  if(!silent)showUI();
-}
-$('pmenu').addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  e.stopPropagation();
-  if(b.dataset.go){menuView=b.dataset.go;renderMenu()}
-  else if(b.dataset.step){stepRate(+b.dataset.step);renderMenu()}
-  else if(b.dataset.sp){setRate(+b.dataset.sp);closeMenu()}
-  else if(b.dataset.q!==undefined){setQuality(+b.dataset.q);closeMenu()}
-  else if(b.dataset.tg==='autonext'){prefs.autonext=!prefs.autonext;savePref();renderMenu()}
-});
-$('pmenu').addEventListener('input',e=>{
-  if(e.target.id!=='spdr')return;
-  const x=RATES[+e.target.value];if(x==null)return;
-  setRate(x,true);
-  e.target.style.setProperty('--v',(+e.target.value/(RATES.length-1)*100)+'%');
-  $('spdval').textContent=rateLabel(x);$('spdlbl').textContent=rateName(x);
-  $('pmenu').querySelectorAll('[data-sp]').forEach(b=>b.classList.toggle('on',+b.dataset.sp===x));
-});
-$('pset').onclick=e=>{e.stopPropagation();openMenu('main')};
-$('pspeed').onclick=e=>{e.stopPropagation();openMenu('speed')};
-document.addEventListener('pointerdown',e=>{
-  if(isOpen()&&!$('pmenu').contains(e.target)&&!$('pset').contains(e.target)&&!$('pspeed').contains(e.target))closeMenu();
-});
-
-/* ============ PLAY VIDEO ============ */
-function cleanup(){
-  $('screen').classList.remove('youtube-mode');
-  if(youtubeFrame){youtubeFrame.src='about:blank';youtubeFrame.style.display='none'}
-  video.style.display='';
-  try{if(hls){hls.destroy();hls=null}}catch(e){}
-  if(currentKeyBlobUrl){try{URL.revokeObjectURL(currentKeyBlobUrl)}catch(e){}currentKeyBlobUrl=null}
-  if(currentPlaylistBlobUrl){try{URL.revokeObjectURL(currentPlaylistBlobUrl)}catch(e){}currentPlaylistBlobUrl=null}
-  video.pause();
-  video.removeAttribute('src');
-  try{video.load()}catch(e){}
-  qualityIdx=-1;
-  curManifest=null;
-}
-function updateMediaSession(){
-  if(!('mediaSession' in navigator)||current<0)return;
-  try{
-    const v=videos[current];
-    navigator.mediaSession.metadata=new MediaMetadata({
-      title:v.title,artist:lectureTitle,album:'دروسك بلس+',
-      artwork:v.thumbnail?[{src:v.thumbnail}]:[]
-    });
-  }catch(e){}
-}
-
-/* ============ Stream-Weave path proxy — token stays on server (session id only) ============ */
-let cryptoUtils = null;
-let currentKeyBlobUrl = null;
-let currentPlaylistBlobUrl = null;
-
-function findCrypto() {
-  if (window.DecryptionUtils && typeof window.DecryptionUtils.decryptPlaybackKey === 'function') {
-    return window.DecryptionUtils;
-  }
-  var names = Object.getOwnPropertyNames(window);
-  for (var i = 0; i < names.length; i++) {
-    try {
-      var obj = window[names[i]];
-      if (obj && typeof obj === 'object' && typeof obj.decryptPlaybackKey === 'function') return obj;
-    } catch (e) {}
-  }
-  return null;
-}
-function loadPlayerScript() {
-  return new Promise(function (resolve, reject) {
-    if (findCrypto()) return resolve(findCrypto());
-    var existing = document.querySelector('script[src*="player.stream-weave.com"]');
-    if (existing) {
-      var tries = 0;
-      var t = setInterval(function () {
-        var c = findCrypto();
-        if (c) { clearInterval(t); resolve(c); }
-        else if (++tries > 40) { clearInterval(t); reject(new Error('timeout crypto')); }
-      }, 150);
-      return;
+    var r=await api('/api/auth/me',{headers:{Authorization:'Bearer '+s.token,Accept:'application/json'}},12000);
+    if(r.status===401||r.status===403){
+      dropSess(s.token);renderSess();if(!sess.length)setView('code');
+      show('error',(r.data&&r.data.message)||'انتهت الجلسة دي. اكتب كودك من جديد.');
+      busy=false;return;
     }
-    var s = document.createElement('script');
-    s.src = 'https://player.stream-weave.com/assets/player.js?v=1.1.1';
-    s.onload = function () {
-      var tries = 0;
-      var t = setInterval(function () {
-        var c = findCrypto();
-        if (c) { clearInterval(t); resolve(c); }
-        else if (++tries > 40) { clearInterval(t); reject(new Error('crypto not found')); }
-      }, 150);
-    };
-    s.onerror = function () { reject(new Error('failed to load player.js')); };
-    document.head.appendChild(s);
-  });
-}
-function joinRel(base, rel) {
-  var q = '', relPath = String(rel);
-  var qi = relPath.indexOf('?');
-  if (qi >= 0) { q = relPath.slice(qi); relPath = relPath.slice(0, qi); }
-  if (relPath.charAt(0) === '/') return relPath.replace(/^\//, '') + q;
-  var parts = String(base || '').replace(/\/+$/, '').split('/').filter(Boolean);
-  relPath.split('/').forEach(function (p) {
-    if (!p || p === '.') return;
-    if (p === '..') parts.pop();
-    else parts.push(p);
-  });
-  return parts.join('/') + q;
-}
-/** Build same-origin stream URL. Uses opaque session id — never the upstream JWT. */
-function streamUrl(path, sessionId) {
-  var origin = location.origin || '';
-  var base = (typeof API !== 'undefined' && API) ? API : origin;
-  return base + '/api/stream?path=' + encodeURIComponent(path) + '&s=' + encodeURIComponent(sessionId);
-}
-function resolveMedia(uri, variantBasePath, sessionId, variantFileUrl) {
-  if (/^(blob:|data:)/i.test(uri)) return uri;
-  var origin = location.origin || '';
-  if (uri.indexOf('/api/stream') === 0) {
-    // force our session param
-    try {
-      var u = new URL(uri, origin);
-      u.searchParams.set('s', sessionId);
-      u.searchParams.delete('t');
-      return u.href;
-    } catch (e) { return origin + uri; }
-  }
-  if (origin && uri.indexOf(origin + '/api/stream') === 0) {
-    try {
-      var u2 = new URL(uri);
-      u2.searchParams.set('s', sessionId);
-      u2.searchParams.delete('t');
-      return u2.href;
-    } catch (e) { return uri; }
-  }
-  if (isMediaSegment(uri) || (/^https?:\/\//i.test(uri) && uri.indexOf('stream-weave.com') === -1)) {
-    return WORKER_PROXY + encodeURIComponent(uri);
-  }
-  if (/^https?:\/\//i.test(uri)) {
-    return streamUrl(uri, sessionId);
-  }
-  if (variantFileUrl) {
-    try {
-      var abs = new URL(uri, variantFileUrl).href;
-      if (/^https?:\/\//i.test(abs)) return resolveMedia(abs, variantBasePath, sessionId, null);
-    } catch (e) {}
-  }
-  return streamUrl(joinRel(variantBasePath || '', uri), sessionId);
-}
-function rewritePlaylist(text, sessionId, keyBlobUrl, variantBasePath, variantFileUrl) {
-  return text.split('\n').map(function (line) {
-    var s = line.trim();
-    if (!s) return line;
-    if (s.charAt(0) === '#') {
-      if (s.indexOf('#EXT-X-KEY:') === 0 && keyBlobUrl) {
-        return s.replace(/URI="[^"]+"/, 'URI="' + keyBlobUrl + '"');
-      }
-      return s.replace(/URI="([^"]+)"/g, function (_m, uri) {
-        return 'URI="' + resolveMedia(uri, variantBasePath, sessionId, variantFileUrl) + '"';
-      });
-    }
-    return resolveMedia(s, variantBasePath, sessionId, variantFileUrl);
-  }).join('\n');
-}
-async function authFetch(url, opts) {
-  opts = opts || {};
-  const headers = Object.assign({}, opts.headers || {});
-  if (token) headers.Authorization = 'Bearer ' + token;
-  return fetch(url, Object.assign({}, opts, { headers, cache: 'no-store' }));
-}
-
-function getYouTubeId(value){
-  if(!value)return null;
-  const raw=String(value).trim();
-  if(/^[A-Za-z0-9_-]{11}$/.test(raw))return raw;
-  try{
-    const u=new URL(raw);
-    if(/(^|\.)youtu\.be$/i.test(u.hostname))return u.pathname.split('/').filter(Boolean)[0]||null;
-    if(/(^|\.)youtube\.com$/i.test(u.hostname)){
-      if(u.searchParams.get('v'))return u.searchParams.get('v');
-      const m=u.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/i);if(m)return m[1];
-    }
-  }catch(e){}
-  return null;
-}
-async function playIndex(i,autoplay){
-  if(i<0 || i>=videos.length) return;
-  saveProgress();
-  const my=++playToken;
-  cleanup();
-  current=i;
-  pendingRestore=i;
-  hlsRetry={net:0,media:0};
-
-  const item=videos[i];
-  $('videoTitle').textContent=item.title;
-  $('ptitle').textContent=item.title;
-  $('lectureName').textContent=lectureTitle;
-  $('prevBtn').disabled=i===0;
-  $('nextBtn').disabled=i===videos.length-1;
-  $('pnx').disabled=i===videos.length-1;
-  hideError();
-  setLoading(true,'جاري تجهيز الفيديو…');
-  renderList();
-  renderDrawer();
-  renderStats();
-
-  const lst=$('videoList');
-  const act=lst.querySelector('.item.active');
-  if(act) lst.scrollTop=Math.max(0,
-    act.getBoundingClientRect().top-lst.getBoundingClientRect().top+
-    lst.scrollTop-lst.clientHeight/2+act.clientHeight/2
-  );
-
-  history.replaceState(null,'',
-    `?lectureId=${encodeURIComponent(lectureId)}&videoId=${encodeURIComponent(item.id)}`
-  );
-  updateMediaSession();
-
-  try{
-    setLoading(true,'جاري طلب رابط التشغيل من السيرفر…');
-    const response=await api('/api/play/'+encodeURIComponent(item.id),{method:'POST'});
-    if(my!==playToken) return;
-    const s=response && response.data ? response.data : (response||{});
-    if(response && response.success===false)
-      throw new Error(response.message||'السيرفر رفض تشغيل الفيديو');
-
-    const youtubeSource=s.youtube_url ||
-      (s.type==='youtube' ? (s.url||s.play_url||s.video_url) : null);
-    if(s.type==='youtube' || youtubeSource){
-      const youtubeId=getYouTubeId(youtubeSource);
-      if(!youtubeId) throw new Error('السيرفر رجّع رابط YouTube غير صالح.');
-      $('screen').classList.add('youtube-mode');
-      video.style.display='none';
-      youtubeFrame.style.display='block';
-      youtubeFrame.onload=()=>{
-        if(my===playToken){hideError();setLoading(false)}
-      };
-      youtubeFrame.src='https://www.youtube-nocookie.com/embed/'+
-        encodeURIComponent(youtubeId)+'?autoplay='+(autoplay?'1':'0')+
-        '&playsinline=1&rel=0';
-      curManifest=null;
-      ready=true;
-      setLoading(false);
-      hideError();
-      showUI(true);
-      return;
-    }
-
-    // MP4 له مسار مستقل حتى لا يتم إنشاء مشغل HLS بالخطأ.
-    if(s.type==='mp4' || s.mp4_url){
-      const mp4Url=s.mp4_url||s.play_url||s.url;
-      if(!mp4Url) throw new Error('السيرفر لم يرجّع رابط الفيديو');
-      const savedMp4=readProgress(item.id);
-      const resumeMp4=savedMp4 && savedMp4.currentTime>2 && !savedMp4.watched
-        ? +savedMp4.currentTime : 0;
-      curManifest=null;
-      video.src=/^https?:\/\//i.test(mp4Url) ? mp4Url : new URL(mp4Url,API).href;
-      video.addEventListener('loadedmetadata',()=>{
-        if(my!==playToken) return;
-        if(resumeMp4 && Number.isFinite(video.duration) && resumeMp4<video.duration-2){
-          try{video.currentTime=resumeMp4}catch(_){}
-        }
-        ready=true;
-        applyRate();
-        paintProgress();
-        setLoading(false);
-      },{once:true});
-      if(autoplay) video.play().catch(()=>{});
-      else video.load();
-      return;
-    }
-
-    // HLS manifest
-    const manifestPath=s.manifest_url||s.play_url||s.url;
-    if(!manifestPath) throw new Error('السيرفر لم يرجّع manifest_url أو play_url');
-    let manifestUrl=/^https?:\/\//i.test(manifestPath)
-      ? manifestPath : new URL(manifestPath,API).href;
-
-    if(token && manifestUrl.indexOf(API)===0 && !/[?&]token=/.test(manifestUrl))
-      manifestUrl+=(manifestUrl.includes('?')?'&':'?')+'token='+encodeURIComponent(token);
-
-    const saved=readProgress(item.id);
-    const resumeAt=saved && saved.currentTime>2 && !saved.watched
-      ? +saved.currentTime : 0;
-
-    curManifest={
-      url:manifestUrl,title:item.title,id:item.id,
-      sessionId:s.session||null,swVideoId:s.video_id||s.sw_video_id||null
-    };
-    dlHook();
-    applyRate();
-
-    video.addEventListener('loadedmetadata',()=>{
-      if(my!==playToken) return;
-      if(resumeAt && Number.isFinite(video.duration) && resumeAt<video.duration-2){
-        try{video.currentTime=resumeAt;showToast('كمّلنا من '+fmt(resumeAt))}catch(_){}
-      }
-      ready=true;
-      applyRate();
-      paintProgress();
-    },{once:true});
-
-    if(window.Hls && Hls.isSupported()){
-      // إصلاح أساسي: مشغل HLS واحد فقط لكل فيديو.
-      hls=new Hls({
-        loader:createWorkerLoader(),
-        enableWorker:false,
-        capLevelToPlayerSize:true,
-        startLevel:-1,
-        maxBufferLength:30,
-        maxMaxBufferLength:60,
-        backBufferLength:15,
-        maxBufferHole:0.5,
-        manifestLoadingTimeOut:20000,
-        manifestLoadingMaxRetry:4,
-        manifestLoadingRetryDelay:1000,
-        levelLoadingTimeOut:20000,
-        levelLoadingMaxRetry:4,
-        levelLoadingRetryDelay:1000,
-        fragLoadingTimeOut:30000,
-        fragLoadingMaxRetry:6,
-        fragLoadingRetryDelay:1000,
-        startPosition:resumeAt||-1,
-        xhrSetup:(x,u)=>{
-          if(token && u && u.indexOf('workers.dev')===-1 &&
-            (u.indexOf('/api/')!==-1 || u.indexOf(API)!==-1))
-            x.setRequestHeader('Authorization','Bearer '+token);
-        }
-      });
-
-      hls.on(Hls.Events.MANIFEST_PARSED,()=>{
-        if(my!==playToken) return;
-        setLoading(false);
-        if(autoplay) video.play().catch(()=>{});
-        showUI(true);
-      });
-      hls.on(Hls.Events.FRAG_BUFFERED,()=>{
-        hlsRetry.net=0;
-        if(!video.paused) setLoading(false);
-      });
-      hls.on(Hls.Events.ERROR,(_e,d)=>{
-        if(my!==playToken || !d || !d.fatal) return;
-        const code=d.response && d.response.code;
-        if(code===401){
-          showHlsError('جلسة الدخول انتهت أو مفيش صلاحية لمشاهدة الفيديو ده.','انتهت الجلسة','leave');
-          return;
-        }
-        if(code===403){
-          showHlsError('السيرفر أو الـ CDN رفض تحميل مقطع الفيديو (403). جرّب من شبكة تانية أو حدّث الصفحة.','فشل تحميل المقطع');
-          return;
-        }
-        if(d.type===Hls.ErrorTypes.NETWORK_ERROR){
-          if(hlsRetry.net<4){
-            hlsRetry.net++;
-            const delay=Math.min(5000,800*Math.pow(2,hlsRetry.net-1));
-            setLoading(true,'الاتصال بطيء… جاري إعادة المحاولة',false);
-            setTimeout(()=>{
-              if(my!==playToken || !hls) return;
-              if(d.details===Hls.ErrorDetails.MANIFEST_LOAD_ERROR ||
-                 d.details===Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT)
-                hls.loadSource(manifestUrl);
-              else hls.startLoad();
-            },delay);
-          }else{
-            showHlsError('تعذّر جلب أجزاء الفيديو بعد عدة محاولات. قد يكون السبب سرعة الاتصال أو سيرفر الفيديو.','مشكلة في تحميل الفيديو');
-          }
-          return;
-        }
-        if(d.type===Hls.ErrorTypes.MEDIA_ERROR){
-          if(hlsRetry.media<2){hlsRetry.media++;hls.recoverMediaError()}
-          else showHlsError('حصل عطل في فك/تشغيل الفيديو. جرّب تحديث الصفحة أو متصفحًا آخر.','تعذّر تشغيل الفيديو');
-          return;
-        }
-        showHlsError('حصلت مشكلة أثناء تحميل الفيديو ('+(d.details||'خطأ غير معروف')+').','تعذّر تحميل الفيديو');
-      });
-
-      hls.loadSource(manifestUrl);
-      hls.attachMedia(video);
-    }else if(video.canPlayType('application/vnd.apple.mpegurl')){
-      video.src=manifestUrl;
-      if(autoplay) video.play().catch(()=>{});
-      else video.load();
-    }else{
-      throw new Error('المتصفح لا يدعم تشغيل HLS؛ افتح الصفحة بمتصفح يدعم HLS.js.');
-    }
-  }catch(e){
-    if(my!==playToken) return;
-    console.error(e);
-    if(e.kind==='auth') showError(e.message,'انتهت الجلسة','leave');
-    else if(e.kind==='network') showError(e.message,'مفيش اتصال');
-    else showError(e.message||'فشل تحميل الفيديو','تعذّر تحميل الفيديو');
+    if(!r.ok)throw new Error('السيرفر مش متاح دلوقتي. جرّب تاني بعد لحظات.');
+    try{localStorage.removeItem('cstk_subjects')}catch(_){}
+    put('cstk_tok',s.token);
+    try{put('cstk_device',deviceId())}catch(_){}
+    try{put('cstk_me',JSON.stringify(s.me||{}))}catch(_){}
+    try{put('cstk_year',String(s.year||4))}catch(_){}
+    try{put('cstk_subject_ids',JSON.stringify(s.subs||[]))}catch(_){}
+    saveSess(s.token,s.me,s.year,s.subs);
+    show('success','أهلاً'+(s.name?' يا '+s.name:' يا بطل')+'! جاري فتح موادك...');
+    setTimeout(function(){location.href='subjects.html'},400);
+  }catch(err){
+    row.classList.remove('busy');busy=false;show('error',errMsg(err));
   }
 }
-/* ============ INIT ============ */
-async function init(){
-  if(!token){
-    showError('جلسة الدخول مش موجودة. ارجع لصفحة المواد وسجّل الدخول من جديد.','محتاج تسجّل دخول','leave');
-    return;
-  }
-  checkOwner();
-  if(!lectureId){
-    showError('رابط المشغل ناقصه رقم المحاضرة. افتح الفيديو من صفحة المواد.','رابط ناقص','leave');
-    return;
-  }
-  try{
-    const r=await api('/api/lectures/'+encodeURIComponent(lectureId)+'/content');
-    const d=r.data||{};
-    videos=(d.videos||[]).map((v,i)=>({
-      id:v.id,
-      title:v.title||v.name||`فيديو ${i+1}`,
-      duration:+(v.duration||v.duration_seconds||v.length)||0,
-      thumbnail:v.thumbnail||v.thumb||v.thumbnail_url||v.image_url||v.poster||''
-    }));
-    const lectureName=d.lecture?.name||d.name||d.title||'المحاضرة';
-    lectureTitle=lectureName;
-    $('crumb').textContent='المحتوى / '+lectureName;
-    $('lectureName').textContent=lectureName;
-    renderStats();
-    renderList();
-    if(!videos.length){
-      setLoading(false);
-      $('videoList').innerHTML='<div class="empty">المحاضرة دي مفيهاش فيديوهات مضافة.</div>';
-      return;
-    }
-    let idx=videos.findIndex(v=>String(v.id)===String(initialVideoId));
-    if(idx<0)idx=videos.findIndex(v=>{const p=readProgress(v.id);return p&&!p.watched&&p.currentTime>0});
-    if(idx<0)idx=0;
-    await playIndex(idx,false);
-  }catch(e){
-    if(e.kind==='auth')showError(e.message,'انتهت الجلسة','leave');
-    else showError(e.message||'فشل تحميل المحاضرة','تعذّر تحميل المحاضرة');
-  }
-}
-
-/* ============ SEEK BAR (السحب يعاين، والتثبيت عند الإفلات) ============ */
-function fracAt(e){
-  const r=seek.getBoundingClientRect();
-  return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
-}
-function placeTip(x){
-  const tip=$('ptip'),w=seek.clientWidth,h=tip.offsetWidth/2;
-  tip.style.left=Math.max(h,Math.min(w-h,x*w))+'px';
-}
-seek.addEventListener('pointerdown',e=>{
-  if(!(video.duration>0))return;
-  if(e.pointerType==='mouse'&&e.button!==0)return;
-  e.stopPropagation();
-  try{seek.setPointerCapture(e.pointerId)}catch(_){}
-  const x=fracAt(e);
-  scrub={t:x*video.duration};
-  seek.classList.add('drag');
-  $('ptip').textContent=fmt(scrub.t);placeTip(x);
-  paintProgress();showUI(true);
-});
-seek.addEventListener('pointermove',e=>{
-  if(!(video.duration>0))return;
-  const x=fracAt(e);
-  $('ptip').textContent=fmt(x*video.duration);placeTip(x);
-  if(scrub){scrub.t=x*video.duration;paintProgress()}
-});
-seek.addEventListener('pointerup',()=>{
-  if(!scrub)return;
-  const t=scrub.t;scrub=null;
-  seek.classList.remove('drag');
-  video.currentTime=t;
-  paintProgress();showUI();
-});
-seek.addEventListener('pointercancel',()=>{
-  if(!scrub)return;
-  scrub=null;seek.classList.remove('drag');paintProgress();showUI();
-});
-seek.addEventListener('keydown',e=>{
-  if(!(video.duration>0))return;
-  let t=video.currentTime;
-  if(e.key==='ArrowRight')t+=5;
-  else if(e.key==='ArrowLeft')t-=5;
-  else if(e.key==='PageUp')t+=30;
-  else if(e.key==='PageDown')t-=30;
-  else if(e.key==='Home')t=0;
-  else if(e.key==='End')t=video.duration;
-  else return;
+form.addEventListener('submit',async function(e){
   e.preventDefault();
-  e.stopPropagation();
-  video.currentTime=Math.max(0,Math.min(video.duration,t));
-  showUI();
-});
-
-/* ============ BUTTONS ============ */
-$('pplay').onclick=e=>{e.stopPropagation();togglePlay()};
-$('pc').onclick=e=>{e.stopPropagation();togglePlay()};
-[['pb','pb2'],['pf','pf2']].forEach(([a,b],k)=>{
-  const side=k?'right':'left',d=k?10:-10;
-  [$(a),$(b)].forEach(el=>{el.onclick=e=>{e.stopPropagation();if(seekBy(d))flashFx(side);showUI()}});
-});
-$('pnx').onclick=e=>{e.stopPropagation();if(current<videos.length-1)playIndex(current+1,true)};
-
-/* PiP */
-if(!(document.pictureInPictureEnabled&&video.requestPictureInPicture))$('ppip').style.display='none';
-$('ppip').onclick=async e=>{
-  e.stopPropagation();
+  if(busy)return;
+  var v=norm(code.value);
+  if(!/^\d{9}$/.test(v)){fail('اكتب كود صحيح مكوّن من 9 أرقام.');code.focus();return}
+  busy=true;btn.disabled=true;btn.classList.add('busy');btxt.textContent='بنتحقق…';
+  show('','بنراجع كودك…');cells.className='cells verify';
   try{
-    if(document.pictureInPictureElement)await document.exitPictureInPicture();
-    else await video.requestPictureInPicture();
-  }catch(err){showToast('مش قادر أفتح النافذة العائمة')}
-  showUI();
-};
-video.addEventListener('enterpictureinpicture',()=>$('ppip').classList.add('active'));
-video.addEventListener('leavepictureinpicture',()=>$('ppip').classList.remove('active'));
-
-/* Fullscreen */
-const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
-function toggleFs(){
-  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen)?.call(document);return}
-  const req=screenEl.requestFullscreen||screenEl.webkitRequestFullscreen;
-  if(req){const p=req.call(screenEl);if(p&&p.catch)p.catch(()=>{})}
-  else if(video.webkitEnterFullscreen)video.webkitEnterFullscreen();
-}
-function onFsChange(){
-  const on=!!fsEl();
-  $('pfs').innerHTML=on?SVG_FS_OFF:SVG_FS_ON;
-  $('pfs').setAttribute('aria-label',on?'خروج من ملء الشاشة':'ملء الشاشة');
-  try{
-    if(on&&matchMedia('(pointer:coarse)').matches&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});
-    else if(!on&&screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
-  }catch(e){}
-  showUI();
-}
-['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,onFsChange));
-$('pfs').onclick=e=>{e.stopPropagation();toggleFs()};
-
-/* Back */
-const goBack=()=>{
-  if(history.length>1)history.back();
-  else location.href='subjects.html';
-};
-$('pback').onclick=e=>{e.stopPropagation();goBack()};
-$('backBtn').onclick=goBack;
-
-/* ============ الضغط المطوّل = سرعة 2× (زي يوتيوب) ============ */
-function startHold(e){
-  if(e.pointerType==='mouse'&&e.button!==0)return;
-  hold.x=e.clientX;hold.y=e.clientY;
-  try{$('ptap').setPointerCapture(e.pointerId)}catch(_){}   // الإصبع يفضل متتبَّع حتى لو خرج برّه الشاشة
-  clearTimeout(hold.timer);
-  hold.timer=setTimeout(()=>{
-    if(video.paused||!(video.duration>0)||isOpen()||drawerOpen())return;
-    hold.active=true;
-    video.playbackRate=2;
-    hideUI();
-    screenEl.classList.add('holding');
-    $('holdb').classList.add('show');
-    try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
-  },450);
-}
-function endHold(){
-  clearTimeout(hold.timer);
-  if(!hold.active)return;
-  hold.active=false;hold.endedAt=Date.now();
-  applyRate();
-  screenEl.classList.remove('holding');
-  $('holdb').classList.remove('show');
-}
-const ptap=$('ptap');
-ptap.addEventListener('pointerdown',e=>{lastPtype=e.pointerType||'mouse';startHold(e)});
-ptap.addEventListener('pointermove',e=>{
-  if(!hold.active&&hold.timer&&Math.hypot(e.clientX-hold.x,e.clientY-hold.y)>40)clearTimeout(hold.timer);
-});
-['pointerup','pointercancel','lostpointercapture'].forEach(n=>ptap.addEventListener(n,endHold));
-// أثناء الـ 2× حرّك صباعك براحتك: نمنع المتصفح يفسّرها سكرول فيلغي اللمسة
-ptap.addEventListener('touchmove',e=>{if(hold.active&&e.cancelable)e.preventDefault()},{passive:false});
-window.addEventListener('blur',endHold);
-ptap.addEventListener('contextmenu',e=>e.preventDefault());
-
-/* ============ اللمس والماوس على الشاشة ============ */
-const DOUBLE_TAP_DELAY=280;
-let fxAcc=0,fxAt=0,fxSide='';
-function flashFx(side){
-  const now=Date.now();
-  if(fxSide!==side||now-fxAt>900)fxAcc=0;
-  fxAcc+=10;fxAt=now;fxSide=side;
-  const fx=$(side==='left'?'fxl':'fxr');
-  fx.innerHTML=(side==='left'?SVG_RW:SVG_FF)+'<span>'+(side==='left'?'−':'+')+fxAcc+' ث</span>';
-  fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');
-}
-function doubleSeek(side){
-  if(seekBy(side==='left'?-10:10))flashFx(side);
-}
-ptap.addEventListener('click',e=>{
-  const now=Date.now();
-  if(now-hold.endedAt<400||now-menuClosedAt<400)return;
-  if(lastPtype==='mouse'){
-    // ماوس: كليك = تشغيل/إيقاف، دبل كليك = ملء الشاشة
-    clearTimeout(tap.timer);
-    tap.timer=setTimeout(togglePlay,220);
-    return;
-  }
-  // لمس: ضغطة = إظهار/إخفاء الأزرار، ضغطتين = تقديم/رجوع 10 ثواني
-  const r=screenEl.getBoundingClientRect();
-  const side=(e.clientX-r.left)<r.width/2?'left':'right';
-  if(now<tap.seekUntil&&tap.side===side){
-    clearTimeout(tap.timer);doubleSeek(side);tap.seekUntil=now+700;return;
-  }
-  if(tap.side===side&&now-tap.t<DOUBLE_TAP_DELAY){
-    clearTimeout(tap.timer);doubleSeek(side);
-    tap.seekUntil=now+700;tap.t=0;return;
-  }
-  tap.t=now;tap.side=side;
-  clearTimeout(tap.timer);
-  tap.timer=setTimeout(()=>{tap.side='';toggleUI()},DOUBLE_TAP_DELAY);
-});
-ptap.addEventListener('dblclick',e=>{
-  if(lastPtype==='mouse'){clearTimeout(tap.timer);toggleFs()}
-});
-screenEl.addEventListener('pointermove',e=>{
-  if(e.pointerType==='mouse'&&!hold.active)showUI();
-});
-screenEl.addEventListener('pointerleave',e=>{
-  if(e.pointerType==='mouse'&&!video.paused&&!isOpen()&&!scrub)hideUI();
-});
-
-/* ============ VIDEO EVENTS ============ */
-['loadedmetadata','resize'].forEach(ev=>video.addEventListener(ev,()=>{if(isOpen()&&menuView==='main')renderMenu()}));
-['progress','loadedmetadata','durationchange','seeked'].forEach(ev=>video.addEventListener(ev,()=>{paintBuffered();paintProgress()}));
-video.addEventListener('timeupdate',()=>{
-  paintProgress();paintBuffered();syncAria();
-  if(ready&&Math.abs((video.currentTime||0)-lastSaved)>4)saveProgress();
-});
-['play','playing','pause','ended'].forEach(ev=>video.addEventListener(ev,syncPlayState));
-video.addEventListener('play',()=>showUI());
-video.addEventListener('pause',()=>{saveProgress();showUI(true)});
-video.addEventListener('waiting',()=>{if(!$('error').classList.contains('show'))setLoading(true,'',true)});
-['playing','canplay'].forEach(ev=>video.addEventListener(ev,()=>{hideError();setLoading(false)}));
-video.addEventListener('error',()=>{
-  if(hls||!video.error||!video.currentSrc)return;     // لو HLS شغال هو اللي بيتعامل مع الأخطاء
-  const code=video.error.code;
-  const msg=code===2?'مشكلة في الاتصال أثناء تحميل الفيديو.':
-    code===3?'تعذّر فك ترميز الفيديو.':
-    code===4?'صيغة الفيديو أو رابط التشغيل مش مدعوم.':
-    'حصل خطأ أثناء تشغيل الفيديو.';
-  showError(msg,'تعذّر تشغيل الفيديو');
-});
-video.addEventListener('ended',()=>{
-  saveProgress();
-  if(prefs.autonext&&current<videos.length-1){
-    showToast('خلصت الفيديو ✓ — التالي حالًا');
-    const my=playToken;
-    setTimeout(()=>{if(my===playToken)playIndex(current+1,true)},1500);
-  }else{
-    showToast('خلصت الفيديو 👏');
-    showUI(true);
+    var r=await api('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify({code:v,deviceId:deviceId(),deviceName:deviceName()})},20000);
+    var d=r.data||{};
+    if(!r.ok||d.success===false)throw new Error(d.message||'الكود غير صحيح أو تعذّر التحقق منه.');
+    var p=d.data||{};
+    if(!p.token)throw new Error('السيرفر وافق على الطلب لكنه لم يُرجع توكن تسجيل الدخول.');
+    try{localStorage.removeItem('cstk_subjects')}catch(_){}
+    put('cstk_tok',p.token);
+    try{put('cstk_device',deviceId())}catch(_){}
+    try{put('cstk_me',JSON.stringify(p.student||{}))}catch(_){}
+    try{put('cstk_year',String(p.yearId||4))}catch(_){}
+    try{put('cstk_subject_ids',JSON.stringify(p.subjectIds||[]))}catch(_){}
+    saveSess(p.token,p.student||{},+p.yearId||4,p.subjectIds||[]);
+    cells.className='cells ok';btxt.textContent='تمام';
+    var nm=p.student&&p.student.name;
+    show('success','أهلاً'+(nm?' يا '+nm:' يا بطل')+'! جاري فتح موادك...');
+    setTimeout(function(){location.href='subjects.html'},600);
+  }catch(err){
+    btn.classList.remove('busy');btxt.textContent='جرّب تاني';fail(errMsg(err));
+    btn.disabled=false;busy=false;code.focus();
   }
 });
-window.addEventListener('pagehide',saveProgress);
-window.addEventListener('offline',()=>showToast('النت اتقطع'));
-window.addEventListener('online',()=>{
-  if($('error').classList.contains('show')&&errAction==='retry'&&current>=0){hideError();playIndex(current,true)}
-  else showToast('النت رجع');
-});
-
-/* ============ MEDIA SESSION (أزرار الإشعارات / شاشة القفل) ============ */
-if('mediaSession' in navigator){
-  const ms=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(e){}};
-  ms('play',()=>video.play().catch(()=>{}));
-  ms('pause',()=>video.pause());
-  ms('seekbackward',()=>seekBy(-10));
-  ms('seekforward',()=>seekBy(10));
-  ms('previoustrack',()=>{if(current>0)playIndex(current-1,true)});
-  ms('nexttrack',()=>{if(current<videos.length-1)playIndex(current+1,true)});
-  ms('seekto',d=>{if(d&&Number.isFinite(d.seekTime))video.currentTime=d.seekTime});
-}
-
-/* ============ KEYBOARD (بالـ code عشان تشتغل مع الكيبورد العربي) ============ */
-document.addEventListener('keydown',e=>{
-  if(e.ctrlKey||e.metaKey||e.altKey)return;
-  const tag=(e.target.tagName||'').toLowerCase();
-  if(tag==='input'||tag==='textarea'||tag==='select')return;
-  const c=e.code;
-  if(c==='Escape'){if(dlOpen()){closeDlModal();return}if(drawerOpen()){closeDrawer();return}closeMenu();return}
-  if(dlOpen())return;
-  if(c==='KeyQ'){e.preventDefault();toggleDrawer();return}
-  if((c==='Space'||c==='Enter')&&tag==='button')return;   // خلّي الزرار يشتغل بنفسه
-  if(c==='Space'||c==='KeyK'){e.preventDefault();togglePlay()}
-  else if(c==='ArrowLeft'){e.preventDefault();seekBy(-5);showUI()}
-  else if(c==='ArrowRight'){e.preventDefault();seekBy(5);showUI()}
-  else if(c==='KeyJ'){e.preventDefault();if(seekBy(-10))flashFx('left');showUI()}
-  else if(c==='KeyL'){e.preventDefault();if(seekBy(10))flashFx('right');showUI()}
-  else if(c==='ArrowUp'){e.preventDefault();video.muted=false;video.volume=Math.min(1,video.volume+.1);showToast('الصوت '+Math.round(video.volume*100)+'%')}
-  else if(c==='ArrowDown'){e.preventDefault();video.volume=Math.max(0,video.volume-.1);showToast('الصوت '+Math.round(video.volume*100)+'%')}
-  else if(c==='KeyM'){e.preventDefault();$('pmute').click()}
-  else if(c==='KeyF'){e.preventDefault();toggleFs()}
-  else if(c==='KeyP'&&!e.shiftKey){e.preventDefault();$('ppip').click()}
-  else if(c==='KeyN'&&e.shiftKey){e.preventDefault();$('pnx').click()}
-  else if(c==='KeyP'&&e.shiftKey){e.preventDefault();if(current>0)playIndex(current-1,true)}
-  else if(c==='Period'&&e.shiftKey){e.preventDefault();stepRate(1)}
-  else if(c==='Comma'&&e.shiftKey){e.preventDefault();stepRate(-1)}
-  else if(c==='Home'){e.preventDefault();video.currentTime=0}
-  else if(c==='End'){e.preventDefault();if(video.duration)video.currentTime=video.duration}
-  else if(/^(Digit|Numpad)[0-9]$/.test(c)&&video.duration>0){e.preventDefault();video.currentTime=video.duration*(+c.slice(-1))/10;showUI()}
-});
-
-/* ============ حالة البداية ============ */
-setRate(rate,true);
-syncVolume();
-syncPlayState();
-$('pfs').innerHTML=SVG_FS_ON;
-
-/* ============ SEARCH & FILTER ============ */
-$('videoSearch').addEventListener('input',e=>{
-  listQuery=e.target.value;
-  renderList();
-});
-document.querySelectorAll('[data-filter]').forEach(b=>{
-  b.addEventListener('click',()=>{
-    listFilter=b.dataset.filter;
-    document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
-    renderList();
-  });
-});
-
-/* ============ PREV/NEXT ============ */
-$('prevBtn').onclick=()=>{if(current>0)playIndex(current-1,true)};
-$('nextBtn').onclick=()=>{if(current<videos.length-1)playIndex(current+1,true)};
-
-/* Retry / Skip */
-$('retryBtn').onclick=()=>{
-  if(errAction==='leave'){location.href='subjects.html';return}
-  hideError();
-  if(current>=0)playIndex(current,true);else init();
-};
-$('skipBtn').onclick=()=>{
-  if(current<videos.length-1){hideError();playIndex(current+1,true)}
-};
-
-/* ============ V4: قايمة الفيديوهات داخل المشغّل ============ */
-let drawQuery='';
-function itemHTML(v,i,p){
-  const s=statusOf(p),active=i===current;
-  const th=v.thumbnail?`<img src="${esc(safeThumbUrl(v.thumbnail))}" alt="" loading="lazy" onerror="this.remove()">`:'';
-  const art=active?'<span class="eq"><i></i><i></i><i></i></span>':'<span class="pl2"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>';
-  return `<div class="item${active?' active':''}${s.done?' done':''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(v.title)}">
-      <div class="thumb">${th}${art}<span class="num">${s.done?'✓':i+1}</span><span class="duration">${fmt(v.duration)}</span><div class="mini"><i style="width:${s.done?100:s.pct}%"></i></div></div>
-      <div class="itemtxt">
-        <div class="itemtitle">${esc(v.title)}</div>
-        <div class="itemmeta">${active?'<span class="st now">يتم التشغيل</span>':''}<span class="st ${s.cls}">${s.label}</span></div>
-      </div>
-    </div>`;
-}
-function drawerOpen(){return $('pdrawer').classList.contains('open')}
-function renderDrawer(){
-  const box=$('pdrawList');if(!box)return;
-  const q=drawQuery.trim().toLocaleLowerCase();
-  const rows=videos.map((v,i)=>({v,i,p:readProgress(v.id)||{}})).filter(({v})=>!q||String(v.title).toLocaleLowerCase().includes(q));
-  const done=videos.filter(v=>{const p=readProgress(v.id);return p&&(p.watched||p.percent>=90)}).length;
-  $('pdSub').textContent=`${videos.length} فيديو · ${done} مكتمل`;
-  box.innerHTML=rows.length?rows.map(({v,i,p})=>itemHTML(v,i,p)).join(''):'<div class="empty">مفيش فيديوهات مطابقة.</div>';
-}
-function openDrawer(){
-  closeMenu(true);
-  drawQuery='';$('drawSearch').value='';
-  renderDrawer();
-  $('pdrawer').classList.add('open');$('pdrawer').setAttribute('aria-hidden','false');
-  screenEl.classList.add('drawer-open');
-  $('plist').classList.add('active');
-  showUI(true);
-  const box=$('pdrawList'),act=box.querySelector('.item.active');
-  if(act)box.scrollTop=Math.max(0,act.offsetTop-box.clientHeight/2+act.clientHeight/2);
-}
-function closeDrawer(silent){
-  if(!drawerOpen())return;
-  $('pdrawer').classList.remove('open');$('pdrawer').setAttribute('aria-hidden','true');
-  screenEl.classList.remove('drawer-open');
-  $('plist').classList.remove('active');
-  if(!silent)showUI();
-}
-function toggleDrawer(){if(drawerOpen())closeDrawer();else openDrawer()}
-$('plist').onclick=e=>{e.stopPropagation();toggleDrawer()};
-$('pdClose').onclick=e=>{e.stopPropagation();closeDrawer()};
-$('drawSearch').addEventListener('input',e=>{drawQuery=e.target.value;renderDrawer()});
-$('pdrawList').addEventListener('click',e=>{
-  const it=e.target.closest('[data-i]');if(!it)return;
-  const i=+it.dataset.i;
-  closeDrawer(true);
-  if(i!==current)playIndex(i,true);else{showToast('ده الفيديو الشغال حالياً');showUI()}
-});
-$('pdrawList').addEventListener('keydown',e=>{
-  const it=e.target.closest&&e.target.closest('[data-i]');
-  if(it&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();it.click()}
-});
-// ضغطة على الفيديو نفسه وهو مفتوح الدرج = تقفل الدرج بس
-ptap.addEventListener('click',e=>{
-  if(drawerOpen()){e.stopImmediatePropagation();closeDrawer();menuClosedAt=Date.now()}
-},true);
-
-/* ============ V4: مدير التحميل (للطالب صاحب الكود 1111111 فقط) ============ */
-const OWNER_CODE='1111111';
-const DL_ICON='<svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 19.5h15"/></svg>';
-const X_ICON='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
-const DLK='cstk_dl_';
-let isOwner=false,curManifest=null,dlTick=0;
-const keyCache={};
-const blankDl=()=>({st:'idle',id:null,title:'',thumb:'',h:0,url:'',ext:'',total:0,totalDur:0,idx:0,bytes:0,doneDur:0,est:0,fname:'',name:'',mem:null,memMode:false,blob:null,cp:{idx:0,bytes:0,dur:0},abort:null,intent:'',err:'',needRefresh:false,netErr:false,speed:0,samples:[],t0:0});
-const dl=blankDl();
-const dlUI={vars:null,loading:false,err:'',sel:0,key:'',cf:'',cft:0};
-const isActive=()=>dl.st==='preparing'||dl.st==='downloading'||dl.st==='pausing';
-const curId=()=>(current>=0&&videos[current])?String(videos[current].id):'';
-const dlOpen=()=>$('dlm').classList.contains('open');
-const L=s=>'<span class="ltr">'+s+'</span>';
-
-function fmtB(n){
-  n=Math.max(0,+n||0);
-  if(n<1024)return Math.round(n)+' B';
-  if(n<1048576)return Math.round(n/1024)+' KB';
-  if(n<1073741824)return (n/1048576).toFixed(n<10485760?2:1)+' MB';
-  return (n/1073741824).toFixed(2)+' GB';
-}
-function fmtT(s){
-  if(!Number.isFinite(s)||s<0)return '—';
-  s=Math.ceil(s);
-  if(s<60)return s+' ث';
-  if(s<3600)return Math.floor(s/60)+' د '+(s%60)+' ث';
-  return Math.floor(s/3600)+' س '+Math.floor(s%3600/60)+' د';
-}
-function pctOf(){
-  if(dl.totalDur>0)return Math.min(100,dl.doneDur/dl.totalDur*100);
-  return dl.total?Math.min(100,dl.idx/dl.total*100):0;
-}
-const absUrl=(u,base)=>new URL(u,base).href;
-function readMeta(id){try{return JSON.parse(localStorage.getItem(DLK+id)||'null')}catch(e){return null}}
-function saveMeta(done){
-  if(dl.memMode||dl.id==null||!dl.fname)return;
-  try{localStorage.setItem(DLK+dl.id,JSON.stringify({
-    id:dl.id,title:dl.title,thumb:dl.thumb,h:dl.h,ext:dl.ext,total:dl.total,totalDur:dl.totalDur,
-    idx:dl.cp.idx,bytes:dl.cp.bytes,doneDur:dl.cp.dur,est:dl.est,fname:dl.fname,name:dl.name,
-    done:!!done,updatedAt:Date.now()
-  }))}catch(e){}
-}
-function hydrate(m){
-  Object.assign(dl,blankDl(),{
-    st:m.done?'done':'paused',id:String(m.id),title:m.title||'',thumb:m.thumb||'',h:m.h||0,ext:m.ext||'',
-    total:m.total||0,totalDur:m.totalDur||0,idx:m.idx||0,bytes:m.bytes||0,doneDur:m.doneDur||0,
-    est:m.est||0,fname:m.fname||'',name:m.name||'',cp:{idx:m.idx||0,bytes:m.bytes||0,dur:m.doneDur||0}
-  });
-}
-async function wipe(id,fname){
-  if(fname&&navigator.storage&&navigator.storage.getDirectory){
-    try{const d=await navigator.storage.getDirectory();await d.removeEntry(fname)}catch(e){}
-  }
-  try{localStorage.removeItem(DLK+id)}catch(e){}
-}
-/* بنخلّي dl يعكس الفيديو الحالي لو مفيش تحميل شغال */
-function syncView(){
-  if(isActive())return;
-  const cid=curId();
-  if(dl.id!=null&&String(dl.id)===cid&&['paused','error','done'].includes(dl.st))return;
-  if(dl.memMode&&['paused','error'].includes(dl.st))return;
-  const m=cid?readMeta(cid):null;
-  if(m)hydrate(m);else Object.assign(dl,blankDl());
-}
-
-/* ---- شبكة ---- */
-async function dlFetch(url,signal,asText){
-  const r=await fetch(url,{headers:token?{Authorization:'Bearer '+token}:{},cache:'no-store',signal});
-  if(!r.ok){const er=new Error('HTTP '+r.status);er.status=r.status;throw er}
-  return asText?r.text():r.arrayBuffer();
-}
-async function dlFetchRetry(url,signal,asText){
-  for(let a=1;;a++){
-    try{return await dlFetch(url,signal,asText)}
-    catch(e){
-      if(e&&e.name==='AbortError')throw e;
-      if(e&&(e.status===401||e.status===403||e.status===404||e.status===410))throw e;
-      if(a>=3)throw e;
-      await new Promise(r=>setTimeout(r,700*a));
-      if(signal&&signal.aborted)throw new DOMException('Aborted','AbortError');
-    }
-  }
-}
-function dlFriendly(e){
-  if(!e)return 'فشل التحميل';
-  if(e.name==='QuotaExceededError')return 'مفيش مساحة كفاية على الجهاز. فضّي مساحة وكمّل.';
-  if(e.status===401||e.status===403)return 'انتهت صلاحية رابط الفيديو. دوس استكمال وهنجدّده.';
-  if(e.status)return 'السيرفر رجّع خطأ ('+e.status+'). جرّب استكمال بعد شوية.';
-  if(e instanceof TypeError)return 'النت ضعيف أو مقطوع. هيكمّل لوحده لما يرجع، أو دوس استكمال.';
-  return e.message||'فشل التحميل';
-}
-async function refreshManifest(id){
-  const r=await api('/api/play/'+encodeURIComponent(id),{method:'POST'});
-  const path=r&&r.data&&(r.data.manifest_url||r.data.play_url||r.data.url);
-  if(!r||!r.success||!path)throw new Error('تعذّر تجديد رابط الفيديو');
-  let url=new URL(path,API).href;
-  if(token && !/[?&]token=/.test(url))url+=(url.includes('?')?'&':'?')+'token='+encodeURIComponent(token);
-  return url;
-}
-
-/* ---- M3U8 ---- */
-function parseAttrs(s){
-  const o={};
-  s.replace(/([A-Z0-9-]+)=("[^"]*"|[^,]*)/g,(_,k,v)=>{o[k]=v.replace(/^"|"$/g,'');return ''});
-  return o;
-}
-function listVariants(text,base){
-  const lines=text.split(/\r?\n/).map(l=>l.trim()),out=[];
-  for(let i=0;i<lines.length;i++){
-    if(!lines[i].startsWith('#EXT-X-STREAM-INF:'))continue;
-    const a=parseAttrs(lines[i].slice(18));
-    let j=i+1;
-    while(j<lines.length&&(!lines[j]||lines[j][0]==='#'))j++;
-    if(j>=lines.length)continue;
-    out.push({url:absUrl(lines[j],base),h:+((a.RESOLUTION||'').split('x')[1])||0,bw:+a['AVERAGE-BANDWIDTH']||+a.BANDWIDTH||0});
-  }
-  out.sort((x,y)=>(y.h-x.h)||(y.bw-x.bw));
-  return out.filter((v,i,arr)=>arr.findIndex(z=>z.h===v.h)===i);
-}
-function parseMedia(text,base){
-  const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  let seq=0,key=null,map=null,wait=false,dur=0;
-  const segs=[];
-  for(const l of lines){
-    if(l.startsWith('#EXT-X-MEDIA-SEQUENCE:'))seq=+l.split(':')[1]||0;
-    else if(l.startsWith('#EXT-X-KEY:')){
-      const a=parseAttrs(l.slice(11));
-      if(a.METHOD==='NONE')key=null;
-      else if(a.METHOD==='AES-128')key={uri:absUrl(a.URI,base),iv:a.IV||null};
-      else throw new Error('نوع تشفير الفيديو مش مدعوم للتحميل');
-    }else if(l.startsWith('#EXT-X-MAP:')){
-      map=absUrl(parseAttrs(l.slice(11)).URI,base);
-    }else if(l.startsWith('#EXTINF:')){dur=parseFloat(l.slice(8))||0;wait=true}
-    else if(l[0]!=='#'&&wait){segs.push({url:absUrl(l,base),key,sn:seq+segs.length,dur});wait=false}
-  }
-  return{segs,map};
-}
-async function decryptSeg(buf,key,sn,signal){
-  let kd=keyCache[key.uri];
-  if(!kd){
-    const raw=await dlFetchRetry(key.uri,signal);
-    kd=keyCache[key.uri]=await crypto.subtle.importKey('raw',raw,{name:'AES-CBC'},false,['decrypt']);
-  }
-  const iv=new Uint8Array(16);
-  if(key.iv){
-    const hex=key.iv.replace(/^0x/i,'').padStart(32,'0');
-    for(let i=0;i<16;i++)iv[i]=parseInt(hex.substr(i*2,2),16);
-  }else{let n=sn;for(let i=15;i>=12;i--){iv[i]=n&255;n>>>=8}}
-  return crypto.subtle.decrypt({name:'AES-CBC',iv},kd,buf);
-}
-
-/* ---- تنظيف ملفات التحميل القديمة ---- */
-async function cleanOpfs(){
-  try{
-    if(!(navigator.storage&&navigator.storage.getDirectory))return;
-    const d=await navigator.storage.getDirectory();
-    const metas={};
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&k.startsWith(DLK)){const m=readMeta(k.slice(DLK.length));if(m&&m.fname)metas[m.fname]={m,k}}
-    }
-    const now=Date.now();
-    for await(const [n] of d.entries()){
-      if(/^dl_(\d+)\./.test(n)){
-        if(now-(+/^dl_(\d+)\./.exec(n)[1])>30*60*1000)await d.removeEntry(n).catch(()=>{});
-      }else if(n.startsWith('dlv_')){
-        const x=metas[n];
-        if(!x){
-          if(isActive()&&dl.fname===n)continue;
-          try{const f=await (await d.getFileHandle(n)).getFile();if(now-f.lastModified>3600000)await d.removeEntry(n)}catch(_){}
-        }else{
-          const age=now-(x.m.updatedAt||0);
-          if((x.m.done&&age>24*3600000)||(!x.m.done&&age>7*24*3600000)){
-            await d.removeEntry(n).catch(()=>{});localStorage.removeItem(x.k);
-          }
-        }
-      }
-    }
-  }catch(e){}
-}
-
-/* ---- زرار التحميل في المشغّل ---- */
-async function checkOwner(){
-  if(!token||isOwner)return;
-  try{
-    const r=await api('/api/auth/me');
-    const d=(r&&r.data)||{};
-    const code=String(d.code||(d.student&&d.student.code)||'').trim();
-    if(code===OWNER_CODE){isOwner=true;addDownloadBtn();cleanOpfs();syncView();setDlBtn()}
-  }catch(e){}
-}
-function addDownloadBtn(){
-  if($('pdl'))return;
-  const b=document.createElement('button');
-  b.className='ib dl';b.id='pdl';b.type='button';
-  b.setAttribute('aria-label','تحميل الفيديو');b.title='تحميل الفيديو';
-  b.innerHTML=DL_ICON+'<span class="dlp"></span>';
-  b.onclick=e=>{e.stopPropagation();openDlModal()};
-  document.querySelector('.prow').insertBefore(b,$('plist'));
-  setDlBtn();
-}
-function setDlBtn(){
-  const b=$('pdl');if(!b)return;
-  const show=dl.id!=null&&dl.st!=='idle'&&(isActive()||(String(dl.id)===curId()&&dl.st!=='done'));
-  b.classList.toggle('busy',!!show);
-  b.classList.toggle('paused',!!show&&!isActive());
-  const sp=b.querySelector('.dlp');
-  if(sp)sp.textContent=show?(dl.st==='preparing'?'…':Math.floor(pctOf())+'%'):'';
-  b.setAttribute('aria-label',show?'نافذة التحميل':'تحميل الفيديو');
-}
-function dlHook(){
-  if(dlOpen()){syncView();renderDl();loadVariants()}
-  setDlBtn();
-}
-
-/* ---- النافذة ---- */
-function openDlModal(){
-  try{if(fsEl())(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(_){}
-  closeMenu(true);closeDrawer(true);
-  syncView();
-  $('dlm').classList.add('open');$('dlm').setAttribute('aria-hidden','false');
-  renderDl();loadVariants();
-}
-function closeDlModal(){
-  $('dlm').classList.remove('open');$('dlm').setAttribute('aria-hidden','true');
-  dlUI.cf='';
-}
-$('dlmX').onclick=closeDlModal;
-$('dlmBg').onclick=closeDlModal;
-
-async function loadVariants(){
-  if(!curManifest)return;
-  if(dlUI.key===curManifest.url&&(dlUI.vars||dlUI.loading||dlUI.err))return;
-  dlUI.key=curManifest.url;dlUI.vars=null;dlUI.err='';dlUI.loading=true;dlUI.sel=0;
-  renderDl();
-  const key=dlUI.key;
-  try{
-    const text=await dlFetchRetry(curManifest.url,undefined,true);
-    if(key!==dlUI.key)return;
-    dlUI.vars=text.includes('#EXT-X-STREAM-INF')?listVariants(text,curManifest.url):[{url:curManifest.url,h:0,bw:0,single:true}];
-    if(!dlUI.vars.length)throw new Error('مش لاقي جودة للتحميل');
-  }catch(e){
-    if(key!==dlUI.key)return;
-    dlUI.err=e&&e.status?'تعذّر تجهيز الجودات ('+e.status+').':'تعذّر تجهيز الجودات. اتأكد من النت.';
-  }
-  dlUI.loading=false;
-  renderDl();
-}
-
-function vidCard(title,thumb,sub){
-  return `<div class="dl-vid"><div class="dl-th">${thumb?`<img src="${esc(safeThumbUrl(thumb))}" alt="" onerror="this.remove()">`:''}</div><div class="dl-vt"><b>${esc(title)}</b><span>${sub}</span></div></div>`;
-}
-function othersHTML(){
-  const rows=[];
-  videos.forEach(v=>{
-    if(dl.id!=null&&dl.st!=='idle'&&String(v.id)===String(dl.id))return;
-    const m=readMeta(v.id);
-    if(!m||m.done)return;
-    const p=m.totalDur?Math.floor(Math.min(100,(m.doneDur||0)/m.totalDur*100)):0;
-    rows.push(`<div class="dl-o"><div class="dl-ot"><b>${esc(m.title||v.title)}</b><span>${L(p+'% · '+fmtB(m.bytes))}</span></div>
-      <button type="button" class="ctrl sm primary" data-act="oresume" data-id="${esc(m.id)}">كمّل</button>
-      <button type="button" class="ctrl sm danger" data-act="odel" data-id="${esc(m.id)}">${dlUI.cf==='del'+m.id?'تأكيد؟':'حذف'}</button></div>`);
-  });
-  return rows.length?`<div class="dl-sec">تحميلات غير مكتملة في المحاضرة دي</div><div class="dl-others">${rows.join('')}</div>`:'';
-}
-function renderDl(){
-  const body=$('dlBody');
-  if(!body||!dlOpen())return;
-  let h='';
-  const st=dl.st;
-  if(dl.id==null||st==='idle'){
-    /* ---- اختيار الجودة ---- */
-    const v=videos[current];
-    if(!v){body.innerHTML='<div class="dl-empty">مفيش فيديو متاح للتحميل.</div>';return}
-    h+=vidCard(v.title,v.thumbnail,v.duration?'المدة '+L(fmt(v.duration)):'');
-    if(!curManifest)h+='<div class="dl-load"><div class="spin sm"></div>الفيديو لسه بيجهز…</div>';
-    else if(dlUI.loading)h+='<div class="dl-load"><div class="spin sm"></div>جاري تجهيز الجودات والأحجام…</div>';
-    else if(dlUI.err)h+=`<div class="dl-note err">${esc(dlUI.err)}</div><div class="dl-act"><button type="button" class="ctrl" data-act="reload">إعادة المحاولة</button></div>`;
-    else if(dlUI.vars){
-      const dur=Number(video.duration)||v.duration||0;
-      h+='<div class="dl-sec">اختار الجودة</div><div class="dl-q">'+dlUI.vars.map((q,i)=>{
-        const est=q.bw&&dur?Math.round(q.bw*dur/8):0;
-        const label=q.h?q.h+'p':'الجودة الأصلية';
-        return `<button type="button" data-q="${i}" class="${i===dlUI.sel?'on':''}"><span class="r"></span><b>${L(label)}${i===0&&dlUI.vars.length>1?' · الأعلى':''}</b><em>${est?'حوالي '+L(fmtB(est)):''}</em></button>`;
-      }).join('')+'</div>';
-      h+='<div class="dl-note">الملف بيتحمّل على جهازك. لو وقّفته أو النت قطع، تقدر تكمّل بعدين من نفس المكان بدل ما تبدأ من الصفر.</div>';
-      h+=`<div class="dl-act"><button type="button" class="ctrl primary" data-act="start">${DL_ICON}<span>بدء التحميل</span></button></div>`;
-    }
-    h+=othersHTML();
-    body.dataset.st='idle';
-    body.innerHTML=h;
-    if(curManifest&&!dlUI.vars&&!dlUI.loading&&!dlUI.err)setTimeout(loadVariants,0);
-    return;
-  }
-  /* ---- شاشة التقدم ---- */
-  const p=pctOf(),bytes=dl.bytes,est=dl.est;
-  const badge={preparing:['b','جاري التجهيز…'],downloading:['b','جاري التحميل'],pausing:['o','جاري الإيقاف…'],paused:['o','متوقف مؤقتاً'],error:['r','فشل التحميل'],done:['g','تم التحميل ✓']}[st]||['b',''];
-  const sub=L((dl.h?dl.h+'p':'جودة أصلية')+(dl.ext?' · '+dl.ext.toUpperCase():''));
-  const left=(est>bytes&&st!=='done')?est-bytes:0;
-  const eta=(st==='downloading'&&dl.speed>0&&left>0)?fmtT(left/dl.speed):'—';
-  h+=vidCard(dl.title,dl.thumb,sub);
-  h+=`<div class="dl-top"><div class="dl-pct">${st==='done'?100:Math.floor(p)}<small style="font-size:.5em">%</small></div><span class="dl-badge ${badge[0]}">${badge[1]}</span></div>`;
-  h+=`<div class="dl-bar"><i style="width:${st==='done'?100:p}%"></i></div>`;
-  h+='<div class="dl-grid">'+
-    `<div class="dl-c"><span>اتحمّل</span><b>${L(fmtB(bytes))}</b></div>`+
-    `<div class="dl-c"><span>حجم الفيديو${st==='done'?'':' (تقريبي)'}</span><b>${est||st==='done'?L((st==='done'?'':'≈ ')+fmtB(st==='done'?bytes:est)):'—'}</b></div>`+
-    `<div class="dl-c"><span>فاضل (حجم)</span><b>${left?L(fmtB(left)):'—'}</b></div>`+
-    `<div class="dl-c"><span>الوقت المتبقي</span><b>${eta}</b></div>`+
-    `<div class="dl-c"><span>السرعة</span><b>${st==='downloading'&&dl.speed>0?L(fmtB(dl.speed)+'/s'):'—'}</b></div>`+
-    `<div class="dl-c"><span>الأجزاء</span><b>${L(dl.idx+' / '+(dl.total||'—'))}</b></div></div>`;
-  if(st==='error')h+=`<div class="dl-note err">${esc(dl.err)}</div>`;
-  else if(st==='paused')h+=`<div class="dl-note">${dl.memMode?'التحميل موقوف على الذاكرة — لو قفلت الصفحة هيضيع.':'التقدم محفوظ على جهازك. دوس استكمال في أي وقت (حتى بعد ما تقفل الصفحة).'}</div>`;
-  else if(st==='downloading'&&dl.memMode)h+='<div class="dl-note">المتصفح ده بيحمّل على الذاكرة. متقفلش الصفحة لحد ما يخلص.</div>';
-  else if(st==='done')h+='<div class="dl-note">لو التنزيل ماظهرش على جهازك، دوس «حفظ الملف». الملف بيتمسح تلقائياً بعد 24 ساعة.</div>';
-  const cancelLbl=dlUI.cf==='cancel'?'اضغط تاني للتأكيد':(st==='done'?'حذف الملف':'إلغاء وحذف');
-  let act='';
-  if(st==='preparing'||st==='downloading')act=`<button type="button" class="ctrl primary" data-act="pause">${SVG_PAUSE}<span>إيقاف مؤقت</span></button><button type="button" class="ctrl danger" data-act="cancel">${X_ICON}<span>${cancelLbl}</span></button>`;
-  else if(st==='pausing')act='<button type="button" class="ctrl" disabled>جاري الإيقاف…</button>';
-  else if(st==='paused'||st==='error')act=`<button type="button" class="ctrl primary" data-act="resume">${SVG_PLAY}<span>استكمال</span></button><button type="button" class="ctrl danger" data-act="cancel">${X_ICON}<span>${cancelLbl}</span></button>`;
-  else if(st==='done')act=`<button type="button" class="ctrl primary" data-act="save">${DL_ICON}<span>حفظ الملف</span></button><button type="button" class="ctrl danger" data-act="cancel">${X_ICON}<span>${cancelLbl}</span></button>`;
-  h+=`<div class="dl-act">${act}</div>`;
-  h+=othersHTML();
-  body.dataset.st=st;
-  body.innerHTML=h;
-}
-function confirmTwice(k){
-  if(dlUI.cf===k&&Date.now()-dlUI.cft<3500){dlUI.cf='';return true}
-  dlUI.cf=k;dlUI.cft=Date.now();renderDl();
-  setTimeout(()=>{if(dlUI.cf===k){dlUI.cf='';renderDl()}},3600);
-  return false;
-}
-$('dlBody').addEventListener('click',e=>{
-  const b=e.target.closest('[data-act],[data-q]');
-  if(!b||b.disabled)return;
-  if(b.dataset.q!==undefined){dlUI.sel=+b.dataset.q;renderDl();return}
-  const a=b.dataset.act,id=b.dataset.id;
-  if(a==='start')startNew();
-  else if(a==='pause')pauseDl();
-  else if(a==='resume')resumeDl();
-  else if(a==='cancel'){if(confirmTwice('cancel'))cancelDl()}
-  else if(a==='save')saveDone();
-  else if(a==='reload'){dlUI.key='';dlUI.err='';loadVariants()}
-  else if(a==='oresume'){
-    const m=readMeta(id);if(!m)return;
-    if(isActive()){showToast('فيه تحميل شغال دلوقتي — أوقفه الأول');return}
-    hydrate(m);dl.needRefresh=true;resumeDl();
-  }else if(a==='odel'){
-    if(confirmTwice('del'+id)){const m=readMeta(id);wipe(id,m&&m.fname).then(()=>{renderDl()})}
-  }
-});
-
-/* ---- التحكم في التحميل ---- */
-async function startNew(){
-  if(isActive()){showToast('فيه تحميل شغال دلوقتي');return}
-  if(!curManifest||!dlUI.vars){showToast('الفيديو لسه بيجهز');return}
-  const v=videos[current],q=dlUI.vars[dlUI.sel]||dlUI.vars[0];
-  const dur=Number(video.duration)||v.duration||0;
-  const old=readMeta(v.id);
-  if(old)await wipe(old.id,old.fname);
-  Object.assign(dl,blankDl(),{id:String(v.id),title:v.title,thumb:v.thumbnail||'',h:q.h,url:curManifest.url,est:q.bw&&dur?Math.round(q.bw*dur/8):0});
-  runDl();
-}
-function pauseDl(){
-  if(!isActive()||dl.st==='pausing')return;
-  dl.intent='pause';dl.st='pausing';
-  renderDl();setDlBtn();
-  if(dl.abort)dl.abort.abort();
-}
-async function resumeDl(){
-  if(isActive())return;
-  dl.err='';dl.st='preparing';renderDl();setDlBtn();
-  try{
-    const cur=videos[current];
-    if(cur&&String(cur.id)===String(dl.id)&&curManifest&&!dl.needRefresh)dl.url=curManifest.url;
-    else dl.url=await refreshManifest(dl.id);
-    dl.needRefresh=false;
-  }catch(e){
-    dl.st='error';dl.err=dlFriendly(e);dl.netErr=!!(e&&!e.status);
-    renderDl();setDlBtn();return;
-  }
-  runDl();
-}
-async function cancelDl(){
-  if(isActive()){
-    dl.intent='cancel';
-    if(dl.abort)dl.abort.abort();
-    return;
-  }
-  await wipe(dl.id,dl.fname);
-  Object.assign(dl,blankDl());
-  renderDl();setDlBtn();showToast('تم الحذف');
-}
-function triggerSave(blob,name){
-  const href=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=href;a.download=name;
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(href),600000);
-}
-async function saveDone(){
-  try{
-    let f=dl.blob;
-    if(!f){
-      const d=await navigator.storage.getDirectory();
-      f=await (await d.getFileHandle(dl.fname)).getFile();
-    }
-    triggerSave(f,dl.name||('video.'+(dl.ext||'ts')));
-  }catch(e){
-    showToast('الملف مش موجود تاني — حمّله من جديد');
-    await wipe(dl.id,dl.fname);Object.assign(dl,blankDl());renderDl();setDlBtn();
-  }
-}
-function dlCalcSpeed(){
-  const now=Date.now();
-  dl.samples=dl.samples.filter(s=>now-s.t<8000);
-  const sum=dl.samples.reduce((a,s)=>a+s.b,0);
-  const win=Math.max(1,Math.min(8,(now-dl.t0)/1000));
-  dl.speed=sum/win;
-}
-
-/* ---- المحرّك ---- */
-async function runDl(){
-  const ac=new AbortController(),signal=ac.signal;
-  dl.abort=ac;dl.intent='';dl.err='';dl.st='preparing';dl.speed=0;dl.samples=[];dl.t0=Date.now();
-  Object.keys(keyCache).forEach(k=>delete keyCache[k]);
-  clearInterval(dlTick);
-  dlTick=setInterval(()=>{dlCalcSpeed();if(dlOpen())renderDl();setDlBtn()},500);
-  renderDl();setDlBtn();
-  let wr=null,fh=null,opfs=null;
-  const closeWr=async()=>{if(wr){try{await wr.close()}catch(_){}wr=null}};
-  try{
-    let text=await dlFetchRetry(dl.url,signal,true),base=dl.url;
-    if(text.includes('#EXT-X-STREAM-INF')){
-      const vs=listVariants(text,dl.url);
-      const v=vs.find(x=>x.h===dl.h)||vs[0];
-      if(!v)throw new Error('مش لاقي جودة للتحميل');
-      dl.h=v.h;
-      text=await dlFetchRetry(v.url,signal,true);base=v.url;
-    }
-    const parsed=parseMedia(text,base),segs=parsed.segs,map=parsed.map;
-    if(!segs.length)throw new Error('مفيش أجزاء فيديو للتحميل');
-    const ext=map?'mp4':'ts';
-    const totalDur=segs.reduce((a,s)=>a+s.dur,0);
-    if(dl.total!==segs.length||dl.ext!==ext){dl.idx=0;dl.bytes=0;dl.doneDur=0;dl.mem=null;dl.memMode=false}
-    dl.total=segs.length;dl.ext=ext;dl.totalDur=totalDur;
-    dl.name=(String(dl.title||'video').replace(/[\\/:*?"<>|]+/g,'-').trim()||'video')+'.'+ext;
-    dl.fname='dlv_'+String(dl.id).replace(/[^\w-]/g,'_')+'_'+(dl.h||0)+'.'+ext;
-
-    /* التخزين: على القرص (OPFS) لو متاح، وإلا على الذاكرة */
-    if(!dl.memMode&&navigator.storage&&navigator.storage.getDirectory){
-      try{
-        opfs=await navigator.storage.getDirectory();
-        let have=-1;
-        try{have=(await (await opfs.getFileHandle(dl.fname)).getFile()).size}catch(_){have=-1}
-        if(have<dl.bytes){dl.idx=0;dl.bytes=0;dl.doneDur=0}
-        fh=await opfs.getFileHandle(dl.fname,{create:true});
-        wr=await fh.createWritable({keepExistingData:true});
-        await wr.truncate(dl.bytes);await wr.seek(dl.bytes);
-      }catch(e){wr=null;fh=null}
-    }
-    if(!wr){
-      if(!dl.memMode){dl.idx=0;dl.bytes=0;dl.doneDur=0;dl.mem=[];dl.memMode=true}
-    }
-    const out=async buf=>{if(wr)await wr.write(buf);else dl.mem.push(buf)};
-    if(dl.idx===0){
-      dl.bytes=0;dl.doneDur=0;
-      if(wr){await wr.truncate(0);await wr.seek(0)}else dl.mem=[];
-      if(map){const mb=await dlFetchRetry(map,signal);await out(mb);dl.bytes+=mb.byteLength}
-    }
-    dl.cp={idx:dl.idx,bytes:dl.bytes,dur:dl.doneDur};
-    dl.st='downloading';
-    saveMeta();renderDl();setDlBtn();
-
-    const N=4;
-    while(dl.idx<segs.length){
-      if(dl.intent)throw new DOMException('Aborted','AbortError');
-      const batch=segs.slice(dl.idx,dl.idx+N);
-      const bufs=await Promise.all(batch.map(async s=>{
-        let b=await dlFetchRetry(s.url,signal);
-        if(s.key)b=await decryptSeg(b,s.key,s.sn,signal);
-        dl.samples.push({t:Date.now(),b:b.byteLength});
-        return b;
-      }));
-      for(let k=0;k<bufs.length;k++){
-        await out(bufs[k]);
-        dl.idx++;dl.bytes+=bufs[k].byteLength;dl.doneDur+=batch[k].dur;
-      }
-      if(dl.idx>=3&&dl.doneDur>0&&dl.totalDur>0)dl.est=Math.round(dl.bytes/dl.doneDur*dl.totalDur);
-      /* نقطة حفظ كل ~128MB عشان لو الصفحة اتقفلت فجأة منبدأش من الصفر */
-      if(wr&&dl.bytes-dl.cp.bytes>=128*1048576){
-        await wr.close();wr=null;
-        wr=await fh.createWritable({keepExistingData:true});
-        await wr.seek(dl.bytes);
-        dl.cp={idx:dl.idx,bytes:dl.bytes,dur:dl.doneDur};
-        saveMeta();
-      }
-    }
-    if(dl.intent==='cancel')throw new DOMException('Aborted','AbortError');
-    await closeWr();
-    dl.cp={idx:dl.idx,bytes:dl.bytes,dur:dl.doneDur};
-    let file;
-    if(fh)file=await fh.getFile();
-    else{file=new Blob(dl.mem,{type:ext==='mp4'?'video/mp4':'video/mp2t'});dl.blob=file;dl.mem=null}
-    dl.est=dl.bytes;dl.st='done';
-    saveMeta(true);
-    triggerSave(file,dl.name);
-    showToast('تم تحميل الفيديو ✓');
-  }catch(e){
-    const aborted=!!(e&&e.name==='AbortError');
-    await closeWr();
-    if(aborted&&dl.intent==='cancel'){
-      await wipe(dl.id,dl.fname);
-      Object.assign(dl,blankDl());
-      showToast('تم إلغاء التحميل');
-    }else if(aborted&&dl.intent==='pause'){
-      dl.cp={idx:dl.idx,bytes:dl.bytes,dur:dl.doneDur};
-      dl.st='paused';saveMeta();
-      showToast('تم الإيقاف — تقدر تكمّل بعدين');
-    }else{
-      dl.cp={idx:dl.idx,bytes:dl.bytes,dur:dl.doneDur};
-      dl.st='error';dl.err=dlFriendly(e);
-      dl.needRefresh=!!(e&&(e.status===401||e.status===403));
-      dl.netErr=!!(e&&!e.status&&!aborted&&e instanceof TypeError);
-      saveMeta();
-      showToast('فشل التحميل — التقدم محفوظ');
-    }
-  }finally{
-    try{ac.abort()}catch(_){}
-    dl.abort=null;dl.intent='';
-    clearInterval(dlTick);dlTick=0;dl.speed=0;
-    renderDl();setDlBtn();
-  }
-}
-window.addEventListener('online',()=>{if(dl.st==='error'&&dl.netErr)resumeDl()});
-window.addEventListener('beforeunload',e=>{if(isActive()){e.preventDefault();e.returnValue=''}});
-
-/* ============ START ============ */
-init();
-
 })();
 </script>
 </body>
