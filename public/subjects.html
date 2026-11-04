@@ -501,7 +501,7 @@ function lsSet(k,v){
 }
 function lsDel(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}try{document.cookie=k+"=;max-age=0;path=/"}catch(e){}delete MEM[k]}
 /* ⚙️ لما تغيّر السيرفر: غيّر الرابط ده بس (أو عرّف window.DOROSAK_API_BASE قبل السكريبت) */
-var API_BASE=(window.DOROSAK_API_BASE||"http://unique-transformation-production-ceaf.up.railway.app").replace(/\/$/,""),LS_API="cstk_api",LS_TOKEN="cstk_tok",LS_DEV="cstk_dev",LS_YEAR="cstk_year",HP="cstk_w_";
+var API_BASE=(window.DOROSAK_API_BASE||"https://coursatk-platform-mo7a.up.railway.app").replace(/\/$/,""),LS_API="cstk_api",LS_TOKEN="cstk_tok",LS_DEV="cstk_dev",LS_YEAR="cstk_year",HP="cstk_w_";
 var S={api:"",token:"",me:null,yearId:26,subjectIds:[],stack:[],player:null,timer:null};
 /* اختيار السنة (2026 / 2027) بيظهر لشعبة علمي علوم بس — باقي الشعب بتدخل 2027 مباشرة */
 var YEARS=[
