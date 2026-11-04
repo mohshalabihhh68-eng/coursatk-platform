@@ -1,6 +1,6 @@
 /**
  * Thanawya World API — Protected Backend
- * VERSION v1.7.5 — CORS allowlist (durosakplus.com) + New Firebase DB + Video play limit (1 video/min per token)
+ * VERSION v1.7.6 — CORS open (all origins) + Video play limit (1 video/min per token)
  */
 import express from "express";
 import cors from "cors";
@@ -46,7 +46,7 @@ const DATA_DIR = path.join(__dirname, "data");
 const MEDIA_DIR = path.join(DATA_DIR, "media");
 const TEMP_DIR = path.join(DATA_DIR, "temp_files");
 try { fs.mkdirSync(MEDIA_DIR, { recursive: true }); fs.mkdirSync(TEMP_DIR, { recursive: true }); } catch {}
-const APP_VERSION = "v1.7.5";
+const APP_VERSION = "v1.7.6";
 
 process.on("unhandledRejection", (r) => console.error("[unhandledRejection]", (r && r.stack) || r));
 process.on("uncaughtException", (e) => console.error("[uncaughtException]", (e && e.stack) || e));
@@ -71,20 +71,23 @@ for (const m of ["get", "post", "put", "patch", "delete", "use"]) {
   };
 }
 app.set("trust proxy", 1);
-// الدومينات المسموح لها تتصل بالسيرفر (تقدر تضيف غيرها من ALLOWED_ORIGINS مفصولة بفاصلة)
+// CORS مفتوح لكل المواقع (أي Origin يُسمح له + credentials)
+// لو حابب تقيّد لاحقًا: CORS_STRICT=1 + ALLOWED_ORIGINS=domain1,domain2
 const ALLOWED_ORIGINS = new Set([
   "https://www.durosakplus.com",
   "https://durosakplus.com",
   ...String(process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean)
 ]);
-// CORS_STRICT=1 → يسمح للدومينات اللي فوق بس. غير كده (الافتراضي) كل الدومينات القديمة تفضل شغالة.
 const CORS_STRICT = process.env.CORS_STRICT === "1";
 app.use(cors({
   credentials: true,
   origin: (origin, cb) => {
+    // بدون Origin (مثل curl/تطبيقات) → اسمح
     if (!origin) return cb(null, true);
-    if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-    return cb(null, !CORS_STRICT);
+    // وضع صارم: الدومينات المسموحة فقط
+    if (CORS_STRICT) return cb(null, ALLOWED_ORIGINS.has(origin));
+    // الافتراضي: افتح لكل المواقع واعكس الـ Origin عشان credentials تشتغل
+    return cb(null, true);
   }
 }));
 app.use(express.json({ limit: "20mb" }));
