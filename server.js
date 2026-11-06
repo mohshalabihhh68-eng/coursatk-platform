@@ -1,6 +1,6 @@
 /**
  * Thanawya World API — Protected Backend
- * VERSION v1.7.6 — CORS open (all origins) + Video play limit (1 video/min per token)
+ * VERSION v1.7.2 — Full Analytics (Visits + Grouped Watch History + Student Tracker)
  */
 import express from "express";
 import cors from "cors";
@@ -46,7 +46,7 @@ const DATA_DIR = path.join(__dirname, "data");
 const MEDIA_DIR = path.join(DATA_DIR, "media");
 const TEMP_DIR = path.join(DATA_DIR, "temp_files");
 try { fs.mkdirSync(MEDIA_DIR, { recursive: true }); fs.mkdirSync(TEMP_DIR, { recursive: true }); } catch {}
-const APP_VERSION = "v1.7.6";
+const APP_VERSION = "v1.7.2";
 
 process.on("unhandledRejection", (r) => console.error("[unhandledRejection]", (r && r.stack) || r));
 process.on("uncaughtException", (e) => console.error("[uncaughtException]", (e && e.stack) || e));
@@ -71,25 +71,7 @@ for (const m of ["get", "post", "put", "patch", "delete", "use"]) {
   };
 }
 app.set("trust proxy", 1);
-// CORS مفتوح لكل المواقع (أي Origin يُسمح له + credentials)
-// لو حابب تقيّد لاحقًا: CORS_STRICT=1 + ALLOWED_ORIGINS=domain1,domain2
-const ALLOWED_ORIGINS = new Set([
-  "https://www.durosakplus.com",
-  "https://durosakplus.com",
-  ...String(process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean)
-]);
-const CORS_STRICT = process.env.CORS_STRICT === "1";
-app.use(cors({
-  credentials: true,
-  origin: (origin, cb) => {
-    // بدون Origin (مثل curl/تطبيقات) → اسمح
-    if (!origin) return cb(null, true);
-    // وضع صارم: الدومينات المسموحة فقط
-    if (CORS_STRICT) return cb(null, ALLOWED_ORIGINS.has(origin));
-    // الافتراضي: افتح لكل المواقع واعكس الـ Origin عشان credentials تشتغل
-    return cb(null, true);
-  }
-}));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "20mb" }));
 // طلب Client Hints من المتصفح (موديل الجهاز وغيره)
 app.use((req, res, next) => {
@@ -365,7 +347,6 @@ function rateLimit(options = {}) {
   const banMs = options.banMs || 5 * 60_000;
   const skip = options.skip;
   const keyFn = options.keyFn;
-  const limitMessage = options.message || "طلبات كثيرة — حاول بعد قليل";
   return (req, res, next) => {
     if (skip && skip(req)) return next();
     const ip = keyFn ? keyFn(req) : clientIp(req);
@@ -392,7 +373,7 @@ function rateLimit(options = {}) {
       if (banAfter > 0 && b.hits429 >= banAfter) banBuckets.set(banKey, Date.now() + banMs);
       const sec = Math.ceil((b.resetAt - t) / 1000);
       res.setHeader("Retry-After", String(Math.max(1, sec)));
-      return res.status(429).json({ success: false, message: limitMessage });
+      return res.status(429).json({ success: false, message: "طلبات كثيرة — حاول بعد قليل" });
     }
     next();
   };
@@ -480,7 +461,7 @@ const CONFIG = {
   STREAM_X_REQUESTED_WITH: "com.mycompany.app.soulbrowser",
   STREAM_UA: "Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 Chrome/153.0.0.0 Mobile Safari/537.36",
   PLAYER_JS: "https://player.stream-weave.com/assets/player.js?v=1.1.1",
-  FIREBASE: process.env.FIREBASE_URL || "https://plus-f09b5-default-rtdb.firebaseio.com",
+  FIREBASE: process.env.FIREBASE_URL || "",
   BOOTSTRAP_ADMIN: {
     username: process.env.ADMIN_USER || "admin",
     passwordHash: "",
@@ -3051,16 +3032,7 @@ async function getStreamSession(id, touch = true) {
   return s;
 }
 
-// ليميت الفيديوهات: كل توكن طالب = فيديو واحد فقط في الدقيقة
-const playLimiter = rateLimit({
-  max: 1,
-  windowMs: 60_000,
-  scope: "video-play",
-  keyFn: (req) => "tok:" + (req.sessionToken || getBearer(req) || clientIp(req)),
-  message: "وصلت للحد الأقصى: فيديو واحد فقط في الدقيقة — استنى شوية وجرّب تاني"
-});
-
-app.post("/api/play/:videoId", requireStudent, playLimiter, async (req, res) => {
+app.post("/api/play/:videoId", requireStudent, async (req, res) => {
   try {
     let videoId = String(req.params.videoId);
     if (CONFIG.THANAWICA_ENABLED && /^thv_\d+$/i.test(videoId)) {
@@ -3098,9 +3070,7 @@ app.post("/api/play/:videoId", requireStudent, playLimiter, async (req, res) => 
     const sessionRow = { id, src, videoId: src.videoId, ownerCode: req.session.code, ownerToken: req.sessionToken, ownerDeviceId: deviceId, streamKey, createdAt: now(), lastUsed: now() };
     streamSessions.set(id, sessionRow);
     persistStreamSession(sessionRow).catch(() => {});
-    const hlsPath = `/api/hls/${id}/master.m3u8?sk=${streamKey}`;
-    // play_url + manifest_url للتوافق مع كل نسخ الفرونت
-    res.json({ success: true, data: { play_url: hlsPath, manifest_url: hlsPath } });
+    res.json({ success: true, data: { play_url: `/api/hls/${id}/master.m3u8?sk=${streamKey}` } });
   } catch (e) {
     try { const yt = await tryResolveYoutube(String(req.params.videoId || "")); if (yt) return res.json({ success: true, data: { type: "youtube", youtube_url: yt, url: yt } }); } catch {}
     console.error("[play]", e.message);
